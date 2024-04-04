@@ -63,11 +63,18 @@ export class AuthService {
     if (!response2)
       throw new BadRequestException({ message: 'Cannot get cmu basic info' });
 
+    const firstName: string =
+      response2.firstname_EN.charAt(0) +
+      response2.firstname_EN.slice(1).toLowerCase();
+    const lastName: string =
+      response2.lastname_EN.charAt(0) +
+      response2.lastname_EN.slice(1).toLowerCase();
+
     //create session
     const user = {
       cmuAccount: response2.cmuitaccount,
-      firstName: response2.firstname_EN,
-      lastName: response2.lastname_EN,
+      firstName,
+      lastName,
       studentId: response2.student_id,
       type: response2.itaccounttype_id,
     };
