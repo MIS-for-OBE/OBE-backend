@@ -1,10 +1,31 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import config from './config/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+import { RepoInterceptor } from './common/interceptor/repo.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app: NestExpressApplication = await NestFactory.create(AppModule);
+
   app.setGlobalPrefix('api/v1');
-  await app.listen(config().port);
+  app.enableCors();
+
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.useGlobalInterceptors(new RepoInterceptor());
+  
+  // const setup = new DocumentBuilder()
+  //   .setTitle('MIS for OBE API')
+  //   // .setDescription('description')
+  //   .setVersion('1.0')
+  //   .build();
+  // const document = SwaggerModule.createDocument(app, setup);
+  // SwaggerModule.setup('', app, document, {
+  //   customSiteTitle: 'MIS for OBE API',
+  //   customfavIcon: '../cmu-logo.png',
+  // });
+
+  const port = parseInt(process.env.PORT);
+  await app.listen(port);
 }
 bootstrap();

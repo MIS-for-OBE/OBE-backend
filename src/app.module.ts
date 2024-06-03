@@ -1,14 +1,22 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import config from './config/config';
-import { AuthModule } from './auth/auth.module';
+import configuration from './config/configuration';
 import { SwaggerModule } from './swagger/swagger.module';
+import { AuthModule } from './auth/auth.module';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { DatabaseModule } from './database/database.module';
+import { UserModule } from './obe/user/user.module';
+import { AcademicYearModule } from './obe/academicYear/academicYear.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+    ConfigModule.forRoot({ load: [configuration], isGlobal: true }),
     AuthModule,
-    SwaggerModule,
+    AuthenticationModule,
+    // DB
+    DatabaseModule,
+    AcademicYearModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],
