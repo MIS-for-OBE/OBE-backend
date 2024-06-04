@@ -15,8 +15,8 @@ import { AcademicYearModule } from './obe/academicYear/academicYear.module';
     AuthenticationModule,
     // DB
     DatabaseModule,
-    AcademicYearModule,
     UserModule,
+    AcademicYearModule,
   ],
   controllers: [],
   providers: [],

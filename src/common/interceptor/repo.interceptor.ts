@@ -3,28 +3,27 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  Logger,
 } from '@nestjs/common';
+import * as chalk from 'chalk';
+import { log } from 'console';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable()
-export class RepoInterceptor implements NestInterceptor {
+export class DocumentInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(DocumentInterceptor.name);
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next.handle().pipe(map((data) => this.transformId(data)));
-  }
-
-  private transformId(document: any): any {
-    if (Array.isArray(document)) {
-      return document.map((doc) => this.replaceId(doc));
-    }
-    return this.replaceId(document);
-  }
-
-  private replaceId(doc: any): any {
-    if (doc && doc._id) {
-      doc.id = doc._id;
-      delete doc._id;
-    }
-    return doc;
+    const request = context.switchToHttp().getRequest();
+    this.logger.log(
+      `Interceptor handling request ${request.method} ${request.url}`,
+    );
+    return next.handle().pipe(
+      map((data) => {
+        log(chalk.cyan(`Response: ${JSON.stringify(data)}`));
+        return data;
+      }),
+    );
   }
 }
