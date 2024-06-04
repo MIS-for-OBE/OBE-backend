@@ -37,8 +37,8 @@ export class User {
   @Prop({ required: true })
   facultyCode: string;
 
-  @Prop({ enum: DEPARTMENT_CODE })
-  departmentCode: string;
+  @Prop()
+  departmentCode: string[];
 
   @Prop({ required: true, enum: ROLE })
   role: string;
