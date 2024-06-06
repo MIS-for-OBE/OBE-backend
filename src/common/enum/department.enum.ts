@@ -1,16 +1,16 @@
 export enum DEPARTMENT_CODE {
-  CE,
-  EE,
-  ENV,
-  ME,
-  IE,
-  MN,
-  CPE,
-  ISNE,
-  ME_INTER,
-  REAI,
-  INTEGRATION,
-  IE_INTER,
+  CE = 'CE',
+  EE = 'EE',
+  ENV = 'ENV',
+  ME = 'ME',
+  IE = 'IE',
+  MN = 'MN',
+  CPE = 'CPE',
+  ISNE = 'ISNE',
+  ME_INTER = 'ME_INTER',
+  REAI = 'REAI',
+  INTEGRATION = 'INTEGRATION',
+  IE_INTER = 'IE_INTER',
 }
 
 export enum DEPARTMENT_TH {

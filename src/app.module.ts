@@ -7,6 +7,8 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { DatabaseModule } from './database/database.module';
 import { UserModule } from './obe/user/user.module';
 import { AcademicYearModule } from './obe/academicYear/academicYear.module';
+import { CourseManagementModule } from './obe/courseManagement/courseManagement.module';
+import { LogEventModule } from './obe/logEvent/logEvent.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { AcademicYearModule } from './obe/academicYear/academicYear.module';
     // DB
     DatabaseModule,
     UserModule,
+    LogEventModule,
+    CourseManagementModule,
     AcademicYearModule,
   ],
   controllers: [],

@@ -5,5 +5,8 @@ export default () => ({
     uri: process.env.DB_URI,
     dbName: process.env.DB_NAME,
   },
-  API_CPE: process.env.BASE_API_CPE,
+  CPE_CONFIG: {
+    url: process.env.BASE_API_CPE,
+    token: process.env.TOKEN_API_CPE,
+  },
 });
