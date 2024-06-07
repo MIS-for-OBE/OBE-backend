@@ -15,6 +15,7 @@ import { LogEventService } from './logEvent.service';
 import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
 import { LogEvent } from './schemas/logEvent.schema';
 import { LogEventSearchDTO } from './dto/search.dto';
+import { LogEventDTO } from './dto/dto';
 
 @Controller('/logEvents')
 export class LogEventController {
@@ -36,7 +37,7 @@ export class LogEventController {
   @UseInterceptors(new ErrorInterceptor())
   async createLogEvent(
     @Request() req,
-    @Body() requestDTO: LogEvent,
+    @Body() requestDTO: LogEventDTO,
   ): Promise<ResponseDTO<LogEvent>> {
     return this.service
       .createLogEvent(req.user.id, requestDTO)

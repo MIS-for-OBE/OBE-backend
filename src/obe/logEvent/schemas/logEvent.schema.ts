@@ -21,17 +21,17 @@ export class LogEvent {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;
 
-  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' } })
-  course: Course;
-
-  @Prop()
-  sectionDetect: string[];
-
   @Prop({ required: true, enum: LOG_EVENT_TYPE })
   type: LOG_EVENT_TYPE;
 
   @Prop({ required: true })
   event: string;
+
+  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' } })
+  course: Course;
+
+  @Prop()
+  sectionDetect: number[];
 }
 
 export const LogEventSchema = SchemaFactory.createForClass(LogEvent);

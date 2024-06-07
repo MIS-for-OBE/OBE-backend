@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Request,
   UseInterceptors,
@@ -14,7 +15,10 @@ import { ResponseDTO } from 'src/common/dto/response.dto';
 import { AcademicYearService } from './academicYear.service';
 import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
 import { AcademicYearSearchDTO } from './dto/search.dto';
-import { AcademicYear } from './schemas/academicYear.schema';
+import {
+  AcademicYear,
+  AcademicYearDocument,
+} from './schemas/academicYear.schema';
 
 @Controller('/academicYears')
 export class AcademicYearController {
@@ -40,6 +44,21 @@ export class AcademicYearController {
   ): Promise<ResponseDTO<AcademicYear>> {
     return this.service
       .createAcademicYear(req.user.id, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<AcademicYear>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
+  }
+
+  @Put('/:id')
+  @UseInterceptors(new ErrorInterceptor())
+  async activeAcademicYear(
+    @Request() req,
+    @Param('id') id: string,
+  ): Promise<ResponseDTO<AcademicYear>> {
+    return this.service
+      .activeAcademicYear(req.user.id, id)
       .then((result) => {
         const responseDTO = new ResponseDTO<AcademicYear>();
         responseDTO.data = result;

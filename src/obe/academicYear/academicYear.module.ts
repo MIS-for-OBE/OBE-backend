@@ -6,6 +6,8 @@ import {
   AcademicYear,
   AcademicYearSchema,
 } from './schemas/academicYear.schema';
+import { LogEventService } from '../logEvent/logEvent.service';
+import { LogEventModel } from '../logEvent/logEvent.module';
 
 export const AcademicYearModel = {
   name: AcademicYear.name,
@@ -13,8 +15,8 @@ export const AcademicYearModel = {
 };
 
 @Module({
-  imports: [MongooseModule.forFeature([AcademicYearModel])],
+  imports: [MongooseModule.forFeature([AcademicYearModel, LogEventModel])],
   controllers: [AcademicYearController],
-  providers: [AcademicYearService],
+  providers: [AcademicYearService, LogEventService],
 })
 export class AcademicYearModule {}
