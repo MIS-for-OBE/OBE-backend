@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { LogEvent } from './schemas/logEvent.schema';
-import { User } from '../user/schemas/user.schema';
 import { LogEventSearchDTO } from './dto/search.dto';
 import { LogEventDTO } from './dto/dto';
 

@@ -69,7 +69,7 @@ export class DocumentInterceptor implements NestInterceptor {
             ...(_.includes(['GET', 'DELETE'], req.method)
               ? { query: req.query }
               : {
-                  body: JSON.stringify(req.body),
+                  body: req.body,
                   query: _.isEmpty(req.query) ? undefined : req.query,
                 }),
           }),
