@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {
-  AcademicYear,
-  AcademicYearDocument,
-} from './schemas/academicYear.schema';
+import { AcademicYear } from './schemas/academicYear.schema';
 import { AcademicYearSearchDTO } from './dto/search.dto';
 import { LogEventService } from '../logEvent/logEvent.service';
 import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
 import { LogEventDTO } from '../logEvent/dto/dto';
-import { now } from 'lodash';
 
 @Injectable()
 export class AcademicYearService {
@@ -23,8 +19,6 @@ export class AcademicYearService {
   ): Promise<AcademicYear[]> {
     return await this.model
       .find()
-      .populate('creator')
-      .populate('modifier')
       .skip((searchDTO.page - 1) * searchDTO.limit)
       .limit(searchDTO.limit);
   }
@@ -33,12 +27,9 @@ export class AcademicYearService {
     const res = await this.model.create({
       year: requestDTO.year,
       semester: requestDTO.semester,
-      creator: id,
-      modifier: id,
     });
     const logEventDTO = new LogEventDTO();
-    logEventDTO.type = LOG_EVENT_TYPE.ADMIN;
-    logEventDTO.event = this.setEventDesc('Create', res.semester, res.year);
+    this.setLogEvent(logEventDTO, 'Create', res.semester, res.year);
     await this.logEventService.createLogEvent(id, logEventDTO);
     return res;
   }
@@ -50,16 +41,11 @@ export class AcademicYearService {
     await this.model.findOneAndUpdate({ isActive: true }, { isActive: false });
     const res = await this.model.findByIdAndUpdate(
       academicYearId,
-      {
-        isActive: true,
-        modifier: id,
-        updatedAt: now(),
-      },
+      { isActive: true },
       { new: true },
     );
     const logEventDTO = new LogEventDTO();
-    logEventDTO.type = LOG_EVENT_TYPE.ADMIN;
-    logEventDTO.event = this.setEventDesc('Active', res.semester, res.year);
+    this.setLogEvent(logEventDTO, 'Active', res.semester, res.year);
     await this.logEventService.createLogEvent(id, logEventDTO);
     return res;
   }
@@ -67,13 +53,18 @@ export class AcademicYearService {
   async deleteAcademicYear(id: string): Promise<AcademicYear> {
     const res = await this.model.findByIdAndDelete(id);
     const logEventDTO = new LogEventDTO();
-    logEventDTO.type = LOG_EVENT_TYPE.ADMIN;
-    logEventDTO.event = this.setEventDesc('Delete', res.semester, res.year);
+    this.setLogEvent(logEventDTO, 'Delete', res.semester, res.year);
     await this.logEventService.createLogEvent(id, logEventDTO);
     return res;
   }
 
-  private setEventDesc(action: string, semester: number, year: number) {
-    return `${action} Academic Year ${semester}/${year}`;
+  private setLogEvent(
+    logEventDTO: LogEventDTO,
+    action: string,
+    semester: number,
+    year: number,
+  ) {
+    logEventDTO.type = LOG_EVENT_TYPE.ADMIN;
+    logEventDTO.event = `${action} Academic Year ${semester}/${year}`;
   }
 }

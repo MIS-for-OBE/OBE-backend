@@ -26,13 +26,18 @@ export enum EVALUATE_TYPE {
   P = 'P',
 }
 
-export enum TQF {
+export enum TQF_TYPE {
   TQF3 = 'TQF3',
   TQF5 = 'TQF5',
 }
 
 export enum TQF_STATUS {
-  NOT_START = 'Not Start',
+  NO_DATA = 'No Data',
   IN_PROGRESS = 'In Progress',
   DONE = 'Done',
+}
+
+export enum OWNER_REF {
+  COURSE = 'Course',
+  SECTION = 'Section',
 }

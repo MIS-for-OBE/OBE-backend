@@ -9,6 +9,8 @@ import { UserModule } from './obe/user/user.module';
 import { AcademicYearModule } from './obe/academicYear/academicYear.module';
 import { CourseManagementModule } from './obe/courseManagement/courseManagement.module';
 import { LogEventModule } from './obe/logEvent/logEvent.module';
+import { CourseModule } from './obe/course/course.module';
+import { SectionModule } from './obe/section/section.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { LogEventModule } from './obe/logEvent/logEvent.module';
     LogEventModule,
     CourseManagementModule,
     AcademicYearModule,
+    CourseModule,
+    SectionModule,
   ],
   controllers: [],
   providers: [],
