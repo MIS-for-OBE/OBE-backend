@@ -13,7 +13,10 @@ import {
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { CourseManagementService } from './courseManagement.service';
 import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
-import { CourseManagement } from './schemas/courseManagement.schema';
+import {
+  CourseManagement,
+  CourseManagementDocument,
+} from './schemas/courseManagement.schema';
 
 @Controller('/courseManagements')
 export class CourseManagementController {
@@ -35,12 +38,12 @@ export class CourseManagementController {
   @UseInterceptors(new ErrorInterceptor())
   async createCourseManagement(
     @Request() req,
-    @Body() requestDTO: CourseManagement,
-  ): Promise<ResponseDTO<any>> {
+    @Body() requestDTO: CourseManagementDocument,
+  ): Promise<ResponseDTO<CourseManagement>> {
     return this.service
-      .createCourseManagement(requestDTO, req.user)
+      .createCourseManagement(req.user.id, requestDTO)
       .then((result) => {
-        const responseDTO = new ResponseDTO<any>();
+        const responseDTO = new ResponseDTO<CourseManagement>();
         responseDTO.data = result;
         return responseDTO;
       });

@@ -1,15 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { DEPARTMENT_CODE } from 'src/common/enum/department.enum';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { User } from 'src/obe/user/schemas/user.schema';
 
 export type CourseManagementDocument = HydratedDocument<CourseManagement>;
 
 @Schema()
-class SectionManagement {
+export class SectionManagement {
   @Prop({ required: true })
   sectionNo: number;
+
+  @Prop()
+  topic: string;
 
   @Prop({ required: true })
   semester: number[];
@@ -17,11 +19,15 @@ class SectionManagement {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   instructor: User;
 
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
+  coInstructor: User[];
+
   @Prop({ required: true, default: true })
   isActive: boolean;
 }
 
-const SectionManagementSchema = SchemaFactory.createForClass(SectionManagement);
+export const SectionManagementSchema =
+  SchemaFactory.createForClass(SectionManagement);
 
 @Schema({
   versionKey: false,
@@ -31,7 +37,7 @@ const SectionManagementSchema = SchemaFactory.createForClass(SectionManagement);
       delete ret._id;
     },
   },
-  timestamps: { createdAt: true, updatedAt: true },
+  timestamps: true,
   collection: 'courseManagements',
 })
 export class CourseManagement {
@@ -50,8 +56,8 @@ export class CourseManagement {
   @Prop({ required: true, enum: COURSE_TYPE })
   type: COURSE_TYPE;
 
-  @Prop({ required: true, enum: DEPARTMENT_CODE })
-  dapartmentCode: DEPARTMENT_CODE;
+  // @Prop({ required: true, enum: DEPARTMENT_CODE })
+  // dapartmentCode: DEPARTMENT_CODE;
 
   @Prop({ type: [SectionManagementSchema] })
   sections: SectionManagement[];

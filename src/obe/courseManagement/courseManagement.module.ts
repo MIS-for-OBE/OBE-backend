@@ -6,6 +6,7 @@ import {
   CourseManagement,
   CourseManagementSchema,
 } from './schemas/courseManagement.schema';
+import { UserModel } from '../user/user.module';
 
 export const CourseManagementModel = {
   name: CourseManagement.name,
@@ -13,7 +14,7 @@ export const CourseManagementModel = {
 };
 
 @Module({
-  imports: [MongooseModule.forFeature([CourseManagementModel])],
+  imports: [MongooseModule.forFeature([CourseManagementModel, UserModel])],
   controllers: [CourseManagementController],
   providers: [CourseManagementService],
 })

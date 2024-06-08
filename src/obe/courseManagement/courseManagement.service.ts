@@ -5,16 +5,15 @@ import {
   CourseManagement,
   CourseManagementDocument,
 } from './schemas/courseManagement.schema';
-import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { COURSE_TYPE } from 'src/common/enum/type.enum';
-import { DEPARTMENT_CODE } from 'src/common/enum/department.enum';
+import { User } from '../user/schemas/user.schema';
 
 @Injectable()
 export class CourseManagementService {
   constructor(
     @InjectModel(CourseManagement.name)
     private readonly model: Model<CourseManagement>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -25,7 +24,10 @@ export class CourseManagementService {
       .limit(searchDTO.limit);
   }
 
-  async createCourseManagement(requestDTO: any, user: any): Promise<any> {
+  async createCourseManagement(
+    id: string,
+    requestDTO: CourseManagementDocument,
+  ): Promise<CourseManagement> {
     // const cpeConfig = this.configService.get('CPE_CONFIG');
     // const courseCPE = await axios.get(`${cpeConfig.url}/course/detail`, {
     //   params: { courseNo: '261' },
@@ -47,15 +49,11 @@ export class CourseManagementService {
     //   }
     // });
     // return course
-    // return await this.model.insertMany(course);
-    // return await this.model.create({
-    //   year: requestDTO.year,
-    //   semester: requestDTO.semester,
-    //   creator: user.id,
-    // });
+    // const user = await this.userModel.findById(id);
+    return await this.model.create(requestDTO);
   }
 
-  // async deleteCourseManagement(id: string): Promise<CourseManagement> {
-  //   return await this.model.findByIdAndDelete(id);
-  // }
+  async deleteCourseManagement(id: string): Promise<CourseManagement> {
+    return await this.model.findByIdAndDelete(id);
+  }
 }
