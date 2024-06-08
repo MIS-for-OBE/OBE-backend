@@ -1,11 +1,21 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { AcademicYear } from 'src/obe/academicYear/schemas/academicYear.schema';
 import { Section } from 'src/obe/section/schemas/section.schema';
+import { TQF } from 'src/obe/tqf/schemas/tqf.schema';
 
 export type CourseDocument = HydratedDocument<Course>;
 
-@Schema({ versionKey: false })
+@Schema({
+  versionKey: false,
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret._id;
+      delete ret._id;
+    },
+  },
+})
 export class Course {
   @Prop({
     required: true,
@@ -15,19 +25,31 @@ export class Course {
   academicYear: AcademicYear;
 
   @Prop({ required: true })
-  courseNo: number;
+  courseNo: Number;
 
   @Prop({ required: true })
-  courseName: string;
+  courseName: String;
+
+  @Prop({ required: true, enum: COURSE_TYPE })
+  type: COURSE_TYPE;
 
   @Prop({
     required: true,
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Section' }],
   })
   sections: Section[];
+
+  @Prop()
+  isProcessTQF3: boolean;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
+  TQF3: TQF;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
+  TQF5: TQF;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course).index(
-  { courseNo: 1, academicYear: 1 },
+  { academicYear: 1, courseNo: 1 },
   { unique: true },
 );
