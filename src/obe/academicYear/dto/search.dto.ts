@@ -1,6 +1,6 @@
-import { IsNumber } from 'class-validator';
+import { IsBoolean, IsNumber } from 'class-validator';
 import { SearchDTO } from 'src/common/dto/search.dto';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class AcademicYearSearchDTO extends SearchDTO {
   @IsNumber()
@@ -10,4 +10,11 @@ export class AcademicYearSearchDTO extends SearchDTO {
   @IsNumber()
   @Type(() => Number)
   semester = 1;
+
+  @IsBoolean()
+  @Transform((transformFn) => {
+    if (transformFn.value === 'true') return true;
+    else return false;
+  })
+  manage = false;
 }

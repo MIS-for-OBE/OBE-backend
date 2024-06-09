@@ -1,5 +1,6 @@
 import { IsBoolean, IsNumber, IsString } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+import { SortOrder } from 'mongoose';
 
 export class SearchDTO {
   @IsNumber()
@@ -34,7 +35,7 @@ export class SearchDTO {
 
   @IsString()
   @Type(() => String)
-  orderType = '';
+  orderType = '' as SortOrder;
 
   @IsString()
   @Type(() => String)

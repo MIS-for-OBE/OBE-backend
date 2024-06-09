@@ -10,6 +10,8 @@ import {
   Query,
   Request,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { AcademicYearService } from './academicYear.service';
@@ -26,6 +28,7 @@ export class AcademicYearController {
 
   @Get()
   @UseInterceptors(new ErrorInterceptor())
+  @UsePipes(new ValidationPipe({ transform: true }))
   async searchAll(
     @Query() searchDTO: AcademicYearSearchDTO,
   ): Promise<ResponseDTO<AcademicYear[]>> {
