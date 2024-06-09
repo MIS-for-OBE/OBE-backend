@@ -20,7 +20,7 @@ export class SectionManagement {
   instructor: User;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
-  coInstructor: User[];
+  coInstructors: User[];
 
   @Prop({ required: true, default: true })
   isActive: boolean;

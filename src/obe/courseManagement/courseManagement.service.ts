@@ -29,6 +29,16 @@ export class CourseManagementService {
     requestDTO: CourseManagementDocument,
   ): Promise<CourseManagement> {
     // const cpeConfig = this.configService.get('CPE_CONFIG');
+    // const instructorCPE = await axios.get(`${cpeConfig.url}/teacher`, {
+    //   headers: { Authorization: 'Bearer ' + cpeConfig.token },
+    // });
+    // const instructor = [];
+    // instructorCPE.data.teachers.forEach((e: any, i: number) => {
+    //   e.role = ROLE.INSTRUCTOR;
+    //   e.facultyCode = '06';
+    //   e.email = i;
+    // });
+    // return await this.userModel.insertMany(instructorCPE.data.teachers);
     // const courseCPE = await axios.get(`${cpeConfig.url}/course/detail`, {
     //   params: { courseNo: '261' },
     //   headers: { Authorization: 'Bearer ' + cpeConfig.token },
