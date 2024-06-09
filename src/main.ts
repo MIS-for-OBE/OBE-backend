@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { DocumentInterceptor } from './common/interceptor/repo.interceptor';
+import { json } from 'express';
 
 async function bootstrap() {
   const app: NestExpressApplication = await NestFactory.create(AppModule);
@@ -13,6 +14,7 @@ async function bootstrap() {
   app.enableCors();
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.use(json({ limit: '50mb' }));
 
   // const setup = new DocumentBuilder()
   //   .setTitle('MIS for OBE API')

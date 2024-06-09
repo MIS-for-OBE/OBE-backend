@@ -9,12 +9,15 @@ import {
   Query,
   Request,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { CourseService } from './course.service';
 import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
 import { Course, CourseDocument } from './schemas/course.schema';
 import { CourseManagementDocument } from '../courseManagement/schemas/courseManagement.schema';
+import { CourseSearchDTO } from './dto/search.dto';
 
 @Controller('/courses')
 export class CourseController {
@@ -22,8 +25,12 @@ export class CourseController {
 
   @Get()
   @UseInterceptors(new ErrorInterceptor())
-  async searchAll(@Query() searchDTO: any): Promise<ResponseDTO<Course[]>> {
-    return this.service.searchCourse(searchDTO).then((result) => {
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async searchCourse(
+    @Request() req,
+    @Query() searchDTO: CourseSearchDTO,
+  ): Promise<ResponseDTO<Course[]>> {
+    return this.service.searchCourse(req.user.id, searchDTO).then((result) => {
       const responseDTO = new ResponseDTO<Course[]>();
       responseDTO.data = result;
       return responseDTO;

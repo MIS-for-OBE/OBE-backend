@@ -11,6 +11,7 @@ import {
   SectionManagement,
 } from '../courseManagement/schemas/courseManagement.schema';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
+import { CourseSearchDTO } from './dto/search.dto';
 
 @Injectable()
 export class CourseService {
@@ -22,11 +23,43 @@ export class CourseService {
     private readonly configService: ConfigService,
   ) {}
 
-  async searchCourse(searchDTO: any): Promise<Course[]> {
-    return await this.model
-      .find()
-      .skip((searchDTO.page - 1) * searchDTO.limit)
-      .limit(searchDTO.limit);
+  async searchCourse(
+    id: string,
+    searchDTO: CourseSearchDTO,
+  ): Promise<Course[]> {
+    if (searchDTO.manage) {
+      return await this.model
+        .find({ academicYear: searchDTO.academicYear })
+        .skip((searchDTO.page - 1) * searchDTO.limit)
+        .limit(searchDTO.limit);
+    } else {
+      const sections = await this.sectionModel.find({
+        $or: [{ instructor: id }, { coInstructors: id }],
+      });
+      const courses = await this.model
+        .find({
+          academicYear: searchDTO.academicYear,
+          sections: { $in: sections.map((e) => e.id) },
+        })
+        .populate({
+          path: 'sections',
+          populate: [
+            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+          ],
+        })
+        .skip((searchDTO.page - 1) * searchDTO.limit)
+        .limit(searchDTO.limit);
+      const filterCourses = courses.map((course) => {
+        course.sections = course.sections.filter(
+          (section: any) =>
+            section.instructor.id == id ||
+            section.coInstructors.some((coIns) => coIns.id == id),
+        );
+        return course;
+      });
+      return filterCourses;
+    }
   }
 
   async createCourse(id: string, requestDTO: any): Promise<any> {
@@ -83,9 +116,10 @@ export class CourseService {
     }
     const newCourse = await this.model.create(data);
 
-    return await (
-      await newCourse.populate('academicYear')
-    ).populate('sections');
+    return await newCourse.populate([
+      { path: 'academicYear' },
+      { path: 'sections' },
+    ]);
   }
 
   // async deleteCourse(id: string): Promise<Course> {
