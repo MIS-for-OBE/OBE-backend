@@ -29,6 +29,15 @@ export class UserController {
     });
   }
 
+  @Get('instructor')
+  async getInstructor(@Request() req): Promise<ResponseDTO<User[]>> {
+    return this.service.getInstructor().then((result) => {
+      const responseDTO = new ResponseDTO<User[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Put()
   async updateUser(
     @Request() req,
