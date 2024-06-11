@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { Course } from './schemas/course.schema';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../user/schemas/user.schema';
 import { Section } from '../section/schemas/section.schema';
 import { CourseManagementService } from '../courseManagement/courseManagement.service';
-import {
-  CourseManagementDocument,
-  SectionManagement,
-} from '../courseManagement/schemas/courseManagement.schema';
+import { SectionManagement } from '../courseManagement/schemas/courseManagement.schema';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { CourseSearchDTO } from './dto/search.dto';
+import { isNumeric } from 'validator';
 
 @Injectable()
 export class CourseService {
@@ -34,11 +32,25 @@ export class CourseService {
       const sections = await this.sectionModel.find({
         $or: [{ instructor: id }, { coInstructors: id }],
       });
+      const where = {
+        academicYear: searchDTO.academicYear,
+        sections: { $in: sections.map((e) => e.id) },
+      };
+      if (searchDTO.search.length) {
+        if (isNumeric(searchDTO.search)) {
+          where['$expr'] = {
+            $regexMatch: {
+              input: { $toString: '$courseNo' },
+              regex: searchDTO.search,
+              options: 'i',
+            },
+          };
+        } else {
+          where['courseName'] = { $regex: searchDTO.search, $options: 'i' };
+        }
+      }
       const courses = await this.model
-        .find({
-          academicYear: searchDTO.academicYear,
-          sections: { $in: sections.map((e) => e.id) },
-        })
+        .find(where)
         .populate({
           path: 'sections',
           populate: [
@@ -57,7 +69,7 @@ export class CourseService {
         );
         return course;
       });
-      if (searchDTO.page == 1) {
+      if (searchDTO.page == 1 && !searchDTO.search.length) {
         const totalCount = await this.model.countDocuments({
           academicYear: searchDTO.academicYear,
           sections: { $in: sections.map((e) => e.id) },

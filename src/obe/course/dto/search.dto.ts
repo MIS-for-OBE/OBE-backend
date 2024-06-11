@@ -6,11 +6,15 @@ export class CourseSearchDTO extends SearchDTO {
   @IsString()
   @Type(() => String)
   academicYear = '';
-  
+
   @IsBoolean()
   @Transform((transformFn) => {
     if (transformFn.value === 'true') return true;
     else return false;
   })
   manage = false;
+
+  @IsString()
+  @Type(() => String)
+  search = '';
 }
