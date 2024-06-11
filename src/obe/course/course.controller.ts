@@ -29,9 +29,9 @@ export class CourseController {
   async searchCourse(
     @Request() req,
     @Query() searchDTO: CourseSearchDTO,
-  ): Promise<ResponseDTO<Course[]>> {
+  ): Promise<ResponseDTO<any>> {
     return this.service.searchCourse(req.user.id, searchDTO).then((result) => {
-      const responseDTO = new ResponseDTO<Course[]>();
+      const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
     });
@@ -44,7 +44,7 @@ export class CourseController {
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<Course>> {
     return this.service.createCourse(req.user.id, requestDTO).then((result) => {
-      const responseDTO = new ResponseDTO<any>();
+      const responseDTO = new ResponseDTO<Course>();
       responseDTO.data = result;
       return responseDTO;
     });

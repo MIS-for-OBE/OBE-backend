@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Course } from './schemas/course.schema';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../user/schemas/user.schema';
@@ -23,13 +23,11 @@ export class CourseService {
     private readonly configService: ConfigService,
   ) {}
 
-  async searchCourse(
-    id: string,
-    searchDTO: CourseSearchDTO,
-  ): Promise<Course[]> {
+  async searchCourse(id: string, searchDTO: CourseSearchDTO): Promise<any> {
     if (searchDTO.manage) {
       return await this.model
         .find({ academicYear: searchDTO.academicYear })
+        .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
     } else {
@@ -48,6 +46,7 @@ export class CourseService {
             { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
           ],
         })
+        .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
       const filterCourses = courses.map((course) => {
@@ -58,6 +57,13 @@ export class CourseService {
         );
         return course;
       });
+      if (searchDTO.page == 1) {
+        const totalCount = await this.model.countDocuments({
+          academicYear: searchDTO.academicYear,
+          sections: { $in: sections.map((e) => e.id) },
+        });
+        return { totalCount, courses: filterCourses };
+      }
       return filterCourses;
     }
   }
