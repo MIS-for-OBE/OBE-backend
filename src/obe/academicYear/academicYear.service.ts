@@ -19,13 +19,17 @@ export class AcademicYearService {
   ): Promise<AcademicYear[]> {
     const academicYear = await this.model
       .find()
-      .sort([[searchDTO.orderBy, searchDTO.orderType]])
+      .sort([
+        [searchDTO.orderBy, searchDTO.orderType],
+        ['semester', searchDTO.orderType],
+      ])
       .skip((searchDTO.page - 1) * searchDTO.limit)
       .limit(searchDTO.limit);
     if (searchDTO.manage) {
       return academicYear;
     } else {
-      return academicYear.slice(academicYear.findIndex((e) => e.isActive));
+      const index = academicYear.findIndex((e) => e.isActive);
+      return academicYear.slice(index, index + 15);
     }
   }
 
