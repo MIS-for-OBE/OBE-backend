@@ -7,6 +7,8 @@ import {
 } from './schemas/courseManagement.schema';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../user/schemas/user.schema';
+import { LogEventDTO } from '../logEvent/dto/dto';
+import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
 
 @Injectable()
 export class CourseManagementService {
@@ -28,42 +30,26 @@ export class CourseManagementService {
     id: string,
     requestDTO: CourseManagementDocument,
   ): Promise<CourseManagement> {
-    // const cpeConfig = this.configService.get('CPE_CONFIG');
-    // const instructorCPE = await axios.get(`${cpeConfig.url}/teacher`, {
-    //   headers: { Authorization: 'Bearer ' + cpeConfig.token },
-    // });
-    // const instructor = [];
-    // instructorCPE.data.teachers.forEach((e: any, i: number) => {
-    //   e.role = ROLE.INSTRUCTOR;
-    //   e.facultyCode = '06';
-    //   e.email = i;
-    // });
-    // return await this.userModel.insertMany(instructorCPE.data.teachers);
-    // const courseCPE = await axios.get(`${cpeConfig.url}/course/detail`, {
-    //   params: { courseNo: '261' },
-    //   headers: { Authorization: 'Bearer ' + cpeConfig.token },
-    // });
-    // const course = [];
-    // courseCPE.data.courseDetails.forEach((e: any) => {
-    //   if (e.courseNo.startsWith('261')) {
-    //     course.push({
-    //       courseNo: e.courseNo,
-    //       courseName: e.courseNameEN,
-    //       updatedYear: e.updatedYear,
-    //       updatedSemester: e.updatedSemester,
-    //       type: e.courseNameEN.startsWith('Selected Topics')
-    //         ? COURSE_TYPE.SEL_TOPIC
-    //         : COURSE_TYPE.GENERAL,
-    //       dapartmentCode: DEPARTMENT_CODE.CPE,
-    //     });
-    //   }
-    // });
-    // return course
-    // const user = await this.userModel.findById(id);
     return await this.model.create(requestDTO);
+  }
+
+  async updateCourseManagement(
+    id: string,
+    requestDTO: any,
+  ): Promise<CourseManagement> {
+    return await this.model.findByIdAndUpdate(id, requestDTO, { new: true });
   }
 
   async deleteCourseManagement(id: string): Promise<CourseManagement> {
     return await this.model.findByIdAndDelete(id);
+  }
+
+  private setLogEvent(
+    logEventDTO: LogEventDTO,
+    action: string,
+    courseNo: number,
+  ) {
+    logEventDTO.type = LOG_EVENT_TYPE.COURSE_MANAGEMENT;
+    logEventDTO.event = `${action} Course ${courseNo}`;
   }
 }

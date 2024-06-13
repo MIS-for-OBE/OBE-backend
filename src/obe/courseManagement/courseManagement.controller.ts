@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Request,
   UseInterceptors,
@@ -49,18 +50,36 @@ export class CourseManagementController {
       });
   }
 
-  // @Delete('/:id')
-  // @UseInterceptors(new ErrorInterceptor())
-  // async deleteCourseManagement(
-  //   @Param('id') id: string,
-  // ): Promise<ResponseDTO<CourseManagement>> {
-  //   return this.service.deleteCourseManagement(id).then((result) => {
-  //     if (!result) {
-  //       throw new BadRequestException('CourseManagement not found.');
-  //     }
-  //     const responseDTO = new ResponseDTO<CourseManagement>();
-  //     responseDTO.data = result;
-  //     return responseDTO;
-  //   });
-  // }
+  @Put('/:id')
+  @UseInterceptors(new ErrorInterceptor())
+  async updateCourseManagement(
+    @Param('id') id: string,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<CourseManagement>> {
+    return this.service
+      .updateCourseManagement(id, requestDTO)
+      .then((result) => {
+        if (!result) {
+          throw new BadRequestException('CourseManagement not found.');
+        }
+        const responseDTO = new ResponseDTO<CourseManagement>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
+  }
+
+  @Delete('/:id')
+  @UseInterceptors(new ErrorInterceptor())
+  async deleteCourseManagement(
+    @Param('id') id: string,
+  ): Promise<ResponseDTO<CourseManagement>> {
+    return this.service.deleteCourseManagement(id).then((result) => {
+      if (!result) {
+        throw new BadRequestException('CourseManagement not found.');
+      }
+      const responseDTO = new ResponseDTO<CourseManagement>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
 }

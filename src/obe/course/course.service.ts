@@ -80,38 +80,7 @@ export class CourseService {
     }
   }
 
-  async createCourse(id: string, requestDTO: any): Promise<any> {
-    // const cpeConfig = this.configService.get('CPE_CONFIG');
-    // const courseCPE = await axios.get(`${cpeConfig.url}/course/detail`, {
-    //   params: { courseNo: '261' },
-    //   headers: { Authorization: 'Bearer ' + cpeConfig.token },
-    // });
-    // const course = [];
-    // courseCPE.data.courseDetails.forEach((e: any) => {
-    //   if (e.courseNo.startsWith('261')) {
-    //     course.push({
-    //       courseNo: e.courseNo,
-    //       courseName: e.courseNameEN,
-    //       updatedYear: e.updatedYear,
-    //       updatedSemester: e.updatedSemester,
-    //       type: e.courseNameEN.startsWith('Selected Topics')
-    //         ? COURSE_TYPE.SEL_TOPIC
-    //         : COURSE_TYPE.GENERAL,
-    //       dapartmentCode: DEPARTMENT_CODE.CPE,
-    //     });
-    //   }
-    // });
-    // return course
-
-    // const newCourseManagement: any = await this.courseManagementModel.create({
-    //   courseNo: requestDTO.courseNo,
-    //   courseName: requestDTO.courseName,
-    //   updatedYear: requestDTO.updatedYear,
-    //   updatedSemester: requestDTO.updatedSemester,
-    //   type: requestDTO.type,
-    //   sections: requestDTO.sections,
-    // });
-
+  async createCourse(id: string, requestDTO: any): Promise<Course> {
     const newCourseManagement: any =
       await this.courseManagementService.createCourseManagement(id, requestDTO);
     requestDTO.sections.forEach((e: Section) => {
@@ -140,7 +109,11 @@ export class CourseService {
     ]);
   }
 
-  // async deleteCourse(id: string): Promise<Course> {
-  //   return await this.model.findByIdAndDelete(id);
-  // }
+  async updateCourse(id: string, requestDTO: any): Promise<Course> {
+    return await this.model.findByIdAndUpdate(id, requestDTO, { new: true });
+  }
+
+  async deleteCourse(id: string): Promise<Course> {
+    return await this.model.findByIdAndDelete(id);
+  }
 }

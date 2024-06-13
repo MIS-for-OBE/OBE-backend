@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Request,
   UseInterceptors,
@@ -50,18 +51,32 @@ export class CourseController {
     });
   }
 
-  // @Delete('/:id')
-  // @UseInterceptors(new ErrorInterceptor())
-  // async deleteCourse(
-  //   @Param('id') id: string,
-  // ): Promise<ResponseDTO<Course>> {
-  //   return this.service.deleteCourse(id).then((result) => {
-  //     if (!result) {
-  //       throw new BadRequestException('Course not found.');
-  //     }
-  //     const responseDTO = new ResponseDTO<Course>();
-  //     responseDTO.data = result;
-  //     return responseDTO;
-  //   });
-  // }
+  @Put('/:id')
+  @UseInterceptors(new ErrorInterceptor())
+  async updateCourse(
+    @Param('id') id: string,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<Course>> {
+    return this.service.updateCourse(id, requestDTO).then((result) => {
+      if (!result) {
+        throw new BadRequestException('Course not found.');
+      }
+      const responseDTO = new ResponseDTO<Course>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Delete('/:id')
+  @UseInterceptors(new ErrorInterceptor())
+  async deleteCourse(@Param('id') id: string): Promise<ResponseDTO<Course>> {
+    return this.service.deleteCourse(id).then((result) => {
+      if (!result) {
+        throw new BadRequestException('Course not found.');
+      }
+      const responseDTO = new ResponseDTO<Course>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
 }
