@@ -15,7 +15,6 @@ import { User } from './schemas/user.schema';
 import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
 
 @Controller('/user')
-@UsePipes(new ValidationPipe({ transform: true }))
 @UseInterceptors(new ErrorInterceptor())
 export class UserController {
   constructor(private service: UserService) {}
