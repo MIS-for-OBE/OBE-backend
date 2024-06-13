@@ -40,6 +40,9 @@ export class Course {
   sections: Section[];
 
   @Prop()
+  addFirstTime: boolean;
+
+  @Prop()
   isProcessTQF3: boolean;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })

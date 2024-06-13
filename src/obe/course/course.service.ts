@@ -97,6 +97,7 @@ export class CourseService {
     let data: Course = {
       ...requestDTO,
       sections: newSecion.map((e) => e.id),
+      addFirstTime: true,
     };
     if (requestDTO.type == COURSE_TYPE.GENERAL) {
       data.isProcessTQF3 = true;
