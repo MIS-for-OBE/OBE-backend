@@ -19,7 +19,7 @@ import {
   CourseManagementDocument,
 } from './schemas/courseManagement.schema';
 
-@Controller('/courseManagements')
+@Controller('/courseManagement')
 export class CourseManagementController {
   constructor(private service: CourseManagementService) {}
 

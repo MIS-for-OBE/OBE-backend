@@ -19,7 +19,7 @@ import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
 import { Course } from './schemas/course.schema';
 import { CourseSearchDTO } from './dto/search.dto';
 
-@Controller('/courses')
+@Controller('/course')
 export class CourseController {
   constructor(private service: CourseService) {}
 

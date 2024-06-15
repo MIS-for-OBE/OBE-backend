@@ -22,7 +22,7 @@ import {
   AcademicYearDocument,
 } from './schemas/academicYear.schema';
 
-@Controller('/academicYears')
+@Controller('/academicYear')
 export class AcademicYearController {
   constructor(private service: AcademicYearService) {}
 
