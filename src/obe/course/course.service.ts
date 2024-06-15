@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Course } from './schemas/course.schema';
-import { ConfigService } from '@nestjs/config';
 import { User } from '../user/schemas/user.schema';
 import { Section } from '../section/schemas/section.schema';
 import { CourseManagementService } from '../courseManagement/courseManagement.service';
-import { SectionManagement } from '../courseManagement/schemas/courseManagement.schema';
+import {
+  CourseManagement,
+  SectionManagement,
+} from '../courseManagement/schemas/courseManagement.schema';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { CourseSearchDTO } from './dto/search.dto';
 import { isNumeric } from 'validator';
@@ -16,9 +18,10 @@ export class CourseService {
   constructor(
     @InjectModel(Course.name) private readonly model: Model<Course>,
     @InjectModel(Section.name) private readonly sectionModel: Model<Section>,
+    @InjectModel(CourseManagement.name)
+    private readonly courseManagementModel: Model<CourseManagement>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly courseManagementService: CourseManagementService,
-    private readonly configService: ConfigService,
   ) {}
 
   async searchCourse(id: string, searchDTO: CourseSearchDTO): Promise<any> {
@@ -111,10 +114,22 @@ export class CourseService {
   }
 
   async updateCourse(id: string, requestDTO: any): Promise<Course> {
-    return await this.model.findByIdAndUpdate(id, requestDTO, { new: true });
+    const updateCourse: any = await this.model.findByIdAndUpdate(
+      id,
+      requestDTO,
+    );
+    await this.courseManagementModel.findOneAndUpdate(
+      { courseNo: updateCourse.courseNo },
+      requestDTO,
+    );
+    return { ...updateCourse._doc, ...requestDTO };
   }
 
   async deleteCourse(id: string): Promise<Course> {
-    return await this.model.findByIdAndDelete(id);
+    const deleteCourse = await this.model.findByIdAndDelete(id);
+    await this.courseManagementModel.findOneAndDelete({
+      courseNo: deleteCourse.courseNo,
+    });
+    return deleteCourse;
   }
 }

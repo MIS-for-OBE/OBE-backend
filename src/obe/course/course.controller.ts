@@ -16,8 +16,7 @@ import {
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { CourseService } from './course.service';
 import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
-import { Course, CourseDocument } from './schemas/course.schema';
-import { CourseManagementDocument } from '../courseManagement/schemas/courseManagement.schema';
+import { Course } from './schemas/course.schema';
 import { CourseSearchDTO } from './dto/search.dto';
 
 @Controller('/courses')
