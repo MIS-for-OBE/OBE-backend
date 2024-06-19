@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { BaseDTO } from 'src/common/dto/base.dto';
 import { User } from 'src/obe/user/schemas/user.schema';
 
@@ -71,6 +71,121 @@ export class CmuOAuthBasicInfoDTO extends BaseDTO {
 
   @IsString()
   itaccounttype_EN: string;
+}
+
+export class CmuOAuthStdInfoDTO extends BaseDTO {
+  @IsString()
+  student_id: string;
+
+  @IsString()
+  prename_id: string;
+
+  @IsString()
+  prename_TH: string;
+
+  @IsString()
+  prename_EN: string;
+
+  @IsString()
+  first_name_TH: string;
+
+  @IsString()
+  last_name_TH: string;
+
+  @IsString()
+  first_name_EN: string;
+
+  @IsString()
+  last_name_EN: string;
+
+  @IsString()
+  faculty_mis_id: string;
+
+  @IsString()
+  faculty_code: string;
+
+  @IsString()
+  faculty_name_TH: string;
+
+  @IsString()
+  faculty_name_EN: string;
+
+  @IsNumber()
+  department_id: number;
+
+  @IsString()
+  department_name_TH: string;
+
+  @IsString()
+  department_name_EN: string;
+
+  @IsNumber()
+  status_id: number;
+
+  @IsString()
+  status_name: string;
+
+  @IsString()
+  cmuitaccount: string;
+}
+
+export class CmuOAuthEmpInfoDTO extends BaseDTO {
+  @IsString()
+  Email: string;
+
+  @IsString()
+  PrenameTha: string;
+
+  @IsString()
+  PrenameEng: string;
+
+  @IsString()
+  NameTha: string;
+
+  @IsString()
+  MiddleNameTha: string;
+
+  @IsString()
+  SurNameTha: string;
+
+  @IsString()
+  NameEng: string;
+
+  @IsString()
+  MiddleNameEng: string;
+
+  @IsString()
+  SurNameEng: string;
+
+  @IsString()
+  WorkStatusNameTha: string;
+
+  @IsString()
+  PositionNameTha: string;
+
+  @IsString()
+  OrganizationID1: string;
+
+  @IsString()
+  OrganizationName1: string;
+
+  @IsString()
+  OrganizationID2: string;
+
+  @IsNumber()
+  OrganizationName2: number;
+
+  @IsString()
+  OrganizationID3: string;
+
+  @IsString()
+  OrganizationName3: string;
+
+  @IsNumber()
+  OrganizationID4: number;
+
+  @IsString()
+  OrganizationName4: string;
 }
 
 export class TokenDTO extends BaseDTO {
