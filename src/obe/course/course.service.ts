@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Course } from './schemas/course.schema';
@@ -69,7 +69,7 @@ export class CourseService {
           (section: any) =>
             section.instructor.id == id ||
             section.coInstructors.some((coIns) => coIns.id == id),
-        );
+        );        
         return course;
       });
       if (searchDTO.page == 1 && !searchDTO.search.length) {
@@ -83,13 +83,54 @@ export class CourseService {
     }
   }
 
+  async searchOneCourse(id: string, searchDTO: any): Promise<Course> {
+    const course = await this.model
+      .findOne({
+        academicYear: searchDTO.academicYear,
+        courseNo: searchDTO.courseNo,
+      })
+      .populate({
+        path: 'sections',
+        populate: [
+          { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+          { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+        ],
+      });
+    course.sections = course.sections.filter(
+      (section: any) =>
+        section.instructor.id == id ||
+        section.coInstructors.some((coIns) => coIns.id == id),
+    );
+    return course;
+  }
+
   async createCourse(id: string, requestDTO: any): Promise<Course> {
-    const newCourseManagement: any =
+    const existCourseManagement = await this.courseManagementModel.findOne({
+      courseNo: requestDTO.courseNo,
+    });
+    if (existCourseManagement) {
+      const existSection = [];
+      requestDTO.sections.forEach((e: any) => {
+        existCourseManagement.sections.find(
+          (sec: any) => sec.sectionNo == e.sectionNo,
+        );
+      });
+      if (existSection.length) {
+        throw new BadRequestException(
+          `section ${existSection.map((e: string, index) => `${index == existSection.length - 1 ? e : e + ', '}`)} has been already added.`,
+        );
+      } else {
+        await existCourseManagement.updateOne({
+          updatedYear: requestDTO.updatedYear,
+          updatedSemester: requestDTO.updatedSemester,
+          $push: { sections: requestDTO.sections },
+        });
+      }
+    } else {
+      // const newCourseManagement: any =
       await this.courseManagementService.createCourseManagement(id, requestDTO);
+    }
     requestDTO.sections.forEach((e: Section) => {
-      e.sectionManage = newCourseManagement.sections.find(
-        (c: SectionManagement) => c.sectionNo == e.sectionNo,
-      ).id;
       if (requestDTO.type == COURSE_TYPE.SEL_TOPIC) {
         e.isProcessTQF3 = true;
       }

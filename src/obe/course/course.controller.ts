@@ -37,6 +37,22 @@ export class CourseController {
     });
   }
 
+  @Get('/one')
+  @UseInterceptors(new ErrorInterceptor())
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async searchOneCourse(
+    @Request() req,
+    @Query() searchDTO: CourseSearchDTO,
+  ): Promise<ResponseDTO<Course>> {
+    return this.service
+      .searchOneCourse(req.user.id, searchDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<Course>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
+  }
+
   @Post()
   @UseInterceptors(new ErrorInterceptor())
   async createCourse(
