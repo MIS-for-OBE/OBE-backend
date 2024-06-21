@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 // import { Assignment } from 'src/obe/assignment/schemas/assignment.schema';
-import { SectionManagement } from 'src/obe/courseManagement/schemas/courseManagement.schema';
 import { TQF } from 'src/obe/tqf/schemas/tqf.schema';
 import { User } from 'src/obe/user/schemas/user.schema';
 
@@ -17,13 +16,6 @@ export type SectionDocument = HydratedDocument<Section>;
   },
 })
 export class Section {
-  @Prop({
-    required: true,
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'SectionManagement',
-  })
-  sectionManage: SectionManagement;
-
   @Prop({ required: true })
   sectionNo: number;
 

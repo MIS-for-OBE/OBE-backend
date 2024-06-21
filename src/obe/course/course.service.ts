@@ -5,10 +5,7 @@ import { Course } from './schemas/course.schema';
 import { User } from '../user/schemas/user.schema';
 import { Section } from '../section/schemas/section.schema';
 import { CourseManagementService } from '../courseManagement/courseManagement.service';
-import {
-  CourseManagement,
-  SectionManagement,
-} from '../courseManagement/schemas/courseManagement.schema';
+import { CourseManagement } from '../courseManagement/schemas/courseManagement.schema';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { CourseSearchDTO } from './dto/search.dto';
 import { isNumeric } from 'validator';
@@ -37,7 +34,7 @@ export class CourseService {
       });
       const where = {
         academicYear: searchDTO.academicYear,
-        sections: { $in: sections.map((e) => e.id) },
+        sections: { $in: sections.map((section) => section.id) },
       };
       if (searchDTO.search.length) {
         if (isNumeric(searchDTO.search)) {
@@ -69,13 +66,13 @@ export class CourseService {
           (section: any) =>
             section.instructor.id == id ||
             section.coInstructors.some((coIns) => coIns.id == id),
-        );        
+        );
         return course;
       });
       if (searchDTO.page == 1 && !searchDTO.search.length) {
         const totalCount = await this.model.countDocuments({
           academicYear: searchDTO.academicYear,
-          sections: { $in: sections.map((e) => e.id) },
+          sections: { $in: sections.map((section) => section.id) },
         });
         return { totalCount, courses: filterCourses };
       }
@@ -104,20 +101,24 @@ export class CourseService {
     return course;
   }
 
-  async createCourse(id: string, requestDTO: any): Promise<Course> {
+  async createCourse(id: string, requestDTO: any): Promise<any> {
     const existCourseManagement = await this.courseManagementModel.findOne({
       courseNo: requestDTO.courseNo,
     });
     if (existCourseManagement) {
       const existSection = [];
-      requestDTO.sections.forEach((e: any) => {
-        existCourseManagement.sections.find(
-          (sec: any) => sec.sectionNo == e.sectionNo,
-        );
+      requestDTO.sections.forEach((section: any) => {
+        if (
+          existCourseManagement.sections.find(
+            (existSec: any) => existSec.sectionNo == section.sectionNo,
+          )
+        ) {
+          existSection.push(section.sectionNo);
+        }
       });
       if (existSection.length) {
         throw new BadRequestException(
-          `section ${existSection.map((e: string, index) => `${index == existSection.length - 1 ? e : e + ', '}`)} has been already added.`,
+          `Section ${existSection.join(', ')} has been already added.`,
         );
       } else {
         await existCourseManagement.updateOne({
@@ -127,31 +128,54 @@ export class CourseService {
         });
       }
     } else {
-      // const newCourseManagement: any =
       await this.courseManagementService.createCourseManagement(id, requestDTO);
     }
-    requestDTO.sections.forEach((e: Section) => {
+    requestDTO.sections.forEach((section: Section) => {
       if (requestDTO.type == COURSE_TYPE.SEL_TOPIC) {
-        e.isProcessTQF3 = true;
+        section.isProcessTQF3 = true;
       }
     });
 
     const newSecion = await this.sectionModel.insertMany(requestDTO.sections);
 
-    let data: Course = {
+    const courseData: Course = {
       ...requestDTO,
-      sections: newSecion.map((e) => e.id),
+      sections: newSecion.map((section) => section.id),
       addFirstTime: true,
     };
     if (requestDTO.type == COURSE_TYPE.GENERAL) {
-      data.isProcessTQF3 = true;
+      courseData.isProcessTQF3 = true;
     }
-    const newCourse = await this.model.create(data);
 
-    return await newCourse.populate([
-      { path: 'academicYear' },
-      { path: 'sections' },
-    ]);
+    let course = await this.model.findOne({
+      academicYear: requestDTO.academicYear,
+      courseNo: requestDTO.courseNo,
+    });
+    if (course) {
+      await course.updateOne(
+        { $push: { sections: courseData.sections } },
+        { new: true },
+      );
+      course = await this.model.findOne({
+        academicYear: requestDTO.academicYear,
+        courseNo: requestDTO.courseNo,
+      });
+    } else {
+      course = await this.model.create(courseData);
+    }
+    await course.populate({
+      path: 'sections',
+      populate: [
+        { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+        { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+      ],
+    });
+    course.sections = course.sections.filter(
+      (section: any) =>
+        section.instructor.id == id ||
+        section.coInstructors.some((coIns: any) => coIns.id == id),
+    );
+    return course;
   }
 
   async updateCourse(id: string, requestDTO: any): Promise<Course> {
