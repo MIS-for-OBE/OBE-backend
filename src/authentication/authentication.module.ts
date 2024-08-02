@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModel } from 'src/obe/user/user.module';
+import { FacultyModel } from 'src/obe/faculty/faculty.module';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { UserModel } from 'src/obe/user/user.module';
       }),
       inject: [ConfigService],
     }),
-    MongooseModule.forFeature([UserModel]),
+    MongooseModule.forFeature([UserModel, FacultyModel]),
   ],
   controllers: [AuthenticationController],
   providers: [AuthenticationService],

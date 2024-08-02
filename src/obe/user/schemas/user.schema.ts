@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { DEPARTMENT_CODE } from 'src/common/enum/department.enum';
 import { ROLE } from 'src/common/enum/role.enum';
 import { Course } from 'src/obe/course/schemas/course.schema';
 
@@ -37,8 +36,8 @@ export class User {
   @Prop({ required: true })
   facultyCode: string;
 
-  @Prop({ type: [String], enum: DEPARTMENT_CODE })
-  departmentCode: DEPARTMENT_CODE[];
+  @Prop()
+  departmentCode: string[];
 
   @Prop({ required: true, enum: ROLE })
   role: string;

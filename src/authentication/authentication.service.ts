@@ -13,17 +13,14 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/obe/user/schemas/user.schema';
 import { CMU_OAUTH_ROLE, ROLE } from 'src/common/enum/role.enum';
 import { InjectModel } from '@nestjs/mongoose';
-import { getEnumByValue } from 'src/common/function/function';
-import {
-  DEPARTMENT_CODE,
-  DEPARTMENT_TH,
-} from 'src/common/enum/department.enum';
+import { Faculty } from 'src/obe/faculty/schemas/faculty.schema';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     private jwtService: JwtService,
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Faculty.name) private readonly facultyModel: Model<Faculty>,
   ) {}
 
   private async getOAuthAccessTokenAsync(
@@ -101,6 +98,7 @@ export class AuthenticationService {
       firstNameEN: user.firstNameEN,
       lastNameEN: user.lastNameEN,
       role: user.role,
+      facultyCode: user.facultyCode,
     } as UserDocument;
     if (user.studentId) {
       payload.studentId = user.studentId;
@@ -150,12 +148,10 @@ export class AuthenticationService {
           const stdInfo = await this.getCMUStdInfoAsync(accessToken);
           data.studentId = basicInfo.student_id;
           data.role = ROLE.STUDENT;
-          data.departmentCode = [
-            getEnumByValue(
-              DEPARTMENT_TH,
-              stdInfo.department_name_TH,
-            ) as DEPARTMENT_CODE,
-          ];
+          data.departmentCode = await this.getDepartmentCode(
+            data.facultyCode,
+            stdInfo.department_name_TH,
+          );
           break;
         case CMU_OAUTH_ROLE.MIS:
           data.role = ROLE.INSTRUCTOR;
@@ -182,27 +178,36 @@ export class AuthenticationService {
         ].includes(basicInfo.cmuitaccount_name)
           ? ROLE.SUPREME_ADMIN
           : ROLE.STUDENT;
-        user = await user.updateOne(
-          {
-            ...data,
-            departmentCode: [
-              getEnumByValue(
-                DEPARTMENT_TH,
-                stdInfo.department_name_TH,
-              ) as DEPARTMENT_CODE,
-            ],
-            role,
-          },
-          { new: true },
+        const departmentCode = await this.getDepartmentCode(
+          data.facultyCode,
+          stdInfo.department_name_TH,
         );
+        await user.updateOne({
+          ...data,
+          departmentCode,
+          role,
+        });
       } else {
-        user = await user.updateOne({ ...data }, { new: true });
+        await user.updateOne({ ...data });
       }
+      user = await this.userModel.findById(user.id);
     }
 
     //create session
     const dataRs = await this.generateJWTToken(user);
     dataRs.user = user;
     return dataRs;
+  }
+
+  private async getDepartmentCode(facultyCode: string, departmentTH: string) {
+    return [
+      await this.facultyModel
+        .findOne({ facultyCode })
+        .then(
+          (result) =>
+            result.department.find((dep) => dep.departmentTH == departmentTH)
+              .departmentCode,
+        ),
+    ];
   }
 }
