@@ -48,4 +48,28 @@ export class UserController {
       return responseDTO;
     });
   }
+
+  @Put('admin')
+  async updateAdmin(
+    @Request() req,
+    @Body() body: any,
+  ): Promise<ResponseDTO<User>> {
+    return this.service.updateAdmin(req.user.id, body).then((result) => {
+      const responseDTO = new ResponseDTO<any>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Put('s.admin')
+  async updateSAdmin(
+    @Request() req,
+    @Body() body: any,
+  ): Promise<ResponseDTO<any>> {
+    return this.service.updateSAdmin(req.user.id, body).then((result) => {
+      const responseDTO = new ResponseDTO<any>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
 }
