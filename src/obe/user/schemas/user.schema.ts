@@ -18,22 +18,22 @@ export class User {
   @Prop()
   studentId: string;
 
-  @Prop({ required: true })
+  @Prop()
   firstNameTH: string;
 
-  @Prop({ required: true })
+  @Prop()
   lastNameTH: string;
 
-  @Prop({ required: true })
+  @Prop()
   firstNameEN: string;
 
-  @Prop({ required: true })
+  @Prop()
   lastNameEN: string;
 
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop()
   facultyCode: string;
 
   @Prop()

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
@@ -29,41 +29,76 @@ export class UserService {
   }
 
   async updateAdmin(id: string, data: any): Promise<User> {
-    const res = await this.model.findByIdAndUpdate(
-      data.id,
-      { role: data.role },
-      { new: true },
-    );
-    const logEventDTO = new LogEventDTO();
-    this.setLogEvent(
-      logEventDTO,
-      res.role == ROLE.ADMIN ? 'Add' : 'Delete',
-      `${res.firstNameEN} ${res.lastNameEN}`,
-    );
-    await this.logEventService.createLogEvent(id, logEventDTO);
-    return res;
+    try {
+      let res;
+      if (data.id) {
+        res = await this.updateUserRoleById(data.id, data.role);
+      } else {
+        res = await this.updateOrCreateUserByEmail(data.email, data.role);
+      }
+      const logEventDTO = new LogEventDTO();
+      this.setLogEvent(
+        logEventDTO,
+        res.role == ROLE.ADMIN ? 'Add' : 'Delete',
+        res.firstNameEN
+          ? `${res.firstNameEN} ${res.lastNameEN}`
+          : `${res.email}`,
+      );
+      await this.logEventService.createLogEvent(id, logEventDTO);
+      return res;
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
   }
 
   async updateSAdmin(id: string, data: any): Promise<any> {
-    const user = await this.model.findByIdAndUpdate(
-      id,
-      { role: ROLE.ADMIN },
-      { new: true },
-    );
-    const newSAdmin = await this.model.findByIdAndUpdate(
-      data.id,
-      { role: ROLE.SUPREME_ADMIN },
-      { new: true },
-    );
-    const logEventDTO = new LogEventDTO();
-    this.setLogEvent(
-      logEventDTO,
-      'Change',
-      `${newSAdmin.firstNameEN} ${newSAdmin.lastNameEN}`,
-      'to S. Admin',
-    );
-    await this.logEventService.createLogEvent(id, logEventDTO);
-    return { user, newSAdmin };
+    try {
+      const user = await this.updateUserRoleById(id, ROLE.ADMIN);
+      const newSAdmin = await this.updateUserRoleById(
+        data.id,
+        ROLE.SUPREME_ADMIN,
+      );
+      const logEventDTO = new LogEventDTO();
+      this.setLogEvent(
+        logEventDTO,
+        'Change',
+        `${newSAdmin.firstNameEN} ${newSAdmin.lastNameEN}`,
+        'to S. Admin',
+      );
+      await this.logEventService.createLogEvent(id, logEventDTO);
+      return { user, newSAdmin };
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
+  }
+
+  private async updateUserRoleById(
+    userId: string,
+    role: string,
+  ): Promise<User> {
+    return this.model.findByIdAndUpdate(userId, { role }, { new: true });
+  }
+
+  private async updateOrCreateUserByEmail(
+    email: string,
+    role: string,
+  ): Promise<User> {
+    let user = await this.model.findOne({ email });
+    if (user) {
+      if (user.role == role) {
+        throw new BadRequestException(
+          `${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`} is already an admin`,
+        );
+      }
+      user = await this.model.findOneAndUpdate(
+        { email },
+        { role },
+        { new: true },
+      );
+    } else {
+      user = await this.model.create({ email, role });
+    }
+    return user;
   }
 
   private setLogEvent(
