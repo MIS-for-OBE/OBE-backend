@@ -198,6 +198,7 @@ export class CourseService {
 
   async deleteCourse(id: string): Promise<Course> {
     const deleteCourse = await this.model.findByIdAndDelete(id);
+    await this.sectionModel.deleteMany({ _id: { $in: deleteCourse.sections } });
     await this.courseManagementModel.findOneAndDelete({
       courseNo: deleteCourse.courseNo,
     });
