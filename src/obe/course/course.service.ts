@@ -25,6 +25,12 @@ export class CourseService {
     if (searchDTO.manage) {
       return await this.model
         .find({ academicYear: searchDTO.academicYear })
+        .populate({
+          path: 'sections',
+          populate: [
+            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+          ],
+        })
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
