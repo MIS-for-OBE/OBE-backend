@@ -44,7 +44,7 @@ export class UserService {
           ? `${res.firstNameEN} ${res.lastNameEN}`
           : `${res.email}`,
       );
-      await this.logEventService.createLogEvent(id, logEventDTO);
+      // await this.logEventService.createLogEvent(id, logEventDTO);
       return res;
     } catch (err) {
       throw new BadRequestException(err);
@@ -65,7 +65,7 @@ export class UserService {
         `${newSAdmin.firstNameEN} ${newSAdmin.lastNameEN}`,
         'to S. Admin',
       );
-      await this.logEventService.createLogEvent(id, logEventDTO);
+      // await this.logEventService.createLogEvent(id, logEventDTO);
       return { user, newSAdmin };
     } catch (err) {
       throw new BadRequestException(err);

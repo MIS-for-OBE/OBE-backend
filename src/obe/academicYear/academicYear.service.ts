@@ -38,9 +38,9 @@ export class AcademicYearService {
       year: requestDTO.year,
       semester: requestDTO.semester,
     });
-    const logEventDTO = new LogEventDTO();
-    this.setLogEvent(logEventDTO, 'Create', res.semester, res.year);
-    await this.logEventService.createLogEvent(id, logEventDTO);
+    // const logEventDTO = new LogEventDTO();
+    // this.setLogEvent(logEventDTO, 'Create', res.semester, res.year);
+    // await this.logEventService.createLogEvent(id, logEventDTO);
     return res;
   }
 
@@ -54,17 +54,17 @@ export class AcademicYearService {
       { isActive: true },
       { new: true },
     );
-    const logEventDTO = new LogEventDTO();
-    this.setLogEvent(logEventDTO, 'Active', res.semester, res.year);
-    await this.logEventService.createLogEvent(id, logEventDTO);
+    // const logEventDTO = new LogEventDTO();
+    // this.setLogEvent(logEventDTO, 'Active', res.semester, res.year);
+    // await this.logEventService.createLogEvent(id, logEventDTO);
     return res;
   }
 
   async deleteAcademicYear(id: string): Promise<AcademicYear> {
     const res = await this.model.findByIdAndDelete(id);
-    const logEventDTO = new LogEventDTO();
-    this.setLogEvent(logEventDTO, 'Delete', res.semester, res.year);
-    await this.logEventService.createLogEvent(id, logEventDTO);
+    // const logEventDTO = new LogEventDTO();
+    // this.setLogEvent(logEventDTO, 'Delete', res.semester, res.year);
+    // await this.logEventService.createLogEvent(id, logEventDTO);
     return res;
   }
 
