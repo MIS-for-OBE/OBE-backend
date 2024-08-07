@@ -5,17 +5,15 @@ import {
   Post,
   Put,
   Request,
-  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UserService } from './service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
-import { User } from './schemas/user.schema';
-import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
+import { User } from './schemas/schema';
 
 @Controller('/user')
-@UseInterceptors(new ErrorInterceptor())
+@UsePipes(new ValidationPipe({ transform: true }))
 export class UserController {
   constructor(private service: UserService) {}
 

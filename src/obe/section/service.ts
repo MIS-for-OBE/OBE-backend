@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Section } from './schemas/section.schema';
+import { Section } from './schemas/schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from '../user/schemas/user.schema';
+import { User } from '../user/schemas/schema';
 
 @Injectable()
 export class SectionService {

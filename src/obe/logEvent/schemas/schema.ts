@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
-import { Course } from 'src/obe/course/schemas/course.schema';
-import { User } from 'src/obe/user/schemas/user.schema';
+import { Course } from 'src/obe/course/schemas/schema';
+import { User } from 'src/obe/user/schemas/schema';
 
 export type LogEventDocument = HydratedDocument<LogEvent>;
 

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
-import { Course } from 'src/obe/course/schemas/course.schema';
+import { Course } from 'src/obe/course/schemas/schema';
 
 export type UserDocument = HydratedDocument<User>;
 

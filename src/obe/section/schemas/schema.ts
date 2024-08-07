@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 // import { Assignment } from 'src/obe/assignment/schemas/assignment.schema';
-import { TQF } from 'src/obe/tqf/schemas/tqf.schema';
-import { User } from 'src/obe/user/schemas/user.schema';
+import { TQF } from 'src/obe/tqf/schemas/schema';
+import { User } from 'src/obe/user/schemas/schema';
 
 export type SectionDocument = HydratedDocument<Section>;
 

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,23 +8,20 @@ import {
   Put,
   Query,
   Request,
-  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ResponseDTO } from 'src/common/dto/response.dto';
-import { CourseService } from './course.service';
-import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
-import { Course } from './schemas/course.schema';
+import { CourseService } from './service';
+import { Course } from './schemas/schema';
 import { CourseSearchDTO } from './dto/search.dto';
 
 @Controller('/course')
+@UsePipes(new ValidationPipe({ transform: true }))
 export class CourseController {
   constructor(private service: CourseService) {}
 
   @Get()
-  @UseInterceptors(new ErrorInterceptor())
-  @UsePipes(new ValidationPipe({ transform: true }))
   async searchCourse(
     @Request() req,
     @Query() searchDTO: CourseSearchDTO,
@@ -38,8 +34,6 @@ export class CourseController {
   }
 
   @Get('/one')
-  @UseInterceptors(new ErrorInterceptor())
-  @UsePipes(new ValidationPipe({ transform: true }))
   async searchOneCourse(
     @Request() req,
     @Query() searchDTO: CourseSearchDTO,
@@ -54,7 +48,6 @@ export class CourseController {
   }
 
   @Post()
-  @UseInterceptors(new ErrorInterceptor())
   async createCourse(
     @Request() req,
     @Body() requestDTO: any,
@@ -67,15 +60,11 @@ export class CourseController {
   }
 
   @Put('/:id')
-  @UseInterceptors(new ErrorInterceptor())
   async updateCourse(
     @Param('id') id: string,
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<Course>> {
     return this.service.updateCourse(id, requestDTO).then((result) => {
-      if (!result) {
-        throw new BadRequestException('Course not found.');
-      }
       const responseDTO = new ResponseDTO<Course>();
       responseDTO.data = result;
       return responseDTO;
@@ -83,12 +72,8 @@ export class CourseController {
   }
 
   @Delete('/:id')
-  @UseInterceptors(new ErrorInterceptor())
   async deleteCourse(@Param('id') id: string): Promise<ResponseDTO<Course>> {
     return this.service.deleteCourse(id).then((result) => {
-      if (!result) {
-        throw new BadRequestException('Course not found.');
-      }
       const responseDTO = new ResponseDTO<Course>();
       responseDTO.data = result;
       return responseDTO;

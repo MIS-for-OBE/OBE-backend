@@ -10,10 +10,10 @@ import {
 } from './dto/dto';
 import { capitalize } from 'lodash';
 import { Model } from 'mongoose';
-import { User, UserDocument } from 'src/obe/user/schemas/user.schema';
+import { User, UserDocument } from 'src/obe/user/schemas/schema';
 import { CMU_OAUTH_ROLE, ROLE } from 'src/common/enum/role.enum';
 import { InjectModel } from '@nestjs/mongoose';
-import { Faculty } from 'src/obe/faculty/schemas/faculty.schema';
+import { Faculty } from 'src/obe/faculty/schemas/schema';
 
 @Injectable()
 export class AuthenticationService {

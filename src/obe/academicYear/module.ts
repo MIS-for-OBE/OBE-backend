@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AcademicYearService } from './academicYear.service';
-import { AcademicYearController } from './academicYear.controller';
+import { AcademicYearService } from './service';
+import { AcademicYearController } from './controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   AcademicYear,
   AcademicYearSchema,
-} from './schemas/academicYear.schema';
-import { LogEventService } from '../logEvent/logEvent.service';
-import { LogEventModel } from '../logEvent/logEvent.module';
+} from './schemas/schema';
+import { LogEventService } from '../logEvent/service';
+import { LogEventModel } from '../logEvent/module';
 
 export const AcademicYearModel = {
   name: AcademicYear.name,

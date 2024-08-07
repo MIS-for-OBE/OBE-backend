@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,26 +8,20 @@ import {
   Put,
   Query,
   Request,
-  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ResponseDTO } from 'src/common/dto/response.dto';
-import { AcademicYearService } from './academicYear.service';
-import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
+import { AcademicYearService } from './service';
 import { AcademicYearSearchDTO } from './dto/search.dto';
-import {
-  AcademicYear,
-  AcademicYearDocument,
-} from './schemas/academicYear.schema';
+import { AcademicYear } from './schemas/schema';
 
 @Controller('/academicYear')
+@UsePipes(new ValidationPipe({ transform: true }))
 export class AcademicYearController {
   constructor(private service: AcademicYearService) {}
 
   @Get()
-  @UseInterceptors(new ErrorInterceptor())
-  @UsePipes(new ValidationPipe({ transform: true }))
   async searchAll(
     @Query() searchDTO: AcademicYearSearchDTO,
   ): Promise<ResponseDTO<AcademicYear[]>> {
@@ -40,7 +33,6 @@ export class AcademicYearController {
   }
 
   @Post()
-  @UseInterceptors(new ErrorInterceptor())
   async createAcademicYear(
     @Request() req,
     @Body() requestDTO: AcademicYear,
@@ -55,29 +47,22 @@ export class AcademicYearController {
   }
 
   @Put('/:id')
-  @UseInterceptors(new ErrorInterceptor())
   async activeAcademicYear(
     @Request() req,
     @Param('id') id: string,
   ): Promise<ResponseDTO<AcademicYear>> {
-    return this.service
-      .activeAcademicYear(req.user.id, id)
-      .then((result) => {
-        const responseDTO = new ResponseDTO<AcademicYear>();
-        responseDTO.data = result;
-        return responseDTO;
-      });
+    return this.service.activeAcademicYear(req.user.id, id).then((result) => {
+      const responseDTO = new ResponseDTO<AcademicYear>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
   }
 
   @Delete('/:id')
-  @UseInterceptors(new ErrorInterceptor())
   async deleteAcademicYear(
     @Param('id') id: string,
   ): Promise<ResponseDTO<AcademicYear>> {
     return this.service.deleteAcademicYear(id).then((result) => {
-      if (!result) {
-        throw new BadRequestException('AcademicYear not found.');
-      }
       const responseDTO = new ResponseDTO<AcademicYear>();
       responseDTO.data = result;
       return responseDTO;

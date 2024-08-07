@@ -5,11 +5,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { DocumentInterceptor } from './common/interceptor/repo.interceptor';
 import { json } from 'express';
+import { ErrorInterceptor } from './common/interceptor/error.interceptor';
 
 async function bootstrap() {
   const app: NestExpressApplication = await NestFactory.create(AppModule);
-  app.useGlobalInterceptors(new DocumentInterceptor());
-  
+  app.useGlobalInterceptors(new DocumentInterceptor(), new ErrorInterceptor());
+
   app.setGlobalPrefix('api/v1');
   app.enableCors();
 

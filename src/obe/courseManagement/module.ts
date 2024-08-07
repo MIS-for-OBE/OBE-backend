@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { CourseManagementService } from './courseManagement.service';
-import { CourseManagementController } from './courseManagement.controller';
+import { CourseManagementService } from './service';
+import { CourseManagementController } from './controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   CourseManagement,
   CourseManagementSchema,
-} from './schemas/courseManagement.schema';
-import { UserModel } from '../user/user.module';
+} from './schemas/schema';
+import { UserModel } from '../user/module';
 
 export const CourseManagementModel = {
   name: CourseManagement.name,

@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
-import { AcademicYear } from 'src/obe/academicYear/schemas/academicYear.schema';
-import { Section } from 'src/obe/section/schemas/section.schema';
-import { TQF } from 'src/obe/tqf/schemas/tqf.schema';
+import { AcademicYear } from 'src/obe/academicYear/schemas/schema';
+import { Section } from 'src/obe/section/schemas/schema';
+import { TQF } from 'src/obe/tqf/schemas/schema';
 
 export type CourseDocument = HydratedDocument<Course>;
 

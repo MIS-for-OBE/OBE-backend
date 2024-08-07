@@ -4,8 +4,8 @@ import { AuthenticationService } from './authentication.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModel } from 'src/obe/user/user.module';
-import { FacultyModel } from 'src/obe/faculty/faculty.module';
+import { UserModel } from 'src/obe/user/module';
+import { FacultyModel } from 'src/obe/faculty/module';
 
 @Module({
   imports: [

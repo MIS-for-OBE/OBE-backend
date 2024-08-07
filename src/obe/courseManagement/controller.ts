@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,22 +8,19 @@ import {
   Put,
   Query,
   Request,
-  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ResponseDTO } from 'src/common/dto/response.dto';
-import { CourseManagementService } from './courseManagement.service';
-import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
-import {
-  CourseManagement,
-  CourseManagementDocument,
-} from './schemas/courseManagement.schema';
+import { CourseManagementService } from './service';
+import { CourseManagement, CourseManagementDocument } from './schemas/schema';
 
 @Controller('/courseManagement')
+@UsePipes(new ValidationPipe({ transform: true }))
 export class CourseManagementController {
   constructor(private service: CourseManagementService) {}
 
   @Get()
-  @UseInterceptors(new ErrorInterceptor())
   async searchAll(
     @Query() searchDTO: any,
   ): Promise<ResponseDTO<CourseManagement[]>> {
@@ -36,7 +32,6 @@ export class CourseManagementController {
   }
 
   @Post()
-  @UseInterceptors(new ErrorInterceptor())
   async createCourseManagement(
     @Request() req,
     @Body() requestDTO: CourseManagementDocument,
@@ -51,7 +46,6 @@ export class CourseManagementController {
   }
 
   @Put('/:id')
-  @UseInterceptors(new ErrorInterceptor())
   async updateCourseManagement(
     @Param('id') id: string,
     @Body() requestDTO: any,
@@ -59,9 +53,6 @@ export class CourseManagementController {
     return this.service
       .updateCourseManagement(id, requestDTO)
       .then((result) => {
-        if (!result) {
-          throw new BadRequestException('CourseManagement not found.');
-        }
         const responseDTO = new ResponseDTO<CourseManagement>();
         responseDTO.data = result;
         return responseDTO;
@@ -69,14 +60,10 @@ export class CourseManagementController {
   }
 
   @Delete('/:id')
-  @UseInterceptors(new ErrorInterceptor())
   async deleteCourseManagement(
     @Param('id') id: string,
   ): Promise<ResponseDTO<CourseManagement>> {
     return this.service.deleteCourseManagement(id).then((result) => {
-      if (!result) {
-        throw new BadRequestException('CourseManagement not found.');
-      }
       const responseDTO = new ResponseDTO<CourseManagement>();
       responseDTO.data = result;
       return responseDTO;

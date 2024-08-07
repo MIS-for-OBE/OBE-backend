@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { SectionService } from './Section.service';
-import { SectionController } from './Section.controller';
+import { SectionService } from './service';
+import { SectionController } from './controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModel } from '../user/user.module';
-import { Section, SectionSchema } from './schemas/Section.schema';
+import { UserModel } from '../user/module';
+import { Section, SectionSchema } from './schemas/schema';
 
 export const SectionModel = {
   name: Section.name,

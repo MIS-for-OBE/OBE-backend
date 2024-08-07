@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './schemas/user.schema';
+import { User } from './schemas/schema';
 import { Model } from 'mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
-import { LogEventService } from '../logEvent/logEvent.service';
+import { LogEventService } from '../logEvent/service';
 import { LogEventDTO } from '../logEvent/dto/dto';
 import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
 
@@ -15,17 +15,29 @@ export class UserService {
   ) {}
 
   async getUserInfo(id: string): Promise<User> {
-    return await this.model.findById(id);
+    try {
+      return await this.model.findById(id);
+    } catch (error) {
+      throw new BadRequestException(error?.message ?? error);
+    }
   }
 
   async getInstructor(): Promise<User[]> {
-    return await this.model
-      .find({ role: { $ne: ROLE.STUDENT } })
-      .sort([['firstNameEN', 'asc']]);
+    try {
+      return await this.model
+        .find({ role: { $ne: ROLE.STUDENT } })
+        .sort([['firstNameEN', 'asc']]);
+    } catch (error) {
+      throw new BadRequestException(error?.message ?? error);
+    }
   }
 
   async updateUser(id: string, data: any): Promise<User> {
-    return await this.model.findByIdAndUpdate(id, { ...data }, { new: true });
+    try {
+      return await this.model.findByIdAndUpdate(id, { ...data }, { new: true });
+    } catch (error) {
+      throw new BadRequestException(error?.message ?? error);
+    }
   }
 
   async updateAdmin(id: string, data: any): Promise<User> {
@@ -46,8 +58,8 @@ export class UserService {
       );
       // await this.logEventService.createLogEvent(id, logEventDTO);
       return res;
-    } catch (err) {
-      throw new BadRequestException(err);
+    } catch (error) {
+      throw new BadRequestException(error?.message ?? error);
     }
   }
 
@@ -67,8 +79,8 @@ export class UserService {
       );
       // await this.logEventService.createLogEvent(id, logEventDTO);
       return { user, newSAdmin };
-    } catch (err) {
-      throw new BadRequestException(err);
+    } catch (error) {
+      throw new BadRequestException(error?.message ?? error);
     }
   }
 
@@ -76,29 +88,37 @@ export class UserService {
     userId: string,
     role: string,
   ): Promise<User> {
-    return this.model.findByIdAndUpdate(userId, { role }, { new: true });
+    try {
+      return this.model.findByIdAndUpdate(userId, { role }, { new: true });
+    } catch (error) {
+      throw new BadRequestException(error?.message ?? error);
+    }
   }
 
   private async updateOrCreateUserByEmail(
     email: string,
     role: string,
   ): Promise<User> {
-    let user = await this.model.findOne({ email });
-    if (user) {
-      if (user.role == role) {
-        throw new BadRequestException(
-          `${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`} is already an admin`,
+    try {
+      let user = await this.model.findOne({ email });
+      if (user) {
+        if (user.role == role) {
+          throw new BadRequestException(
+            `${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`} is already an admin`,
+          );
+        }
+        user = await this.model.findOneAndUpdate(
+          { email },
+          { role },
+          { new: true },
         );
+      } else {
+        user = await this.model.create({ email, role });
       }
-      user = await this.model.findOneAndUpdate(
-        { email },
-        { role },
-        { new: true },
-      );
-    } else {
-      user = await this.model.create({ email, role });
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error?.message ?? error);
     }
-    return user;
   }
 
   private setLogEvent(

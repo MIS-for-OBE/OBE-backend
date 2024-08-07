@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,21 +7,21 @@ import {
   Post,
   Query,
   Request,
-  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ResponseDTO } from 'src/common/dto/response.dto';
-import { LogEventService } from './logEvent.service';
-import { ErrorInterceptor } from 'src/common/interceptor/error.interceptor';
-import { LogEvent } from './schemas/logEvent.schema';
+import { LogEventService } from './service';
+import { LogEvent } from './schemas/schema';
 import { LogEventSearchDTO } from './dto/search.dto';
 import { LogEventDTO } from './dto/dto';
 
 @Controller('/logEvents')
+@UsePipes(new ValidationPipe({ transform: true }))
 export class LogEventController {
   constructor(private service: LogEventService) {}
 
   @Get()
-  @UseInterceptors(new ErrorInterceptor())
   async searchAll(
     @Query() searchDTO: LogEventSearchDTO,
   ): Promise<ResponseDTO<LogEvent[]>> {
@@ -34,7 +33,6 @@ export class LogEventController {
   }
 
   @Post()
-  @UseInterceptors(new ErrorInterceptor())
   async createLogEvent(
     @Request() req,
     @Body() requestDTO: LogEventDTO,
