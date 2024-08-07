@@ -19,7 +19,7 @@ export class FacultyController {
 
   @Get()
   async getFaculty(@Request() req): Promise<ResponseDTO<Faculty>> {
-    return this.service.getFaculty('07').then((result) => {
+    return this.service.getFaculty(req.user.facultyCode).then((result) => {
       const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
