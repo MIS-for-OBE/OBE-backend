@@ -9,8 +9,10 @@ export enum LOG_EVENT_TYPE {
 }
 
 export enum COURSE_TYPE {
-  GENERAL = 'General',
+  GENERAL = 'General Education',
+  SPECIAL = 'Field of Specialization',
   SEL_TOPIC = 'Selected Topics',
+  FREE = 'Free Elective',
 }
 
 export enum TEACHING_METHOD {

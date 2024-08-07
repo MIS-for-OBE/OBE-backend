@@ -149,7 +149,7 @@ export class CourseService {
       sections: newSecion.map((section) => section.id),
       addFirstTime: true,
     };
-    if (requestDTO.type == COURSE_TYPE.GENERAL) {
+    if (requestDTO.type !== COURSE_TYPE.SEL_TOPIC) {
       courseData.isProcessTQF3 = true;
     }
 
