@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AcademicYear } from './schemas/schema';
@@ -33,7 +33,7 @@ export class AcademicYearService {
         return academicYear.slice(index, index + 15);
       }
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -48,7 +48,7 @@ export class AcademicYearService {
       // await this.logEventService.createLogEvent(id, logEventDTO);
       return res;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -71,7 +71,7 @@ export class AcademicYearService {
       // await this.logEventService.createLogEvent(id, logEventDTO);
       return res;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -79,14 +79,14 @@ export class AcademicYearService {
     try {
       const res = await this.model.findByIdAndDelete(id);
       if (!res) {
-        throw new BadRequestException('AcademicYear not found.');
+        throw new NotFoundException('AcademicYear not found.');
       }
       // const logEventDTO = new LogEventDTO();
       // this.setLogEvent(logEventDTO, 'Delete', res.semester, res.year);
       // await this.logEventService.createLogEvent(id, logEventDTO);
       return res;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 

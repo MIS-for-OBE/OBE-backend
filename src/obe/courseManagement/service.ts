@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CourseManagement, CourseManagementDocument } from './schemas/schema';
@@ -24,7 +28,7 @@ export class CourseManagementService {
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -35,7 +39,7 @@ export class CourseManagementService {
     try {
       return await this.model.create(requestDTO);
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -48,11 +52,11 @@ export class CourseManagementService {
         new: true,
       });
       if (!res) {
-        throw new BadRequestException('CourseManagement not found');
+        throw new NotFoundException('CourseManagement not found');
       }
       return res;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -60,11 +64,11 @@ export class CourseManagementService {
     try {
       const res = await this.model.findByIdAndDelete(id);
       if (!res) {
-        throw new BadRequestException('CourseManagement not found');
+        throw new NotFoundException('CourseManagement not found');
       }
       return res;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 

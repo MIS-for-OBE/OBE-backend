@@ -15,10 +15,12 @@ export class ErrorInterceptor implements NestInterceptor {
     return next.handle().pipe(
       catchError((err) =>
         throwError(() => {
+          console.log(err);
+
           if (err instanceof HttpException) {
             throw err;
           }
-          const newError = new BadRequestException(err.message);
+          const newError = new BadRequestException(err.message ?? err);
           if (err?.stack) {
             newError.stack = err.stack;
           }

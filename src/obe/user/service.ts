@@ -18,7 +18,7 @@ export class UserService {
     try {
       return await this.model.findById(id);
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -28,7 +28,7 @@ export class UserService {
         .find({ role: { $ne: ROLE.STUDENT } })
         .sort([['firstNameEN', 'asc']]);
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -36,7 +36,7 @@ export class UserService {
     try {
       return await this.model.findByIdAndUpdate(id, { ...data }, { new: true });
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -59,7 +59,7 @@ export class UserService {
       // await this.logEventService.createLogEvent(id, logEventDTO);
       return res;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -80,7 +80,7 @@ export class UserService {
       // await this.logEventService.createLogEvent(id, logEventDTO);
       return { user, newSAdmin };
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -91,7 +91,7 @@ export class UserService {
     try {
       return this.model.findByIdAndUpdate(userId, { role }, { new: true });
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -117,7 +117,7 @@ export class UserService {
       }
       return user;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 

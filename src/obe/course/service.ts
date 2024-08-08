@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Course } from './schemas/schema';
@@ -86,7 +90,7 @@ export class CourseService {
         return filterCourses;
       }
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -104,6 +108,9 @@ export class CourseService {
             { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
           ],
         });
+      if (!course) {
+        throw new NotFoundException('Course not found');
+      }
       course.sections = course.sections.filter(
         (section: any) =>
           section.instructor.id == id ||
@@ -111,7 +118,7 @@ export class CourseService {
       );
       return course;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -195,7 +202,7 @@ export class CourseService {
       );
       return course;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -206,7 +213,7 @@ export class CourseService {
         requestDTO,
       );
       if (!updateCourse) {
-        throw new BadRequestException('Course not found');
+        throw new NotFoundException('Course not found');
       }
       await this.courseManagementModel.findOneAndUpdate(
         { courseNo: updateCourse.courseNo },
@@ -214,7 +221,7 @@ export class CourseService {
       );
       return { ...updateCourse._doc, ...requestDTO };
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -222,7 +229,7 @@ export class CourseService {
     try {
       const deleteCourse = await this.model.findByIdAndDelete(id);
       if (!deleteCourse) {
-        throw new BadRequestException('Course not found');
+        throw new NotFoundException('Course not found');
       }
       await this.sectionModel.deleteMany({
         _id: { $in: deleteCourse.sections },
@@ -232,7 +239,7 @@ export class CourseService {
       });
       return deleteCourse;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 }

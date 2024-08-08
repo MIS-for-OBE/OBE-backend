@@ -25,7 +25,7 @@ export class LogEventService {
         .limit(searchDTO.limit);
       return res;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 
@@ -39,7 +39,7 @@ export class LogEventService {
         sectionDetect: requestDTO.sectionDetect,
       });
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 }
