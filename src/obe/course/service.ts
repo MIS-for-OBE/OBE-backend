@@ -242,4 +242,32 @@ export class CourseService {
       throw error;
     }
   }
+
+  async leaveCourse(userId: string, id: string): Promise<Course> {
+    try {
+      const leaveCourse = await this.model.findById(id);
+      if (!leaveCourse) {
+        throw new BadRequestException('Course not found');
+      }
+      await this.sectionModel.updateMany(
+        {
+          _id: { $in: leaveCourse.sections },
+        },
+        {
+          $pull: { coInstructors: userId },
+        },
+      );
+      await this.courseManagementModel.findOneAndUpdate(
+        {
+          courseNo: leaveCourse.courseNo,
+        },
+        {
+          $pull: { 'sections.$[].coInstructors': userId },
+        },
+      );
+      return leaveCourse;
+    } catch (error) {
+      throw new BadRequestException(error?.message ?? error);
+    }
+  }
 }

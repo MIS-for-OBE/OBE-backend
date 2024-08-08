@@ -79,4 +79,16 @@ export class CourseController {
       return responseDTO;
     });
   }
+
+  @Post('leave/:id')
+  async leaveCourse(
+    @Request() req,
+    @Param('id') id: string,
+  ): Promise<ResponseDTO<Course>> {
+    return this.service.leaveCourse(req.user.id, id).then((result) => {
+      const responseDTO = new ResponseDTO<Course>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
 }
