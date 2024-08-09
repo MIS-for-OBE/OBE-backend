@@ -13,6 +13,9 @@ export class Department {
 
   @Prop({ required: true })
   departmentEN: string;
+
+  @Prop()
+  courseCode: number;
 }
 
 @Schema({
@@ -33,6 +36,9 @@ export class Faculty {
 
   @Prop({ required: true })
   facultyEN: string;
+
+  @Prop({ required: true })
+  courseCode: number;
 
   @Prop()
   department: Department[];

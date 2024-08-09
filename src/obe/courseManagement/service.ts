@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CourseManagement, CourseManagementDocument } from './schemas/schema';
@@ -10,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { User } from '../user/schemas/schema';
 import { LogEventDTO } from '../logEvent/dto/dto';
 import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
+import { FacultyService } from '../faculty/service';
 
 @Injectable()
 export class CourseManagementService {
@@ -17,13 +14,28 @@ export class CourseManagementService {
     @InjectModel(CourseManagement.name)
     private readonly model: Model<CourseManagement>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    private readonly facultyService: FacultyService,
     private readonly configService: ConfigService,
   ) {}
 
-  async searchCourseManagement(searchDTO: any): Promise<CourseManagement[]> {
+  async searchCourseManagement(
+    facultyCode: string,
+    searchDTO: any,
+  ): Promise<CourseManagement[]> {
     try {
+      const courseCode = await this.facultyService.getCourseCode(
+        facultyCode,
+        searchDTO.departmentCode,
+      );
+
       return await this.model
-        .find()
+        .find({
+          courseNo: {
+            $in: courseCode.map(
+              (code) => new RegExp('^' + ('000' + code).slice(-3)),
+            ),
+          },
+        })
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
@@ -75,7 +87,7 @@ export class CourseManagementService {
   private setLogEvent(
     logEventDTO: LogEventDTO,
     action: string,
-    courseNo: number,
+    courseNo: string,
   ) {
     logEventDTO.type = LOG_EVENT_TYPE.COURSE_MANAGEMENT;
     logEventDTO.event = `${action} Course ${courseNo}`;

@@ -25,7 +25,7 @@ export class Course {
   academicYear: AcademicYear;
 
   @Prop({ required: true })
-  courseNo: Number;
+  courseNo: String;
 
   @Prop({ required: true })
   courseName: String;

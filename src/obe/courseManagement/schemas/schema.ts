@@ -42,7 +42,7 @@ export const SectionManagementSchema =
 })
 export class CourseManagement {
   @Prop({ required: true, unique: true })
-  courseNo: Number;
+  courseNo: String;
 
   @Prop({ required: true })
   courseName: String;

@@ -7,6 +7,8 @@ import { CourseManagementModel } from '../courseManagement/module';
 import { Course, CourseSchema } from './schemas/schema';
 import { SectionModel } from '../section/module';
 import { CourseManagementService } from '../courseManagement/service';
+import { FacultyService } from '../faculty/service';
+import { FacultyModel } from '../faculty/module';
 
 export const CourseModel = { name: Course.name, schema: CourseSchema };
 
@@ -17,9 +19,10 @@ export const CourseModel = { name: Course.name, schema: CourseSchema };
       SectionModel,
       CourseManagementModel,
       UserModel,
+      FacultyModel,
     ]),
   ],
   controllers: [CourseController],
-  providers: [CourseService, CourseManagementService],
+  providers: [CourseService, CourseManagementService, FacultyService],
 })
 export class CourseModule {}
