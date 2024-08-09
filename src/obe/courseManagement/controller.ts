@@ -21,7 +21,7 @@ export class CourseManagementController {
   constructor(private service: CourseManagementService) {}
 
   @Get()
-  async searchAll(
+  async searchCourseManagement(
     @Request() req,
     @Query() searchDTO: any,
   ): Promise<ResponseDTO<CourseManagement[]>> {
@@ -32,6 +32,18 @@ export class CourseManagementController {
         responseDTO.data = result;
         return responseDTO;
       });
+  }
+
+  @Get('one')
+  async searchOneCourseManagement(
+    @Request() req,
+    @Query() searchDTO: any,
+  ): Promise<ResponseDTO<CourseManagement>> {
+    return this.service.searchOneCourseManagement(searchDTO).then((result) => {
+      const responseDTO = new ResponseDTO<CourseManagement>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
   }
 
   @Post()

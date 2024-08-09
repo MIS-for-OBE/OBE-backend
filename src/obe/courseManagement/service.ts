@@ -27,7 +27,6 @@ export class CourseManagementService {
         facultyCode,
         searchDTO.departmentCode,
       );
-
       return await this.model
         .find({
           courseNo: {
@@ -36,9 +35,33 @@ export class CourseManagementService {
             ),
           },
         })
+        .populate({
+          path: 'sections',
+          populate: [
+            { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
+            {
+              path: 'coInstructors',
+              select: '_id firstNameEN lastNameEN email',
+            },
+          ],
+        })
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async searchOneCourseManagement(searchDTO: any): Promise<CourseManagement> {
+    try {
+      const course = await this.model.findOne({
+        courseNo: searchDTO.courseNo,
+      });
+      if (!course) {
+        throw new NotFoundException('Course not found');
+      }
+      return course;
     } catch (error) {
       throw error;
     }
@@ -60,13 +83,13 @@ export class CourseManagementService {
     requestDTO: any,
   ): Promise<CourseManagement> {
     try {
-      const res = await this.model.findByIdAndUpdate(id, requestDTO, {
+      const course = await this.model.findByIdAndUpdate(id, requestDTO, {
         new: true,
       });
-      if (!res) {
+      if (!course) {
         throw new NotFoundException('CourseManagement not found');
       }
-      return res;
+      return course;
     } catch (error) {
       throw error;
     }
@@ -74,11 +97,11 @@ export class CourseManagementService {
 
   async deleteCourseManagement(id: string): Promise<CourseManagement> {
     try {
-      const res = await this.model.findByIdAndDelete(id);
-      if (!res) {
+      const course = await this.model.findByIdAndDelete(id);
+      if (!course) {
         throw new NotFoundException('CourseManagement not found');
       }
-      return res;
+      return course;
     } catch (error) {
       throw error;
     }

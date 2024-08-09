@@ -21,8 +21,8 @@ export class CourseService {
     @InjectModel(Section.name) private readonly sectionModel: Model<Section>,
     @InjectModel(CourseManagement.name)
     private readonly courseManagementModel: Model<CourseManagement>,
-    @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly courseManagementService: CourseManagementService,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
   async searchCourse(id: string, searchDTO: CourseSearchDTO): Promise<any> {
@@ -33,7 +33,7 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+              { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
             ],
           })
           .sort([[searchDTO.orderBy, searchDTO.orderType]])
@@ -65,8 +65,8 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-              { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+              { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
+              { path: 'coInstructors', select: '_id firstNameEN lastNameEN email' },
             ],
           })
           .sort([[searchDTO.orderBy, searchDTO.orderType]])
@@ -104,8 +104,8 @@ export class CourseService {
         .populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+            { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
+            { path: 'coInstructors', select: '_id firstNameEN lastNameEN email' },
           ],
         });
       if (!course) {
@@ -191,8 +191,8 @@ export class CourseService {
       await course.populate({
         path: 'sections',
         populate: [
-          { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-          { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+          { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
+          { path: 'coInstructors', select: '_id firstNameEN lastNameEN email' },
         ],
       });
       course.sections = course.sections.filter(
@@ -208,10 +208,9 @@ export class CourseService {
 
   async updateCourse(id: string, requestDTO: any): Promise<Course> {
     try {
-      const updateCourse: any = await this.model.findByIdAndUpdate(
-        id,
-        requestDTO,
-      );
+      const updateCourse = await this.model.findByIdAndUpdate(id, requestDTO, {
+        new: true,
+      });
       if (!updateCourse) {
         throw new NotFoundException('Course not found');
       }
@@ -219,7 +218,8 @@ export class CourseService {
         { courseNo: updateCourse.courseNo },
         requestDTO,
       );
-      return { ...updateCourse._doc, ...requestDTO };
+      // return { ...updateCourse, ...requestDTO };
+      return updateCourse;
     } catch (error) {
       throw error;
     }

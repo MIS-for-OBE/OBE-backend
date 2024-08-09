@@ -33,7 +33,7 @@ export class CourseController {
     });
   }
 
-  @Get('/one')
+  @Get('one')
   async searchOneCourse(
     @Request() req,
     @Query() searchDTO: CourseSearchDTO,
