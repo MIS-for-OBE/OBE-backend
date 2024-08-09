@@ -234,9 +234,11 @@ export class CourseService {
       await this.sectionModel.deleteMany({
         _id: { $in: deleteCourse.sections },
       });
-      await this.courseManagementModel.findOneAndDelete({
-        courseNo: deleteCourse.courseNo,
-      });
+      if (deleteCourse.addFirstTime) {
+        await this.courseManagementModel.findOneAndDelete({
+          courseNo: deleteCourse.courseNo,
+        });
+      }
       return deleteCourse;
     } catch (error) {
       throw error;
@@ -247,27 +249,19 @@ export class CourseService {
     try {
       const leaveCourse = await this.model.findById(id);
       if (!leaveCourse) {
-        throw new BadRequestException('Course not found');
+        throw new NotFoundException('Course not found');
       }
       await this.sectionModel.updateMany(
-        {
-          _id: { $in: leaveCourse.sections },
-        },
-        {
-          $pull: { coInstructors: userId },
-        },
+        { _id: { $in: leaveCourse.sections } },
+        { $pull: { coInstructors: userId } },
       );
       await this.courseManagementModel.findOneAndUpdate(
-        {
-          courseNo: leaveCourse.courseNo,
-        },
-        {
-          $pull: { 'sections.$[].coInstructors': userId },
-        },
+        { courseNo: leaveCourse.courseNo },
+        { $pull: { 'sections.$[].coInstructors': userId } },
       );
       return leaveCourse;
     } catch (error) {
-      throw new BadRequestException(error?.message ?? error);
+      throw error;
     }
   }
 }
