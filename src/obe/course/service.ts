@@ -33,7 +33,10 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
+              {
+                path: 'instructor',
+                select: '_id firstNameEN lastNameEN email',
+              },
             ],
           })
           .sort([[searchDTO.orderBy, searchDTO.orderType]])
@@ -65,8 +68,14 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
-              { path: 'coInstructors', select: '_id firstNameEN lastNameEN email' },
+              {
+                path: 'instructor',
+                select: '_id firstNameEN lastNameEN email',
+              },
+              {
+                path: 'coInstructors',
+                select: '_id firstNameEN lastNameEN email',
+              },
             ],
           })
           .sort([[searchDTO.orderBy, searchDTO.orderType]])
@@ -105,7 +114,10 @@ export class CourseService {
           path: 'sections',
           populate: [
             { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
-            { path: 'coInstructors', select: '_id firstNameEN lastNameEN email' },
+            {
+              path: 'coInstructors',
+              select: '_id firstNameEN lastNameEN email',
+            },
           ],
         });
       if (!course) {
@@ -161,7 +173,9 @@ export class CourseService {
         }
       });
 
-      const newSecion = await this.sectionModel.insertMany(requestDTO.sections);
+      const newSecion = await this.sectionModel.insertMany(
+        requestDTO.sections.filter((sec) => sec.openThisTerm),
+      );
 
       const courseData: Course = {
         ...requestDTO,
