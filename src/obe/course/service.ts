@@ -13,6 +13,7 @@ import { CourseManagement } from '../courseManagement/schemas/schema';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { CourseSearchDTO } from './dto/search.dto';
 import { isNumeric } from 'validator';
+import { setWhereWithSearchCourse } from 'src/common/function/function';
 
 @Injectable()
 export class CourseService {
@@ -51,17 +52,7 @@ export class CourseService {
           sections: { $in: sections.map((section) => section.id) },
         };
         if (searchDTO.search.length) {
-          if (isNumeric(searchDTO.search)) {
-            where['$expr'] = {
-              $regexMatch: {
-                input: { $toString: '$courseNo' },
-                regex: searchDTO.search,
-                options: 'i',
-              },
-            };
-          } else {
-            where['courseName'] = { $regex: searchDTO.search, $options: 'i' };
-          }
+          setWhereWithSearchCourse(where, searchDTO.search);
         }
         const courses = await this.model
           .find(where)
