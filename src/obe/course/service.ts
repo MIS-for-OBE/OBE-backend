@@ -192,19 +192,24 @@ export class CourseService {
           course = await this.model.create(courseData);
         }
       }
-      await course.populate({
-        path: 'sections',
-        populate: [
-          { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
-          { path: 'coInstructors', select: '_id firstNameEN lastNameEN email' },
-        ],
-      });
-      course.sections = course.sections.filter(
-        (section: any) =>
-          section.instructor.id == id ||
-          section.coInstructors.some((coIns: any) => coIns.id == id),
-      );
-      return course;
+      if (course) {
+        await course.populate({
+          path: 'sections',
+          populate: [
+            { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
+            {
+              path: 'coInstructors',
+              select: '_id firstNameEN lastNameEN email',
+            },
+          ],
+        });
+        course.sections = course.sections.filter(
+          (section: any) =>
+            section.instructor.id == id ||
+            section.coInstructors.some((coIns: any) => coIns.id == id),
+        );
+      }
+      return course ?? [];
     } catch (error) {
       throw error;
     }
