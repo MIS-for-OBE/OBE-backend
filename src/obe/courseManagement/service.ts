@@ -21,20 +21,22 @@ export class CourseManagementService {
   async searchCourseManagement(
     facultyCode: string,
     searchDTO: any,
-  ): Promise<CourseManagement[]> {
+  ): Promise<any> {
     try {
       const courseCode = await this.facultyService.getCourseCode(
         facultyCode,
         searchDTO.departmentCode,
       );
-      return await this.model
-        .find({
-          courseNo: {
-            $in: courseCode.map(
-              (code) => new RegExp('^' + ('000' + code).slice(-3)),
-            ),
-          },
-        })
+      const where = {
+        courseNo: {
+          $in: courseCode.map(
+            (code) => new RegExp('^' + ('000' + code).slice(-3)),
+          ),
+        },
+      };
+      const totalCount = await this.model.countDocuments(where);
+      const courses = await this.model
+        .find(where)
         .populate({
           path: 'sections',
           populate: [
@@ -48,6 +50,7 @@ export class CourseManagementService {
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
+      return { totalCount, courses };
     } catch (error) {
       throw error;
     }

@@ -90,10 +90,7 @@ export class CourseService {
           return course;
         });
         if (searchDTO.page == 1 && !searchDTO.search.length) {
-          const totalCount = await this.model.countDocuments({
-            academicYear: searchDTO.academicYear,
-            sections: { $in: sections.map((section) => section.id) },
-          });
+          const totalCount = await this.model.countDocuments(where);
           return { totalCount, courses: filterCourses };
         }
         return filterCourses;
