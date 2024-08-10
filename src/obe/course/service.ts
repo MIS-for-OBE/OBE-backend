@@ -188,7 +188,9 @@ export class CourseService {
           courseNo: requestDTO.courseNo,
         });
       } else {
-        course = await this.model.create(courseData);
+        if (courseData.sections.length) {
+          course = await this.model.create(courseData);
+        }
       }
       await course.populate({
         path: 'sections',
