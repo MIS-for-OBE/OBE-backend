@@ -60,13 +60,27 @@ export class CourseManagementController {
       });
   }
 
-  @Put('/:id')
+  @Put('course/:id')
   async updateCourseManagement(
     @Param('id') id: string,
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<CourseManagement>> {
     return this.service
       .updateCourseManagement(id, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<CourseManagement>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
+  }
+
+  @Put('section/:id')
+  async updateSectionManagement(
+    @Param('id') id: string,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<CourseManagement>> {
+    return this.service
+      .updateSectionManagement(id, requestDTO)
       .then((result) => {
         const responseDTO = new ResponseDTO<CourseManagement>();
         responseDTO.data = result;

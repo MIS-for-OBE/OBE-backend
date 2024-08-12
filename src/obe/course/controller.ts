@@ -51,9 +51,9 @@ export class CourseController {
   async createCourse(
     @Request() req,
     @Body() requestDTO: any,
-  ): Promise<ResponseDTO<Course>> {
+  ): Promise<ResponseDTO<any>> {
     return this.service.createCourse(req.user.id, requestDTO).then((result) => {
-      const responseDTO = new ResponseDTO<Course>();
+      const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
     });

@@ -106,6 +106,25 @@ export class CourseManagementService {
     }
   }
 
+  async updateSectionManagement(
+    id: string,
+    requestDTO: any,
+  ): Promise<CourseManagement> {
+    try {
+      const course = await this.model.findOneAndUpdate(
+        { 'sections.$.id': id },
+        { $set: { 'sections.$': requestDTO } },
+        { new: true },
+      );
+      if (!course) {
+        throw new NotFoundException('SectionManagement not found');
+      }
+      return course;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async deleteCourseManagement(id: string): Promise<CourseManagement> {
     try {
       const course = await this.model.findByIdAndDelete(id);

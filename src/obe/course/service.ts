@@ -12,8 +12,8 @@ import { CourseManagementService } from '../courseManagement/service';
 import { CourseManagement } from '../courseManagement/schemas/schema';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { CourseSearchDTO } from './dto/search.dto';
-import { isNumeric } from 'validator';
 import { setWhereWithSearchCourse } from 'src/common/function/function';
+import { ROLE } from 'src/common/enum/role.enum';
 
 @Injectable()
 export class CourseService {
@@ -124,9 +124,32 @@ export class CourseService {
 
   async createCourse(id: string, requestDTO: any): Promise<any> {
     try {
+      const coInstructors = [
+        ...new Set(
+          requestDTO.sections
+            .flatMap((sec) => sec.coInstructors)
+            .filter((email) => email.endsWith('@cmu.ac.th')),
+        ),
+      ].map((email) => ({ email, role: ROLE.INSTRUCTOR }));
+
+      for (const instructor of coInstructors) {
+        let user = await this.userModel.findOne({
+          email: instructor.email,
+        });
+        if (!user) {
+          user = await this.userModel.create(instructor);
+        }
+        requestDTO.sections.forEach((sec) => {
+          sec.coInstructors = sec.coInstructors.map((value) =>
+            value === instructor.email ? user.id : value,
+          );
+        });
+      }
+
       const existCourseManagement = await this.courseManagementModel.findOne({
         courseNo: requestDTO.courseNo,
       });
+
       if (existCourseManagement) {
         const existSection = [];
         requestDTO.sections.forEach((section: any) => {
@@ -223,11 +246,6 @@ export class CourseService {
       if (!updateCourse) {
         throw new NotFoundException('Course not found');
       }
-      await this.courseManagementModel.findOneAndUpdate(
-        { courseNo: updateCourse.courseNo },
-        requestDTO,
-      );
-      // return { ...updateCourse, ...requestDTO };
       return updateCourse;
     } catch (error) {
       throw error;
