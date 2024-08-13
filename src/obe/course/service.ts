@@ -122,6 +122,36 @@ export class CourseService {
     }
   }
 
+  async checkCanCreateCourse(requestDTO: any): Promise<any> {
+    try {
+      const existCourseManagement = await this.courseManagementModel.findOne({
+        courseNo: requestDTO.courseNo,
+      });
+
+      if (existCourseManagement) {
+        const existSection = [];
+        requestDTO.sections.forEach((section: any) => {
+          if (
+            existCourseManagement.sections.find(
+              (existSec: any) => existSec.sectionNo == section.sectionNo,
+            )
+          ) {
+            existSection.push(section.sectionNo);
+          }
+        });
+        if (existSection.length) {
+          throw new BadRequestException(
+            `Section ${existSection.join(', ')} has been already added.`,
+          );
+        } else {
+          return;
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async createCourse(id: string, requestDTO: any): Promise<any> {
     try {
       const coInstructors = [
@@ -151,27 +181,27 @@ export class CourseService {
       });
 
       if (existCourseManagement) {
-        const existSection = [];
-        requestDTO.sections.forEach((section: any) => {
-          if (
-            existCourseManagement.sections.find(
-              (existSec: any) => existSec.sectionNo == section.sectionNo,
-            )
-          ) {
-            existSection.push(section.sectionNo);
-          }
+        // const existSection = [];
+        // requestDTO.sections.forEach((section: any) => {
+        //   if (
+        //     existCourseManagement.sections.find(
+        //       (existSec: any) => existSec.sectionNo == section.sectionNo,
+        //     )
+        //   ) {
+        //     existSection.push(section.sectionNo);
+        //   }
+        // });
+        // if (existSection.length) {
+        //   throw new BadRequestException(
+        //     `Section ${existSection.join(', ')} has been already added.`,
+        //   );
+        // } else {
+        await existCourseManagement.updateOne({
+          updatedYear: requestDTO.updatedYear,
+          updatedSemester: requestDTO.updatedSemester,
+          $push: { sections: requestDTO.sections },
         });
-        if (existSection.length) {
-          throw new BadRequestException(
-            `Section ${existSection.join(', ')} has been already added.`,
-          );
-        } else {
-          await existCourseManagement.updateOne({
-            updatedYear: requestDTO.updatedYear,
-            updatedSemester: requestDTO.updatedSemester,
-            $push: { sections: requestDTO.sections },
-          });
-        }
+        // }
       } else {
         await this.courseManagementService.createCourseManagement(
           id,
