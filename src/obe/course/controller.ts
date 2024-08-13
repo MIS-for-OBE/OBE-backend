@@ -47,8 +47,8 @@ export class CourseController {
       });
   }
 
-  @Post('check')
-  async checkCanCreateCourse(@Body() requestDTO: any): Promise<ResponseDTO<any>> {
+  @Get('check')
+  async checkCanCreateCourse(@Query() requestDTO: any): Promise<ResponseDTO<any>> {
     return this.service.checkCanCreateCourse(requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;

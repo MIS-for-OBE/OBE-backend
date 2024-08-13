@@ -144,10 +144,9 @@ export class CourseService {
           throw new BadRequestException(
             `Section ${existSection.join(', ')} has been already added.`,
           );
-        } else {
-          return TEXT_ENUM.Success;
         }
       }
+      return TEXT_ENUM.Success;
     } catch (error) {
       throw error;
     }
