@@ -270,13 +270,17 @@ export class CourseService {
 
   async updateCourse(id: string, requestDTO: any): Promise<Course> {
     try {
-      const updateCourse = await this.model.findByIdAndUpdate(id, requestDTO, {
-        new: true,
-      });
+      const updateCourse: any = await this.model.findByIdAndUpdate(id, requestDTO);
       if (!updateCourse) {
         throw new NotFoundException('Course not found');
       }
-      return updateCourse;
+      if (updateCourse.addFirstTime) {
+        await this.courseManagementModel.findOneAndUpdate(
+          { courseNo: updateCourse.courseNo },
+          requestDTO,
+        );
+      }
+      return { ...updateCourse._doc, ...requestDTO };
     } catch (error) {
       if (error.code == 11000) {
         throw new BadRequestException('Course No already exists');
