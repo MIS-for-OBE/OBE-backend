@@ -248,6 +248,9 @@ export class CourseService {
       }
       return updateCourse;
     } catch (error) {
+      if (error.code == 11000) {
+        throw new BadRequestException('Course No already exists');
+      }
       throw error;
     }
   }
