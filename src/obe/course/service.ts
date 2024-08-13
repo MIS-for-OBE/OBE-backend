@@ -14,6 +14,7 @@ import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { CourseSearchDTO } from './dto/search.dto';
 import { setWhereWithSearchCourse } from 'src/common/function/function';
 import { ROLE } from 'src/common/enum/role.enum';
+import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @Injectable()
 export class CourseService {
@@ -144,7 +145,7 @@ export class CourseService {
             `Section ${existSection.join(', ')} has been already added.`,
           );
         } else {
-          return;
+          return TEXT_ENUM.Success;
         }
       }
     } catch (error) {
@@ -270,7 +271,10 @@ export class CourseService {
 
   async updateCourse(id: string, requestDTO: any): Promise<Course> {
     try {
-      const updateCourse: any = await this.model.findByIdAndUpdate(id, requestDTO);
+      const updateCourse: any = await this.model.findByIdAndUpdate(
+        id,
+        requestDTO,
+      );
       if (!updateCourse) {
         throw new NotFoundException('Course not found');
       }
