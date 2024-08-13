@@ -107,14 +107,15 @@ export class CourseManagementService {
   }
 
   async updateSectionManagement(
-    id: string,
+    params: any,
     requestDTO: any,
   ): Promise<CourseManagement> {
     try {
-      const course = await this.model.findOneAndUpdate(
-        { 'sections.$.id': id },
-        { $set: { 'sections.$': requestDTO } },
-        { new: true },
+      const course = await this.model.findByIdAndUpdate(
+        params.id,
+        // { id: params.id, 'sections.$[].id': params.section },
+        { $set: { 'sections.$[sec]': requestDTO } },
+        { arrayFilters: [{ 'sec._id': params.section }], new: true },
       );
       if (!course) {
         throw new NotFoundException('SectionManagement not found');
@@ -130,6 +131,22 @@ export class CourseManagementService {
       const course = await this.model.findByIdAndDelete(id);
       if (!course) {
         throw new NotFoundException('CourseManagement not found');
+      }
+      return course;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteSectionManagement(params: any): Promise<CourseManagement> {
+    try {
+      const course = await this.model.findByIdAndUpdate(
+        params.id,
+        { $pull: { sections: { id: params.section } } },
+        { new: true },
+      );
+      if (!course) {
+        throw new NotFoundException('SectionManagement not found');
       }
       return course;
     } catch (error) {

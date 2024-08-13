@@ -89,7 +89,11 @@ export class UserService {
     role: string,
   ): Promise<User> {
     try {
-      return this.model.findByIdAndUpdate(userId, { role }, { new: true });
+      return await this.model.findByIdAndUpdate(
+        userId,
+        { role },
+        { new: true },
+      );
     } catch (error) {
       throw error;
     }
@@ -105,6 +109,10 @@ export class UserService {
         if (user.role == role) {
           throw new BadRequestException(
             `${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`} is already an admin`,
+          );
+        } else if (user.role == ROLE.SUPREME_ADMIN) {
+          throw new BadRequestException(
+            `Cannot change the role of ${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`}`,
           );
         }
         user = await this.model.findOneAndUpdate(

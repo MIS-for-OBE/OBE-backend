@@ -60,7 +60,7 @@ export class CourseManagementController {
       });
   }
 
-  @Put('course/:id')
+  @Put('/:id')
   async updateCourseManagement(
     @Param('id') id: string,
     @Body() requestDTO: any,
@@ -74,13 +74,13 @@ export class CourseManagementController {
       });
   }
 
-  @Put('section/:id')
+  @Put('/:id/:section')
   async updateSectionManagement(
-    @Param('id') id: string,
+    @Param() params: any,
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<CourseManagement>> {
     return this.service
-      .updateSectionManagement(id, requestDTO)
+      .updateSectionManagement(params, requestDTO)
       .then((result) => {
         const responseDTO = new ResponseDTO<CourseManagement>();
         responseDTO.data = result;
@@ -93,6 +93,17 @@ export class CourseManagementController {
     @Param('id') id: string,
   ): Promise<ResponseDTO<CourseManagement>> {
     return this.service.deleteCourseManagement(id).then((result) => {
+      const responseDTO = new ResponseDTO<CourseManagement>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Delete('/:id/:section')
+  async deleteSectionManagement(
+    @Param() params: any,
+  ): Promise<ResponseDTO<CourseManagement>> {
+    return this.service.deleteSectionManagement(params).then((result) => {
       const responseDTO = new ResponseDTO<CourseManagement>();
       responseDTO.data = result;
       return responseDTO;
