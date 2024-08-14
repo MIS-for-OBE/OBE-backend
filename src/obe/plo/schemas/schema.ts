@@ -40,6 +40,12 @@ export class PLO {
   @Prop({ required: true })
   departmentCode: string[];
 
+  @Prop({ required: true })
+  criteriaTH: string;
+
+  @Prop({ required: true })
+  criteriaEN: string;
+
   @Prop({ required: true, type: [PLONoSchema] })
   data: PLONo[];
 }
