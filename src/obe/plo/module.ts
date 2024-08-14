@@ -6,6 +6,7 @@ import { UserModel } from '../user/module';
 import { PLO, PLOSchema } from './schemas/schema';
 import { LogEventModel } from '../logEvent/module';
 import { LogEventService } from '../logEvent/service';
+import { FacultyModel } from '../faculty/module';
 
 export const PLOModel = {
   name: PLO.name,
@@ -16,6 +17,7 @@ export const PLOModel = {
   imports: [
     MongooseModule.forFeature([
       PLOModel,
+      FacultyModel,
       UserModel,
       // CourseModel,
       // CourseManagementModel,
