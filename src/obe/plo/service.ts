@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PLO } from './schemas/schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { ROLE } from 'src/common/enum/role.enum';
 
 @Injectable()
 export class PLOService {
@@ -13,16 +14,16 @@ export class PLOService {
   ) {}
   async searchPLO(facultyCode: string, searchDTO: any): Promise<any> {
     try {
-      const plos = await this.model
-        .find({
-          facultyCode,
-          departmentCode: { $in: searchDTO.departmentCode },
-        })
-        .sort([
-          ['year', searchDTO.orderType],
-          ['semester', searchDTO.orderType],
-        ]);
-      return plos;
+      const where: any = { facultyCode };
+      if (searchDTO.role !== ROLE.SUPREME_ADMIN) {
+        where.departmentCode = { $in: searchDTO.departmentCode };
+      }
+      const totalCount = await this.model.countDocuments(where);
+      const plos = await this.model.find(where).sort([
+        ['year', 'desc'],
+        ['semester', 'desc'],
+      ]);
+      return { totalCount, plos };
     } catch (error) {
       throw error;
     }

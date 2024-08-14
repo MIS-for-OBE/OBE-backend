@@ -6,10 +6,9 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { SectionService } from '../section/service';
 import { PLOService } from './service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
-import { CourseManagement } from '../courseManagement/schemas/schema';
+import { PLO } from './schemas/schema';
 
 @Controller('/plo')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -20,11 +19,11 @@ export class PLOController {
   async searchPLO(
     @Request() req,
     @Query() searchDTO: any,
-  ): Promise<ResponseDTO<CourseManagement[]>> {
+  ): Promise<ResponseDTO<any>> {
     return this.service
       .searchPLO(req.user.facultyCode, searchDTO)
       .then((result) => {
-        const responseDTO = new ResponseDTO<CourseManagement[]>();
+        const responseDTO = new ResponseDTO<any>();
         responseDTO.data = result;
         return responseDTO;
       });
