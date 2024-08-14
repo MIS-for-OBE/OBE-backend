@@ -12,6 +12,7 @@ import { CourseManagementModule } from './obe/courseManagement/module';
 import { LogEventModule } from './obe/logEvent/module';
 import { CourseModule } from './obe/course/module';
 import { SectionModule } from './obe/section/module';
+import { PLOModule } from './obe/plo/module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SectionModule } from './obe/section/module';
     DatabaseModule,
     UserModule,
     FacultyModule,
+    PLOModule,
     LogEventModule,
     CourseManagementModule,
     AcademicYearModule,
