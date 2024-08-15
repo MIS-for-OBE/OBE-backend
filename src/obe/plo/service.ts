@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PLO } from './schemas/schema';
-import { Collection, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
 import { Faculty } from '../faculty/schemas/schema';
@@ -20,6 +20,8 @@ export class PLOService {
       const where: any = { facultyCode };
       if (!isSAdmin) {
         where.departmentCode = { $in: searchDTO.departmentCode };
+      } else {
+        where.isActive = true;
       }
       const faculty = await this.facultyModel.findOne({ facultyCode });
       const totalCount = await this.model.countDocuments(where);

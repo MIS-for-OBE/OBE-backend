@@ -4,6 +4,7 @@ import {
   Delete,
   Param,
   Put,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -31,7 +32,7 @@ export class SectionController {
   @Delete('/:id')
   async deleteSection(
     @Param('id') id: string,
-    @Body() reqestDTO: any,
+    @Query() reqestDTO: any,
   ): Promise<ResponseDTO<Section>> {
     return this.service.deleteSection(id, reqestDTO).then((result) => {
       const responseDTO = new ResponseDTO<Section>();

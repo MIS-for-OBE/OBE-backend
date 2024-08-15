@@ -6,16 +6,16 @@ import {
 import { Section } from './schemas/schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Course } from '../course/schemas/schema';
 import { CourseManagement } from '../courseManagement/schemas/schema';
+import { Course } from '../course/schemas/schema';
 
 @Injectable()
 export class SectionService {
   constructor(
     @InjectModel(Section.name) private readonly model: Model<Section>,
-    // @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(CourseManagement.name)
     private readonly courseManagementModel: Model<CourseManagement>,
+    @InjectModel(Course.name) private readonly courseModel: Model<Course>,
   ) {}
 
   async createSection(id: string, requestDTO: any): Promise<Section> {
@@ -58,7 +58,7 @@ export class SectionService {
         },
       );
       if (!updateCourse) {
-        throw new NotFoundException('Section not found');
+        throw new NotFoundException('Course not found');
       }
       const updateSection = await this.model.findByIdAndUpdate(
         id,
@@ -74,20 +74,21 @@ export class SectionService {
 
   async deleteSection(id: string, requestDTO: any): Promise<Section> {
     try {
+      const updateCourse = await this.courseManagementModel.findOneAndUpdate(
+        { courseNo: requestDTO.courseNo },
+        { $pull: { sections: { sectionNo: requestDTO.sectionNo } } },
+        { new: true },
+      );
+      if (!updateCourse) {
+        throw new NotFoundException('Course not found');
+      }
+      await this.courseModel.findByIdAndUpdate(requestDTO.courseId, {
+        $pull: { sections: id },
+      });
       const deleteSection = await this.model.findByIdAndDelete(id);
       if (!deleteSection) {
         throw new NotFoundException('Section not found');
       }
-      // const updateCourse = await this.courseModel.findByIdAndUpdate(
-      //   requestDTO.courseId,
-      //   { sections: { $pull: id } },
-      // );
-      // if (updateCourse.addFirstTime) {
-      //   await this.courseManagementModel.findOneAndUpdate(
-      //     { courseNo: updateCourse.courseNo },
-      //     { sections: { $pull: deleteSection.sectionNo } },
-      //   );
-      // }
       return deleteSection;
     } catch (error) {
       throw error;
