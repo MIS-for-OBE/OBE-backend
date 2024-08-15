@@ -16,8 +16,9 @@ export class PLOService {
   ) {}
   async searchPLO(facultyCode: string, searchDTO: any): Promise<any> {
     try {
+      const isSAdmin = searchDTO.role == ROLE.SUPREME_ADMIN;
       const where: any = { facultyCode };
-      if (searchDTO.role !== ROLE.SUPREME_ADMIN) {
+      if (!isSAdmin) {
         where.departmentCode = { $in: searchDTO.departmentCode };
       }
       const faculty = await this.facultyModel.findOne({ facultyCode });
@@ -26,7 +27,10 @@ export class PLOService {
         ['year', 'desc'],
         ['semester', 'desc'],
       ]);
-      const plos = searchDTO.departmentCode.map((dep) => {
+      const departmentCodes = isSAdmin
+        ? faculty.department.map((dep) => dep.departmentCode)
+        : searchDTO.departmentCode;
+      const plos = departmentCodes.map((dep) => {
         return {
           departmentCode: dep,
           departmentEN: faculty.department.find(
@@ -41,11 +45,9 @@ export class PLOService {
             plo.collections.push(collection);
           }
         });
-        if (!plo.collections.length) {
-          plos.splice(index);
-        }
       });
-      return { totalCount, plos };
+      const filteredPLOs = plos.filter((plo) => plo.collections.length > 0);
+      return { totalCount, plos: filteredPLOs };
     } catch (error) {
       throw error;
     }
