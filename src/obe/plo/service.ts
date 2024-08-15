@@ -20,7 +20,8 @@ export class PLOService {
       const where: any = { facultyCode };
       if (!isSAdmin) {
         where.departmentCode = { $in: searchDTO.departmentCode };
-      } else {
+      }
+      if (searchDTO.manage) {
         where.isActive = true;
       }
       const faculty = await this.facultyModel.findOne({ facultyCode });
