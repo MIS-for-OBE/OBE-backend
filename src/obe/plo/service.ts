@@ -27,6 +27,9 @@ export class PLOService {
         ['year', 'desc'],
         ['semester', 'desc'],
       ]);
+      if (searchDTO.manage) {
+        return data;
+      }
       const departmentCodes = isSAdmin
         ? faculty.department.map((dep) => dep.departmentCode)
         : searchDTO.departmentCode;
