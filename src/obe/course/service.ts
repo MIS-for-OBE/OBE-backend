@@ -74,11 +74,13 @@ export class CourseService {
           .skip((searchDTO.page - 1) * searchDTO.limit)
           .limit(searchDTO.limit);
         const filterCourses = courses.map((course) => {
-          course.sections = course.sections.filter(
-            (section: any) =>
-              section.instructor.id == id ||
-              section.coInstructors.some((coIns) => coIns.id == id),
-          );
+          course.sections = course.sections
+            .filter(
+              (section: any) =>
+                section.instructor.id == id ||
+                section.coInstructors.some((coIns) => coIns.id == id),
+            )
+            .sort((a, b) => a.sectionNo - b.sectionNo);
           return course;
         });
         if (searchDTO.page == 1 && !searchDTO.search.length) {
@@ -112,11 +114,13 @@ export class CourseService {
       if (!course) {
         throw new NotFoundException('Course not found');
       }
-      course.sections = course.sections.filter(
-        (section: any) =>
-          section.instructor.id == id ||
-          section.coInstructors.some((coIns) => coIns.id == id),
-      );
+      course.sections = course.sections
+        .filter(
+          (section: any) =>
+            section.instructor.id == id ||
+            section.coInstructors.some((coIns) => coIns.id == id),
+        )
+        .sort((a, b) => a.sectionNo - b.sectionNo);
       return course;
     } catch (error) {
       throw error;

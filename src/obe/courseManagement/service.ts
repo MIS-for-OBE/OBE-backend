@@ -54,6 +54,9 @@ export class CourseManagementService {
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
+      courses.forEach((course) => {
+        course.sections.sort((a, b) => a.sectionNo - b.sectionNo);
+      });
       if (searchDTO.page == 1 && !searchDTO.search.length) {
         const totalCount = await this.model.countDocuments(where);
         return { totalCount, courses };
