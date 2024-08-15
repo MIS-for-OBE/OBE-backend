@@ -19,6 +19,9 @@ export class Section {
   @Prop({ required: true })
   sectionNo: number;
 
+  @Prop({ required: true, default: true })
+  isActive: boolean;
+
   @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
