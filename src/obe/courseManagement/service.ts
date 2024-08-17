@@ -9,12 +9,14 @@ import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
 import { FacultyService } from '../faculty/service';
 import { setWhereWithSearchCourse } from 'src/common/function/function';
 import { CourseManagementSearchDTO } from './dto/search.dto';
+import { Course } from '../course/schemas/schema';
 
 @Injectable()
 export class CourseManagementService {
   constructor(
     @InjectModel(CourseManagement.name)
     private readonly model: Model<CourseManagement>,
+    @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly facultyService: FacultyService,
     private readonly configService: ConfigService,
@@ -92,10 +94,7 @@ export class CourseManagementService {
     }
   }
 
-  async updateCourseManagement(
-    id: string,
-    requestDTO: any,
-  ): Promise<CourseManagement> {
+  async updateCourseManagement(id: string, requestDTO: any): Promise<any> {
     try {
       const course = await this.model.findByIdAndUpdate(id, requestDTO, {
         new: true,
@@ -103,7 +102,15 @@ export class CourseManagementService {
       if (!course) {
         throw new NotFoundException('CourseManagement not found');
       }
-      return course;
+      const updateCourse = await this.courseModel.findOneAndUpdate(
+        {
+          academicYear: requestDTO.academicYear,
+          courseNo: requestDTO.oldCourseNo,
+        },
+        requestDTO,
+        { new: true },
+      );
+      return updateCourse;
     } catch (error) {
       throw error;
     }

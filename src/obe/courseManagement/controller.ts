@@ -64,11 +64,11 @@ export class CourseManagementController {
   async updateCourseManagement(
     @Param('id') id: string,
     @Body() requestDTO: any,
-  ): Promise<ResponseDTO<CourseManagement>> {
+  ): Promise<ResponseDTO<any>> {
     return this.service
       .updateCourseManagement(id, requestDTO)
       .then((result) => {
-        const responseDTO = new ResponseDTO<CourseManagement>();
+        const responseDTO = new ResponseDTO<any>();
         responseDTO.data = result;
         return responseDTO;
       });
