@@ -5,7 +5,14 @@ import { User } from 'src/obe/user/schemas/schema';
 
 export type CourseManagementDocument = HydratedDocument<CourseManagement>;
 
-@Schema()
+@Schema({
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret._id;
+      delete ret._id;
+    },
+  },
+})
 export class SectionManagement {
   @Prop({ required: true })
   sectionNo: number;
@@ -63,6 +70,5 @@ export class CourseManagement {
   sections: SectionManagement[];
 }
 
-export const CourseManagementSchema = SchemaFactory.createForClass(
-  CourseManagement,
-).index({ courseNo: 1, 'sections.sectionNo': 1 }, { unique: true });
+export const CourseManagementSchema =
+  SchemaFactory.createForClass(CourseManagement);

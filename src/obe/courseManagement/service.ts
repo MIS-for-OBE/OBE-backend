@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CourseManagement, CourseManagementDocument } from './schemas/schema';
@@ -10,6 +14,7 @@ import { FacultyService } from '../faculty/service';
 import { setWhereWithSearchCourse } from 'src/common/function/function';
 import { CourseManagementSearchDTO } from './dto/search.dto';
 import { Course } from '../course/schemas/schema';
+import { Section } from '../section/schemas/schema';
 
 @Injectable()
 export class CourseManagementService {
@@ -17,6 +22,7 @@ export class CourseManagementService {
     @InjectModel(CourseManagement.name)
     private readonly model: Model<CourseManagement>,
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
+    @InjectModel(Section.name) private readonly sectionModel: Model<Section>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly facultyService: FacultyService,
     private readonly configService: ConfigService,
@@ -116,21 +122,53 @@ export class CourseManagementService {
     }
   }
 
-  async updateSectionManagement(
-    params: any,
-    requestDTO: any,
-  ): Promise<CourseManagement> {
+  async updateSectionManagement(params: any, requestDTO: any): Promise<any> {
     try {
-      const course = await this.model.findByIdAndUpdate(
-        params.id,
-        // { id: params.id, 'sections.$[].id': params.section },
-        { $set: { 'sections.$[sec]': requestDTO } },
-        { arrayFilters: [{ 'sec._id': params.section }], new: true },
+      let updateCourse: any = await this.model.findById(params.id);
+      if (!updateCourse) {
+        throw new NotFoundException('CourseManagement not found');
+      }
+      const isDuplicateSectionNo = updateCourse.sections.some(
+        (sec: any) =>
+          sec.sectionNo === requestDTO.data.sectionNo &&
+          sec.id !== params.section,
       );
-      if (!course) {
+      if (isDuplicateSectionNo) {
+        throw new BadRequestException('Section No already exists');
+      }
+      const updateFields = {};
+      for (const key in requestDTO.data) {
+        updateFields[`sections.$[sec].${key}`] = requestDTO.data[key];
+      }
+      updateCourse = await this.model
+        .findByIdAndUpdate(
+          params.id,
+          { $set: updateFields },
+          { arrayFilters: [{ 'sec._id': params.section }], new: true },
+        )
+        .sort([['sectionNo', 'asc']]);
+      if (!updateCourse) {
         throw new NotFoundException('SectionManagement not found');
       }
-      return course;
+      updateCourse = updateCourse.sections.sort(
+        (a, b) => a.sectionNo - b.sectionNo,
+      );
+      const course: any = await this.courseModel
+        .findOne({
+          academicYear: requestDTO.academicYear,
+          courseNo: requestDTO.courseNo,
+        })
+        .populate('sections');
+      if (course) {
+        const secId = course.sections.find(
+          (sec) => sec.sectionNo == requestDTO.oldSectionNo,
+        ).id;
+        if (secId) {
+          await this.sectionModel.findByIdAndUpdate(secId, requestDTO.data);
+        }
+        return { updateCourse, courseId: course.id, secId };
+      }
+      return { updateCourse };
     } catch (error) {
       throw error;
     }

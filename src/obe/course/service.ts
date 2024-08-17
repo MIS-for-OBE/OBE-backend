@@ -146,7 +146,7 @@ export class CourseService {
         });
         if (existSection.length) {
           throw new BadRequestException(
-            `Section ${existSection.join(', ')} has been already added.`,
+            `Section ${existSection.map((sec) => ('000' + sec).slice(-3)).join(', ')} has been already added.`,
           );
         }
       }

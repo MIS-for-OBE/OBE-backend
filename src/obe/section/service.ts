@@ -21,6 +21,9 @@ export class SectionService {
   async createSection(id: string, requestDTO: any): Promise<Section> {
     try {
       const createSection = await this.model.create(requestDTO);
+      await this.courseModel.findOneAndUpdate(requestDTO.courseId, {
+        $push: { sections: createSection.id },
+      });
       return createSection;
     } catch (error) {
       throw error;
@@ -39,7 +42,7 @@ export class SectionService {
       );
       if (sectionExists) {
         throw new BadRequestException(
-          `Section no ${('000' + requestDTO.data.sectionNo).slice(-3)} already exists`,
+          `Section No ${('000' + requestDTO.data.sectionNo).slice(-3)} already exists`,
         );
       }
       const updateFields = {};
@@ -65,7 +68,6 @@ export class SectionService {
         requestDTO.data,
         { new: true },
       );
-
       return updateSection;
     } catch (error) {
       throw error;

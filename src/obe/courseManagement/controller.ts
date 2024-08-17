@@ -78,11 +78,11 @@ export class CourseManagementController {
   async updateSectionManagement(
     @Param() params: any,
     @Body() requestDTO: any,
-  ): Promise<ResponseDTO<CourseManagement>> {
+  ): Promise<ResponseDTO<any>> {
     return this.service
       .updateSectionManagement(params, requestDTO)
       .then((result) => {
-        const responseDTO = new ResponseDTO<CourseManagement>();
+        const responseDTO = new ResponseDTO<any>();
         responseDTO.data = result;
         return responseDTO;
       });

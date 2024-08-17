@@ -7,6 +7,7 @@ import { FacultyService } from '../faculty/service';
 import { Faculty, FacultySchema } from '../faculty/schemas/schema';
 import { User, UserSchema } from '../user/schemas/schema';
 import { Course, CourseSchema } from '../course/schemas/schema';
+import { Section, SectionSchema } from '../section/schemas/schema';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Course, CourseSchema } from '../course/schemas/schema';
         schema: CourseManagementSchema,
       },
       { name: Course.name, schema: CourseSchema },
+      { name: Section.name, schema: SectionSchema },
       { name: User.name, schema: UserSchema },
       {
         name: Faculty.name,
