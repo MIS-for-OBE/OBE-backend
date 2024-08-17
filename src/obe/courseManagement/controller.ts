@@ -105,11 +105,14 @@ export class CourseManagementController {
   @Delete('/:id/:section')
   async deleteSectionManagement(
     @Param() params: any,
-  ): Promise<ResponseDTO<CourseManagement>> {
-    return this.service.deleteSectionManagement(params).then((result) => {
-      const responseDTO = new ResponseDTO<CourseManagement>();
-      responseDTO.data = result;
-      return responseDTO;
-    });
+    @Query() requestDTO: any,
+  ): Promise<ResponseDTO<any>> {
+    return this.service
+      .deleteSectionManagement(params, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<CourseManagement>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
   }
 }

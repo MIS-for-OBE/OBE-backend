@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { CourseManagement, CourseManagementDocument } from './schemas/schema';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../user/schemas/schema';
@@ -190,17 +190,39 @@ export class CourseManagementService {
     }
   }
 
-  async deleteSectionManagement(params: any): Promise<CourseManagement> {
+  async deleteSectionManagement(params: any, requestDTO: any): Promise<any> {
     try {
-      const course = await this.model.findByIdAndUpdate(
+      const updateCourse = await this.model.findByIdAndUpdate(
         params.id,
-        { $pull: { sections: { id: params.section } } },
+        {
+          $pull: { sections: { _id: params.section } },
+        },
         { new: true },
       );
-      if (!course) {
+      if (!updateCourse) {
         throw new NotFoundException('SectionManagement not found');
       }
-      return course;
+      const course: any = await this.courseModel
+        .findOne({
+          academicYear: requestDTO.academicYear,
+          courseNo: requestDTO.courseNo,
+        })
+        .populate('sections');
+      if (course) {
+        const secId = course.sections.find(
+          (sec) => sec.sectionNo == requestDTO.sectionNo,
+        )?.id;
+        if (secId) {
+          await Promise.all([
+            this.courseModel.findByIdAndUpdate(course.id, {
+              $pull: { sections: secId },
+            }),
+            this.sectionModel.findByIdAndDelete(secId),
+          ]);
+        }
+        return { updateCourse, courseId: course.id, secId };
+      }
+      return updateCourse;
     } catch (error) {
       throw error;
     }
