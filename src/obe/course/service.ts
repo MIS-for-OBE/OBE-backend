@@ -287,7 +287,7 @@ export class CourseService {
           requestDTO,
         );
       }
-      return { ...updateCourse._doc, ...requestDTO };
+      return { id, ...requestDTO };
     } catch (error) {
       if (error.code == 11000) {
         throw new BadRequestException('Course No already exists');

@@ -110,7 +110,7 @@ export class CourseManagementService {
         requestDTO,
         { new: true },
       );
-      return updateCourse;
+      return { id, ...requestDTO, courseId: updateCourse.id };
     } catch (error) {
       throw error;
     }
