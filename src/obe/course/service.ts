@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Course } from './schemas/schema';
 import { User } from '../user/schemas/schema';
 import { Section } from '../section/schemas/schema';
@@ -274,19 +274,18 @@ export class CourseService {
 
   async updateCourse(id: string, requestDTO: any): Promise<Course> {
     try {
-      const updateCourse: any = await this.model.findByIdAndUpdate(
-        id,
-        requestDTO,
-      );
-      if (!updateCourse) {
+      const currentCourse = await this.model.findById(id);
+      if (!currentCourse) {
         throw new NotFoundException('Course not found');
       }
-      if (updateCourse.addFirstTime) {
+      if (currentCourse.addFirstTime) {
         await this.courseManagementModel.findOneAndUpdate(
-          { courseNo: updateCourse.courseNo },
+          { courseNo: currentCourse.courseNo },
           requestDTO,
         );
       }
+      await this.model.findByIdAndUpdate(id, requestDTO);
+
       return { id, ...requestDTO };
     } catch (error) {
       if (error.code == 11000) {
