@@ -3,18 +3,23 @@ import { CourseManagementService } from './service';
 import { CourseManagementController } from './controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CourseManagement, CourseManagementSchema } from './schemas/schema';
-import { UserModel } from '../user/module';
-import { FacultyModel } from '../faculty/module';
 import { FacultyService } from '../faculty/service';
-
-export const CourseManagementModel = {
-  name: CourseManagement.name,
-  schema: CourseManagementSchema,
-};
+import { Faculty, FacultySchema } from '../faculty/schemas/schema';
+import { User, UserSchema } from '../user/schemas/schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([CourseManagementModel, UserModel, FacultyModel]),
+    MongooseModule.forFeature([
+      {
+        name: CourseManagement.name,
+        schema: CourseManagementSchema,
+      },
+      { name: User.name, schema: UserSchema },
+      {
+        name: Faculty.name,
+        schema: FacultySchema,
+      },
+    ]),
   ],
   controllers: [CourseManagementController],
   providers: [CourseManagementService, FacultyService],

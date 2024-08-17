@@ -2,26 +2,28 @@ import { Module } from '@nestjs/common';
 import { PLOController } from './controller';
 import { PLOService } from './service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModel } from '../user/module';
 import { PLO, PLOSchema } from './schemas/schema';
-import { LogEventModel } from '../logEvent/module';
 import { LogEventService } from '../logEvent/service';
-import { FacultyModel } from '../faculty/module';
-
-export const PLOModel = {
-  name: PLO.name,
-  schema: PLOSchema,
-};
+import { User, UserSchema } from '../user/schemas/schema';
+import { LogEvent, LogEventSchema } from '../logEvent/schemas/schema';
+import { Faculty, FacultySchema } from '../faculty/schemas/schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      PLOModel,
-      FacultyModel,
-      UserModel,
-      // CourseModel,
-      // CourseManagementModel,
-      LogEventModel,
+      {
+        name: PLO.name,
+        schema: PLOSchema,
+      },
+      {
+        name: Faculty.name,
+        schema: FacultySchema,
+      },
+      { name: User.name, schema: UserSchema },
+      {
+        name: LogEvent.name,
+        schema: LogEventSchema,
+      },
     ]),
   ],
   controllers: [PLOController],

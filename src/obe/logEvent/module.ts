@@ -4,13 +4,15 @@ import { LogEventController } from './controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LogEvent, LogEventSchema } from './schemas/schema';
 
-export const LogEventModel = {
-  name: LogEvent.name,
-  schema: LogEventSchema,
-};
-
 @Module({
-  imports: [MongooseModule.forFeature([LogEventModel])],
+  imports: [
+    MongooseModule.forFeature([
+      {
+        name: LogEvent.name,
+        schema: LogEventSchema,
+      },
+    ]),
+  ],
   controllers: [LogEventController],
   providers: [LogEventService],
 })
