@@ -91,12 +91,15 @@ export class CourseManagementController {
   @Delete('/:id')
   async deleteCourseManagement(
     @Param('id') id: string,
-  ): Promise<ResponseDTO<CourseManagement>> {
-    return this.service.deleteCourseManagement(id).then((result) => {
-      const responseDTO = new ResponseDTO<CourseManagement>();
-      responseDTO.data = result;
-      return responseDTO;
-    });
+    @Query() requestDTO: any,
+  ): Promise<ResponseDTO<any>> {
+    return this.service
+      .deleteCourseManagement(id, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<any>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
   }
 
   @Delete('/:id/:section')

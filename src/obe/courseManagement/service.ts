@@ -136,13 +136,17 @@ export class CourseManagementService {
     }
   }
 
-  async deleteCourseManagement(id: string): Promise<CourseManagement> {
+  async deleteCourseManagement(id: string, requestDTO: any): Promise<any> {
     try {
       const course = await this.model.findByIdAndDelete(id);
       if (!course) {
         throw new NotFoundException('CourseManagement not found');
       }
-      return course;
+      const deleteCourse = await this.courseModel.findOneAndDelete({
+        academicYear: requestDTO.academicYear,
+        courseNo: requestDTO.courseNo,
+      });
+      return { id, courseId: deleteCourse.id };
     } catch (error) {
       throw error;
     }
