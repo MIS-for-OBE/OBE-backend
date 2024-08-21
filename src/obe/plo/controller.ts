@@ -9,6 +9,7 @@ import {
 import { PLOService } from './service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { PLO } from './schemas/schema';
+import { PLOSearchDTO } from './dto/search.dto';
 
 @Controller('/plo')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -18,7 +19,7 @@ export class PLOController {
   @Get()
   async searchPLO(
     @Request() req,
-    @Query() searchDTO: any,
+    @Query() searchDTO: PLOSearchDTO,
   ): Promise<ResponseDTO<any>> {
     return this.service
       .searchPLO(req.user.facultyCode, searchDTO)
