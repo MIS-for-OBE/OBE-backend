@@ -30,7 +30,7 @@ export class PLOService {
         ['year', 'desc'],
         ['semester', 'desc'],
       ]);
-      if (searchDTO.manage) {
+      if (searchDTO.manage || searchDTO.all) {
         return data;
       }
       const departmentCodes = isSAdmin
