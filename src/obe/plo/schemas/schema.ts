@@ -28,6 +28,9 @@ export const PLONoSchema = SchemaFactory.createForClass(PLONo);
   collection: 'PLOs',
 })
 export class PLO {
+  @Prop({ required: true, unique: true })
+  name: string;
+
   @Prop({ required: true })
   year: number;
 
