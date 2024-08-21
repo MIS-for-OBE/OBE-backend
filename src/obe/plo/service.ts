@@ -58,4 +58,15 @@ export class PLOService {
       throw error;
     }
   }
+
+  async updatePLO(id: string, requestDTO: any): Promise<PLO> {
+    try {
+      const updatePLO = await this.model.findByIdAndUpdate(id, {
+        data: requestDTO.data,
+      });
+      return updatePLO;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

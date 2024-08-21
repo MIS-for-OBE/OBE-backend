@@ -1,6 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
+  Param,
+  Put,
   Query,
   Request,
   UsePipes,
@@ -28,5 +31,18 @@ export class PLOController {
         responseDTO.data = result;
         return responseDTO;
       });
+  }
+
+  @Put('/:id')
+  async updatePLO(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<PLO>> {
+    return this.service.updatePLO(id, requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<PLO>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
   }
 }
