@@ -83,7 +83,7 @@ export class CourseService {
             .sort((a, b) => a.sectionNo - b.sectionNo);
           return course;
         });
-        if (searchDTO.page == 1 && !searchDTO.search.length) {
+        if (searchDTO.page == 1) {
           const totalCount = await this.model.countDocuments(where);
           return { totalCount, courses: filterCourses };
         }
