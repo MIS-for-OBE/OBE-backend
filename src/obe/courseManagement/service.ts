@@ -203,7 +203,7 @@ export class CourseManagementService {
       if (course) {
         const secId = course.sections.find(
           (sec) => sec.sectionNo == requestDTO.oldSectionNo,
-        ).id;
+        )?.id;
         if (secId) {
           await this.sectionModel.findByIdAndUpdate(secId, requestDTO.data);
         }
