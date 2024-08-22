@@ -60,6 +60,31 @@ export class CourseManagementController {
       });
   }
 
+  @Get('check')
+  async checkCanCreateSection(
+    @Query() requestDTO: any,
+  ): Promise<ResponseDTO<any>> {
+    return this.service.checkCanCreateSection(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<any>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Post('section/:id')
+  async createSectionManagement(
+    @Param('id') id: string,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<any>> {
+    return this.service
+      .createSectionManagement(id, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<any>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
+  }
+
   @Put('/:id')
   async updateCourseManagement(
     @Param('id') id: string,

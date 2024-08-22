@@ -15,6 +15,7 @@ import { setWhereWithSearchCourse } from 'src/common/function/function';
 import { CourseManagementSearchDTO } from './dto/search.dto';
 import { Course } from '../course/schemas/schema';
 import { Section } from '../section/schemas/schema';
+import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @Injectable()
 export class CourseManagementService {
@@ -95,6 +96,46 @@ export class CourseManagementService {
   ): Promise<CourseManagement> {
     try {
       return await this.model.create(requestDTO);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async checkCanCreateSection(requestDTO: any): Promise<any> {
+    try {
+      const courseManagement = await this.model.findById(requestDTO.id);
+      if (courseManagement) {
+        const existSection = [];
+        requestDTO.sections.forEach((section: any) => {
+          if (
+            courseManagement.sections.find(
+              (existSec: any) => existSec.sectionNo == section.sectionNo,
+            )
+          ) {
+            existSection.push(section.sectionNo);
+          }
+        });
+        if (existSection.length) {
+          throw new BadRequestException({
+            title: 'Section existing',
+            message: `Section ${existSection.map((sec) => ('000' + sec).slice(-3)).join(', ')} has been already added.`,
+          });
+        }
+      }
+      return TEXT_ENUM.Success;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createSectionManagement(id: string, requestDTO: any): Promise<any> {
+    try {
+      const updateCourse = await this.model.findByIdAndUpdate(
+        id,
+        { $push: { sections: requestDTO.sections } },
+        { new: true },
+      );
+      return updateCourse;
     } catch (error) {
       throw error;
     }
