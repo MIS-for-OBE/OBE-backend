@@ -66,7 +66,7 @@ export class CourseManagementService {
       courses.forEach((course) => {
         course.sections.sort((a, b) => a.sectionNo - b.sectionNo);
       });
-      if (searchDTO.page == 1 && !searchDTO.search.length) {
+      if (searchDTO.page == 1) {
         const totalCount = await this.model.countDocuments(where);
         return { totalCount, courses };
       }
