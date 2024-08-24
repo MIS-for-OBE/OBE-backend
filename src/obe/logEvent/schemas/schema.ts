@@ -10,7 +10,7 @@ export type LogEventDocument = HydratedDocument<LogEvent>;
   versionKey: false,
   toJSON: {
     transform(doc, ret) {
-      ret.id = ret._id;
+      ret.id = ret.id ?? ret._id;
       delete ret._id;
     },
   },

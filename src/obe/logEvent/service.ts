@@ -18,7 +18,7 @@ export class LogEventService {
         .where(searchDTO.type ? { type: searchDTO.type } : {})
         .populate(
           'user',
-          '-enrollCourses -ownCourses -coCourses -facultyCode -departmentCode',
+          'firstNameTH lastNameTH firstNameEN lastNameEN email role',
         )
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)

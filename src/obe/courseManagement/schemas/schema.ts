@@ -8,7 +8,7 @@ export type CourseManagementDocument = HydratedDocument<CourseManagement>;
 @Schema({
   toJSON: {
     transform(doc, ret) {
-      ret.id = ret._id;
+      ret.id = ret.id ?? ret._id;
       delete ret._id;
     },
   },
@@ -40,7 +40,7 @@ export const SectionManagementSchema =
   versionKey: false,
   toJSON: {
     transform(doc, ret) {
-      ret.id = ret._id;
+      ret.id = ret.id ?? ret._id;
       delete ret._id;
     },
   },

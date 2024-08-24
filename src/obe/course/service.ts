@@ -35,10 +35,7 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              {
-                path: 'instructor',
-                select: '_id firstNameEN lastNameEN email',
-              },
+              { path: 'instructor', select: 'firstNameEN lastNameEN email' },
             ],
           })
           .sort([[searchDTO.orderBy, searchDTO.orderType]])
@@ -60,14 +57,8 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              {
-                path: 'instructor',
-                select: '_id firstNameEN lastNameEN email',
-              },
-              {
-                path: 'coInstructors',
-                select: '_id firstNameEN lastNameEN email',
-              },
+              { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+              { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
             ],
           })
           .sort([[searchDTO.orderBy, searchDTO.orderType]])
@@ -104,11 +95,8 @@ export class CourseService {
         .populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
-            {
-              path: 'coInstructors',
-              select: '_id firstNameEN lastNameEN email',
-            },
+            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
           ],
         });
       if (!course) {
@@ -145,9 +133,10 @@ export class CourseService {
           }
         });
         if (existSection.length) {
-          throw new BadRequestException(
-            {title: 'Section existing' ,message: `Section ${existSection.map((sec) => ('000' + sec).slice(-3)).join(', ')} has been already added.`,}
-          );
+          throw new BadRequestException({
+            title: 'Section existing',
+            message: `Section ${existSection.map((sec) => ('000' + sec).slice(-3)).join(', ')} has been already added.`,
+          });
         }
       }
       return TEXT_ENUM.Success;
@@ -253,11 +242,8 @@ export class CourseService {
         await course.populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
-            {
-              path: 'coInstructors',
-              select: '_id firstNameEN lastNameEN email',
-            },
+            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
           ],
         });
         course.sections = course.sections.filter(

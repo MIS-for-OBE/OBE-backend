@@ -9,7 +9,7 @@ export type UserDocument = HydratedDocument<User>;
   versionKey: false,
   toJSON: {
     transform(doc, ret) {
-      ret.id = ret._id;
+      ret.id = doc._id;
       delete ret._id;
     },
   },

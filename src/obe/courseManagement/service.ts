@@ -45,7 +45,7 @@ export class CourseManagementService {
           ),
         },
       };
-      if (searchDTO.search.length) {
+      if (searchDTO.search?.length) {
         setWhereWithSearchCourse(where, searchDTO.search);
       }
       const courses = await this.model
@@ -53,11 +53,8 @@ export class CourseManagementService {
         .populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: '_id firstNameEN lastNameEN email' },
-            {
-              path: 'coInstructors',
-              select: '_id firstNameEN lastNameEN email',
-            },
+            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
           ],
         })
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
