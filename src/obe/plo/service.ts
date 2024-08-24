@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
 import { Faculty } from '../faculty/schemas/schema';
+import { sortData } from 'src/common/function/function';
 
 @Injectable()
 export class PLOService {
@@ -53,6 +54,7 @@ export class PLOService {
         });
       });
       const filteredPLOs = plos.filter((plo) => plo.collections.length > 0);
+      sortData(filteredPLOs, 'departmentEN', 'string');
       return { totalCount, plos: filteredPLOs };
     } catch (error) {
       throw error;
