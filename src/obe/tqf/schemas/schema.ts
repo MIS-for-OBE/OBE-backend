@@ -15,6 +15,7 @@ export type TQFDocument = HydratedDocument<TQF>;
     },
   },
   timestamps: true,
+  discriminatorKey: 'type',
   collection: 'TQF',
 })
 export class TQF {
@@ -32,12 +33,6 @@ export class TQF {
 
   @Prop({ required: true, enum: TQF_TYPE })
   type: TQF_TYPE;
-
-  @Prop({ required: true })
-  semester: number;
 }
 
-export const TQFSchema = SchemaFactory.createForClass(TQF).index(
-  { year: 1, semester: 1 },
-  { unique: true },
-);
+export const TQFSchema = SchemaFactory.createForClass(TQF);
