@@ -12,7 +12,10 @@ import { CourseManagementService } from '../courseManagement/service';
 import { CourseManagement } from '../courseManagement/schemas/schema';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { CourseSearchDTO } from './dto/search.dto';
-import { setWhereWithSearchCourse } from 'src/common/function/function';
+import {
+  setWhereWithSearchCourse,
+  sortData,
+} from 'src/common/function/function';
 import { ROLE } from 'src/common/enum/role.enum';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
@@ -65,13 +68,13 @@ export class CourseService {
           .skip((searchDTO.page - 1) * searchDTO.limit)
           .limit(searchDTO.limit);
         const filterCourses = courses.map((course) => {
-          course.sections = course.sections
-            .filter(
-              (section: any) =>
-                section.instructor.id == id ||
-                section.coInstructors.some((coIns) => coIns.id == id),
-            )
-            .sort((a, b) => a.sectionNo - b.sectionNo);
+          course.sections = course.sections.filter(
+            (section: any) =>
+              section.instructor.id == id ||
+              section.coInstructors.some((coIns) => coIns.id == id),
+          );
+          sortData(course.sections, 'sectionNo');
+          sortData(course.sections, 'isActive', 'boolean');
           return course;
         });
         if (searchDTO.page == 1) {
@@ -102,13 +105,13 @@ export class CourseService {
       if (!course) {
         throw new NotFoundException('Course not found');
       }
-      course.sections = course.sections
-        .filter(
-          (section: any) =>
-            section.instructor.id == id ||
-            section.coInstructors.some((coIns) => coIns.id == id),
-        )
-        .sort((a, b) => a.sectionNo - b.sectionNo);
+      course.sections = course.sections.filter(
+        (section: any) =>
+          section.instructor.id == id ||
+          section.coInstructors.some((coIns) => coIns.id == id),
+      );
+      sortData(course.sections, 'sectionNo');
+      sortData(course.sections, 'isActive', 'boolean');
       return course;
     } catch (error) {
       throw error;
