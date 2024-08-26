@@ -18,18 +18,6 @@ export class SectionService {
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
   ) {}
 
-  async createSection(id: string, requestDTO: any): Promise<Section> {
-    try {
-      const createSection = await this.model.create(requestDTO);
-      await this.courseModel.findOneAndUpdate(requestDTO.courseId, {
-        $push: { sections: createSection.id },
-      });
-      return createSection;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async updateSection(id: string, requestDTO: any): Promise<Section> {
     try {
       const check = await this.courseManagementModel.findOne({
@@ -68,6 +56,17 @@ export class SectionService {
         requestDTO.data,
         { new: true },
       );
+      return updateSection;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateSectionActive(id: string, requestDTO: any): Promise<Section> {
+    try {
+      const updateSection = await this.model.findByIdAndUpdate(id, requestDTO, {
+        new: true,
+      });
       return updateSection;
     } catch (error) {
       throw error;

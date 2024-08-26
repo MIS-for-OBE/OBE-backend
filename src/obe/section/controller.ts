@@ -29,6 +29,18 @@ export class SectionController {
     });
   }
 
+  @Put('/:id/active')
+  async updateSectionActive(
+    @Param('id') id: string,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<Section>> {
+    return this.service.updateSectionActive(id, requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Delete('/:id')
   async deleteSection(
     @Param('id') id: string,
