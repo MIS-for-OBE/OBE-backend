@@ -3,7 +3,14 @@ import { HydratedDocument } from 'mongoose';
 
 export type PLODocument = HydratedDocument<PLO>;
 
-@Schema()
+@Schema({
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret.id ?? ret._id;
+      delete ret._id;
+    },
+  },
+})
 export class PLONo {
   @Prop({ required: true })
   no: number;
