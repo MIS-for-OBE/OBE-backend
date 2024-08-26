@@ -67,21 +67,22 @@ export class CourseService {
           .sort([[searchDTO.orderBy, searchDTO.orderType]])
           .skip((searchDTO.page - 1) * searchDTO.limit)
           .limit(searchDTO.limit);
-        const filterCourses = courses.map((course) => {
-          course.sections = course.sections.filter(
-            (section: any) =>
-              section.instructor.id == id ||
-              section.coInstructors.some((coIns) => coIns.id == id),
-          );
+        // const filterCourses =
+        courses.map((course) => {
+          // course.sections = course.sections.filter(
+          //   (section: any) =>
+          //     section.instructor.id == id ||
+          //     section.coInstructors.some((coIns) => coIns.id == id),
+          // );
           sortData(course.sections, 'sectionNo');
           sortData(course.sections, 'isActive', 'boolean');
           return course;
         });
         if (searchDTO.page == 1) {
           const totalCount = await this.model.countDocuments(where);
-          return { totalCount, courses: filterCourses };
+          return { totalCount, courses };
         }
-        return filterCourses;
+        return courses;
       }
     } catch (error) {
       throw error;
@@ -105,11 +106,11 @@ export class CourseService {
       if (!course) {
         throw new NotFoundException('Course not found');
       }
-      course.sections = course.sections.filter(
-        (section: any) =>
-          section.instructor.id == id ||
-          section.coInstructors.some((coIns) => coIns.id == id),
-      );
+      // course.sections = course.sections.filter(
+      //   (section: any) =>
+      //     section.instructor.id == id ||
+      //     section.coInstructors.some((coIns) => coIns.id == id),
+      // );
       sortData(course.sections, 'sectionNo');
       sortData(course.sections, 'isActive', 'boolean');
       return course;
@@ -249,11 +250,11 @@ export class CourseService {
             { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
           ],
         });
-        course.sections = course.sections.filter(
-          (section: any) =>
-            section.instructor.id == id ||
-            section.coInstructors.some((coIns: any) => coIns.id == id),
-        );
+        // course.sections = course.sections.filter(
+        //   (section: any) =>
+        //     section.instructor.id == id ||
+        //     section.coInstructors.some((coIns: any) => coIns.id == id),
+        // );
       }
       return course ?? [];
     } catch (error) {
