@@ -45,7 +45,7 @@ export class PLO {
   semester: number;
 
   @Prop({ required: true, default: false })
-  isActive: number;
+  isActive: boolean;
 
   @Prop({ required: true })
   facultyCode: string;
