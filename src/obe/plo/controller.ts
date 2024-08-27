@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Post,
   Put,
   Query,
   Request,
@@ -31,6 +32,27 @@ export class PLOController {
         responseDTO.data = result;
         return responseDTO;
       });
+  }
+
+  @Get('check')
+  async checkCanCreatePLO(@Query() requestDTO: any): Promise<ResponseDTO<any>> {
+    return this.service.checkCanCreatePLO(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<any>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Post()
+  async createPLO(
+    @Request() req,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<any>> {
+    return this.service.createPLO(req.user.id, requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<any>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
   }
 
   @Put('/:id')

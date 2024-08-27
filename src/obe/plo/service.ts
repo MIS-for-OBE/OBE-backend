@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PLO } from './schemas/schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
 import { Faculty } from '../faculty/schemas/schema';
 import { sortData } from 'src/common/function/function';
+import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @Injectable()
 export class PLOService {
@@ -56,6 +57,30 @@ export class PLOService {
       const filteredPLOs = plos.filter((plo) => plo.collections.length > 0);
       sortData(filteredPLOs, 'departmentEN', 'string');
       return { totalCount, plos: filteredPLOs };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async checkCanCreatePLO(requestDTO: any): Promise<any> {
+    try {
+      const existPLO = await this.model.findOne({ name: requestDTO.name });
+      if (existPLO) {
+        throw new BadRequestException({
+          title: 'PLO name existing',
+          message: `${existPLO.name} already exist.`,
+        });
+      }
+      return TEXT_ENUM.Success;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createPLO(id: string, requestDTO: any): Promise<PLO> {
+    try {
+      const newPLO = await this.model.create(requestDTO);
+      return newPLO;
     } catch (error) {
       throw error;
     }
