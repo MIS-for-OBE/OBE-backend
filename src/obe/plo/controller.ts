@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -55,6 +56,19 @@ export class PLOController {
     });
   }
 
+  @Put('/:id/no')
+  async createPLONo(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<PLO>> {
+    return this.service.createPLONo(id, requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<PLO>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Put('/:id')
   async updatePLO(
     @Request() req,
@@ -62,6 +76,31 @@ export class PLOController {
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<PLO>> {
     return this.service.updatePLO(id, requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<PLO>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Delete('/:id')
+  async deletePLO(
+    @Request() req,
+    @Param('id') id: string,
+  ): Promise<ResponseDTO<PLO>> {
+    return this.service.deletePLO(id).then((result) => {
+      const responseDTO = new ResponseDTO<PLO>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Delete('/:id/no')
+  async deletePLONo(
+    @Request() req,
+    @Param('id') id: string,
+    @Query() requestDTO: any,
+  ): Promise<ResponseDTO<PLO>> {
+    return this.service.deletePLONo(id, requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<PLO>();
       responseDTO.data = result;
       return responseDTO;

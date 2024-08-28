@@ -13,6 +13,7 @@ export enum CMU_OAUTH_ROLE {
 
 export enum ROLE {
   STUDENT = 'Student',
+  TA = 'TA',
   INSTRUCTOR = 'Instructor',
   ADMIN = 'Admin',
   SUPREME_ADMIN = 'S. Admin',

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PLO } from './schemas/schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -105,11 +109,52 @@ export class PLOService {
     }
   }
 
+  async createPLONo(id: string, requestDTO: any): Promise<PLO> {
+    try {
+      const updatePLO = await this.model.findByIdAndUpdate(
+        id,
+        { $push: { data: requestDTO } },
+        { new: true },
+      );
+      return updatePLO;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async updatePLO(id: string, requestDTO: any): Promise<PLO> {
     try {
       const updatePLO = await this.model.findByIdAndUpdate(id, {
         data: requestDTO.data,
       });
+      return updatePLO;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deletePLO(id: string): Promise<PLO> {
+    try {
+      const deletePLO = await this.model.findByIdAndDelete(id);
+      if (!deletePLO) {
+        throw new NotFoundException('PLO Collection not found');
+      }
+      return deletePLO;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deletePLONo(id: string, requestDTO: any): Promise<PLO> {
+    try {
+      const updatePLO = await this.model.findByIdAndUpdate(
+        id,
+        { $pull: { data: { _id: requestDTO.id } } },
+        { new: true },
+      );
+      if (!updatePLO) {
+        throw new NotFoundException('PLO Collection not found');
+      }
       return updatePLO;
     } catch (error) {
       throw error;
