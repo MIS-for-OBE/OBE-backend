@@ -79,6 +79,25 @@ export class PLOService {
 
   async createPLO(id: string, requestDTO: any): Promise<PLO> {
     try {
+      const existPloWithDep = await this.model.find({
+        semester: requestDTO.semester,
+        year: requestDTO.year,
+      });
+      if (existPloWithDep) {
+        const existDep = [];
+        existPloWithDep.forEach((plo) => {
+          requestDTO.departmentCode.forEach((dep) => {
+            if (plo.departmentCode.includes(dep) && !existDep.includes(dep))
+              existDep.push(dep);
+          });
+        });
+        if (existDep.length) {
+          throw new BadRequestException({
+            title: `Department PLO Conflict`,
+            message: `${existDep.join(', ')} already exist PLO for semester ${requestDTO.semester}/${requestDTO.year}.`,
+          });
+        }
+      }
       const newPLO = await this.model.create(requestDTO);
       return newPLO;
     } catch (error) {
