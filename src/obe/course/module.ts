@@ -3,7 +3,6 @@ import { CourseService } from './service';
 import { CourseController } from './controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Course, CourseSchema } from './schemas/schema';
-import { CourseManagementService } from '../courseManagement/service';
 import { FacultyService } from '../faculty/service';
 import {
   CourseManagement,
@@ -12,8 +11,6 @@ import {
 import { Faculty, FacultySchema } from '../faculty/schemas/schema';
 import { Section, SectionSchema } from '../section/schemas/schema';
 import { User, UserSchema } from '../user/schemas/schema';
-
-export const CourseModel = { name: Course.name, schema: CourseSchema };
 
 @Module({
   imports: [
@@ -35,6 +32,6 @@ export const CourseModel = { name: Course.name, schema: CourseSchema };
     ]),
   ],
   controllers: [CourseController],
-  providers: [CourseService, CourseManagementService, FacultyService],
+  providers: [CourseService, FacultyService],
 })
 export class CourseModule {}

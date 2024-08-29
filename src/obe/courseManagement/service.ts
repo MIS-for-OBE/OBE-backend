@@ -13,6 +13,7 @@ import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
 import { FacultyService } from '../faculty/service';
 import { setWhereWithSearchCourse } from 'src/common/function/function';
 import { CourseManagementSearchDTO } from './dto/search.dto';
+import { AcademicYear } from '../academicYear/schemas/schema';
 import { Course } from '../course/schemas/schema';
 import { Section } from '../section/schemas/schema';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
@@ -24,9 +25,10 @@ export class CourseManagementService {
     private readonly model: Model<CourseManagement>,
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(Section.name) private readonly sectionModel: Model<Section>,
+    @InjectModel(AcademicYear.name)
+    private readonly academicYearModel: Model<AcademicYear>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly facultyService: FacultyService,
-    private readonly configService: ConfigService,
   ) {}
 
   async searchCourseManagement(
@@ -60,8 +62,29 @@ export class CourseManagementService {
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
+      const activeTerm = await this.academicYearModel.findOne({
+        isActive: true,
+      });
+      const activeCourses = await this.courseModel
+        .find({
+          academicYear: activeTerm.id,
+          ...where,
+        })
+        .populate('sections');
       courses.forEach((course) => {
         course.sections.sort((a, b) => a.sectionNo - b.sectionNo);
+        const curCourse = activeCourses.find(
+          (e) => e.courseNo == course.courseNo,
+        );
+        if (curCourse) {
+          course.sections.forEach((sec) => {
+            sec.isActive =
+              curCourse.sections.find((e) => e.sectionNo == sec.sectionNo)
+                ?.isActive || false;
+          });
+        } else {
+          course.sections.forEach((sec) => (sec.isActive = false));
+        }
       });
       if (searchDTO.page == 1) {
         const totalCount = await this.model.countDocuments(where);
@@ -188,23 +211,48 @@ export class CourseManagementService {
       if (!updateCourse) {
         throw new NotFoundException('SectionManagement not found');
       }
-      updateCourse = updateCourse.sections.sort(
+      const updateSection = updateCourse.sections.sort(
         (a, b) => a.sectionNo - b.sectionNo,
       );
-      const course: any = await this.courseModel
+      let course: any = await this.courseModel
         .findOne({
           academicYear: requestDTO.academicYear,
           courseNo: requestDTO.courseNo,
         })
         .populate('sections');
       if (course) {
-        const secId = course.sections.find(
+        if (!requestDTO.oldSectionNo) {
+          requestDTO.oldSectionNo = requestDTO.data.sectionNo;
+        }
+        let secId = course.sections.find(
           (sec) => sec.sectionNo == requestDTO.oldSectionNo,
         )?.id;
         if (secId) {
-          await this.sectionModel.findByIdAndUpdate(secId, requestDTO.data);
+          await this.sectionModel.findByIdAndUpdate(secId, {
+            ...requestDTO.data,
+            isActive: requestDTO.openThisTerm,
+          });
+        } else if (requestDTO.openThisTerm) {
+          secId = await this.createSection(updateSection, requestDTO);
+          await this.courseModel.findOneAndUpdate(
+            {
+              academicYear: requestDTO.academicYear,
+              courseNo: requestDTO.courseNo,
+            },
+            { $push: { sections: secId._id } },
+            { new: true },
+          );
         }
         return { updateCourse, courseId: course.id, secId };
+      } else if (requestDTO.openThisTerm) {
+        let secId = await this.createSection(updateSection, requestDTO);
+        course = await this.courseModel.create({
+          academicYear: requestDTO.academicYear,
+          courseNo: requestDTO.courseNo,
+          courseName: updateCourse.courseName,
+          type: updateCourse.type,
+          sections: [secId],
+        });
       }
       return { updateCourse };
     } catch (error) {
@@ -232,9 +280,7 @@ export class CourseManagementService {
     try {
       const updateCourse = await this.model.findByIdAndUpdate(
         params.id,
-        {
-          $pull: { sections: { _id: params.section } },
-        },
+        { $pull: { sections: { _id: params.section } } },
         { new: true },
       );
       if (!updateCourse) {
@@ -264,6 +310,14 @@ export class CourseManagementService {
     } catch (error) {
       throw error;
     }
+  }
+
+  private async createSection(course: any, requestDTO: any) {
+    const data = course.find(
+      (sec) => sec.sectionNo == requestDTO.data.sectionNo,
+    )._doc;
+    delete data._id;
+    return await this.sectionModel.create(data);
   }
 
   private setLogEvent(

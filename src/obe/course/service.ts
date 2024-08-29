@@ -26,7 +26,6 @@ export class CourseService {
     @InjectModel(Section.name) private readonly sectionModel: Model<Section>,
     @InjectModel(CourseManagement.name)
     private readonly courseManagementModel: Model<CourseManagement>,
-    private readonly courseManagementService: CourseManagementService,
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
@@ -214,10 +213,7 @@ export class CourseService {
         });
         // }
       } else {
-        await this.courseManagementService.createCourseManagement(
-          id,
-          requestDTO,
-        );
+        await this.courseManagementModel.create(requestDTO);
       }
       requestDTO.sections.forEach((section: Section) => {
         if (requestDTO.type == COURSE_TYPE.SEL_TOPIC) {
