@@ -221,6 +221,7 @@ export class CourseService {
         await existCourseManagement.updateOne({
           updatedYear: requestDTO.updatedYear,
           updatedSemester: requestDTO.updatedSemester,
+          courseName: requestDTO.courseName,
           $push: { sections: requestDTO.sections },
         });
         // }
@@ -252,7 +253,10 @@ export class CourseService {
       });
       if (course) {
         await course.updateOne(
-          { $push: { sections: courseData.sections } },
+          {
+            courseName: requestDTO.courseName,
+            $push: { sections: courseData.sections },
+          },
           { new: true },
         );
         course = await this.model.findOne({
