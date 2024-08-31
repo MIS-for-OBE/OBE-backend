@@ -47,8 +47,21 @@ export class CourseController {
       });
   }
 
+  @Get('courseName/:courseNo')
+  async getExistCourseName(
+    @Param('courseNo') courseNo: string,
+  ): Promise<ResponseDTO<any>> {
+    return this.service.getExistsCourseName(courseNo).then((result) => {
+      const responseDTO = new ResponseDTO<any>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Get('check')
-  async checkCanCreateCourse(@Query() requestDTO: any): Promise<ResponseDTO<any>> {
+  async checkCanCreateCourse(
+    @Query() requestDTO: any,
+  ): Promise<ResponseDTO<any>> {
     return this.service.checkCanCreateCourse(requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;

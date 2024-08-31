@@ -132,6 +132,18 @@ export class CourseService {
     }
   }
 
+  async getExistsCourseName(courseNo: string): Promise<String> {
+    try {
+      const course = await this.courseManagementModel.findOne({
+        courseNo,
+      });
+      if (course) return course.courseName;
+      else return '';
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async checkCanCreateCourse(requestDTO: any): Promise<any> {
     try {
       const existCourseManagement = await this.courseManagementModel.findOne({
