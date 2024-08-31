@@ -143,10 +143,10 @@ export class CourseService {
         requestDTO.sections.forEach((section: any) => {
           if (
             existCourseManagement.sections.find(
-              (existSec: any) => existSec.sectionNo == section.sectionNo,
+              (existSec: any) => existSec.sectionNo == section,
             )
           ) {
-            existSection.push(section.sectionNo);
+            existSection.push(section);
           }
         });
         if (existSection.length) {
