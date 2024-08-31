@@ -66,6 +66,18 @@ export class PLOService {
     }
   }
 
+  async searchOnePLO(searchDTO: any): Promise<PLO> {
+    try {
+      const plo = await this.model.findOne({ name: searchDTO.name });
+      if (!plo) {
+        throw new NotFoundException('PLO Collection not found');
+      }
+      return plo;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async checkCanCreatePLO(requestDTO: any): Promise<any> {
     try {
       const existPLO = await this.model.findOne({ name: requestDTO.name });

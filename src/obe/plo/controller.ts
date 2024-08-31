@@ -35,6 +35,18 @@ export class PLOController {
       });
   }
 
+  @Get('one')
+  async seachOnePLO(
+    @Request() req,
+    @Query() searchDTO: PLOSearchDTO,
+  ): Promise<ResponseDTO<PLO>> {
+    return this.service.searchOnePLO(searchDTO).then((result) => {
+      const responseDTO = new ResponseDTO<PLO>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Get('check')
   async checkCanCreatePLO(@Query() requestDTO: any): Promise<ResponseDTO<any>> {
     return this.service.checkCanCreatePLO(requestDTO).then((result) => {
