@@ -4,6 +4,7 @@ import {
   COURSE_TYPE,
   EVALUATE_TYPE,
   TEACHING_METHOD,
+  TQF_STATUS,
 } from 'src/common/enum/type.enum';
 
 export type TQF3Document = HydratedDocument<TQF3>;
@@ -123,6 +124,9 @@ export const Part6Schema = SchemaFactory.createForClass(Part6);
   timestamps: true,
 })
 export class TQF3 {
+  @Prop({ required: true, enum: TQF_STATUS })
+  status: TQF_STATUS;
+
   @Prop({ type: Part1Schema })
   part1: Part1;
 

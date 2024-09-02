@@ -42,11 +42,17 @@ export class Course {
   @Prop()
   addFirstTime: boolean;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
-  TQF3: TQF;
+  @Prop({ type: Object })
+  TQF3: Object;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
-  TQF5: TQF;
+  @Prop({ type: Object })
+  TQF5: Object;
+
+  // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
+  // TQF3: TQF;
+
+  // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
+  // TQF5: TQF;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course).index(
