@@ -228,11 +228,6 @@ export class CourseService {
       } else {
         await this.courseManagementModel.create(requestDTO);
       }
-      requestDTO.sections.forEach((section: Section) => {
-        if (requestDTO.type == COURSE_TYPE.SEL_TOPIC) {
-          section.isProcessTQF3 = true;
-        }
-      });
 
       const newSecion = await this.sectionModel.insertMany(
         requestDTO.sections.filter((sec) => sec.openThisTerm),
@@ -243,9 +238,6 @@ export class CourseService {
         sections: newSecion.map((section) => section.id),
         addFirstTime: true,
       };
-      if (requestDTO.type !== COURSE_TYPE.SEL_TOPIC) {
-        courseData.isProcessTQF3 = true;
-      }
 
       let course = await this.model.findOne({
         academicYear: requestDTO.academicYear,

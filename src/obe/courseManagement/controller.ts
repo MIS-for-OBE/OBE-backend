@@ -113,6 +113,20 @@ export class CourseManagementController {
       });
   }
 
+  @Put('/:id/coIns')
+  async updateCoInsSections(
+    @Param('id') courseId: any,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<any>> {
+    return this.service
+      .updateCoInsSections(courseId, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<any>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
+  }
+
   @Delete('/:id')
   async deleteCourseManagement(
     @Param('id') id: string,

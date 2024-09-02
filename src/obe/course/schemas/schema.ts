@@ -42,9 +42,6 @@ export class Course {
   @Prop()
   addFirstTime: boolean;
 
-  @Prop()
-  isProcessTQF3: boolean;
-
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
   TQF3: TQF;
 

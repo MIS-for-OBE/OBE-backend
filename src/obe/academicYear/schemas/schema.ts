@@ -22,6 +22,9 @@ export class AcademicYear {
 
   @Prop({ default: false })
   isActive: boolean;
+
+  @Prop({ default: true })
+  isProcessTQF3: boolean;
 }
 
 export const AcademicYearSchema = SchemaFactory.createForClass(

@@ -43,9 +43,6 @@ export class Section {
   assignments: any[];
 
   @Prop()
-  isProcessTQF3: boolean;
-
-  @Prop()
   topic: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
