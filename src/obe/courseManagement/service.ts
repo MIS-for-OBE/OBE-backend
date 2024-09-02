@@ -17,6 +17,7 @@ import { AcademicYear } from '../academicYear/schemas/schema';
 import { Course } from '../course/schemas/schema';
 import { Section } from '../section/schemas/schema';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
+import { ROLE } from 'src/common/enum/role.enum';
 
 @Injectable()
 export class CourseManagementService {
@@ -189,13 +190,25 @@ export class CourseManagementService {
       if (!updateCourse) {
         throw new NotFoundException('CourseManagement not found');
       }
-      const isDuplicateSectionNo = updateCourse.sections.some(
-        (sec: any) =>
-          sec.sectionNo === requestDTO.data.sectionNo &&
-          sec.id !== params.section,
-      );
-      if (isDuplicateSectionNo) {
-        throw new BadRequestException('Section No already exists');
+      let instructor = requestDTO.data.instructor;
+      if (instructor && instructor.endsWith('@cmu.ac.th')) {
+        let user = await this.userModel.findOne({ email: instructor });
+        if (!user) {
+          user = await this.userModel.create({
+            email: instructor,
+            role: ROLE.INSTRUCTOR,
+          });
+        }
+        requestDTO.data.instructor = user.id;
+      } else {
+        const isDuplicateSectionNo = updateCourse.sections.some(
+          (sec: any) =>
+            sec.sectionNo === requestDTO.data.sectionNo &&
+            sec.id !== params.section,
+        );
+        if (isDuplicateSectionNo) {
+          throw new BadRequestException('Section No already exists');
+        }
       }
       const updateFields = {};
       for (const key in requestDTO.data) {
@@ -207,6 +220,14 @@ export class CourseManagementService {
           { $set: updateFields },
           { arrayFilters: [{ 'sec._id': params.section }], new: true },
         )
+        .populate({
+          path: 'sections',
+          populate: [
+            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+          ],
+        })
+        .select('-sections.isActive')
         .sort([['sectionNo', 'asc']]);
       if (!updateCourse) {
         throw new NotFoundException('SectionManagement not found');
@@ -243,7 +264,11 @@ export class CourseManagementService {
             { new: true },
           );
         }
-        return { updateCourse, courseId: course.id, secId };
+        return {
+          updateSection: updateSection.find((sec) => sec.id == params.section),
+          courseId: course.id,
+          secId,
+        };
       } else if (requestDTO.openThisTerm) {
         let secId = await this.createSection(updateSection, requestDTO);
         course = await this.courseModel.create({
@@ -254,7 +279,84 @@ export class CourseManagementService {
           sections: [secId],
         });
       }
-      return { updateCourse };
+      return {
+        updateSection: updateSection.find((sec) => sec.id == params.section),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateCoInsSections(
+    courseId: string,
+    requestDTO: any,
+  ): Promise<CourseManagement> {
+    try {
+      let updateCourse: any = await this.model.findById(courseId);
+      if (!updateCourse) {
+        throw new NotFoundException('CourseManagement not found');
+      }
+      const emails = requestDTO.data
+        .flatMap((sec) => sec.coInstructors)
+        .filter((email) => email.endsWith('@cmu.ac.th'));
+      const uniqueEmails = [...new Set(emails)];
+      const users = await Promise.all(
+        uniqueEmails.map(async (email) => {
+          let user = await this.userModel.findOne({ email });
+          if (!user) {
+            user = await this.userModel.create({
+              email,
+              role: ROLE.INSTRUCTOR,
+            });
+          }
+          return { email, id: user.id };
+        }),
+      );
+      const emailToId = new Map(users.map(({ email, id }) => [email, id]));
+      requestDTO.data.forEach((sec) => {
+        sec.coInstructors = sec.coInstructors.map(
+          (email) => emailToId.get(email) || email,
+        );
+      });
+
+      const updatePromises = requestDTO.data.map((item) => {
+        return this.model.findOneAndUpdate(
+          { id: courseId, 'sections.sectionNo': item.sectionNo },
+          { $set: { 'sections.$.coInstructors': item.coInstructors } },
+          { new: true },
+        );
+      });
+      await Promise.all(updatePromises);
+
+      let course = await this.courseModel
+        .findOne({
+          academicYear: requestDTO.academicYear,
+          courseNo: requestDTO.courseNo,
+        })
+        .populate('sections');
+
+      if (course) {
+        const updateSectionPromises = course.sections.map((sec: any) => {
+          return this.sectionModel.findByIdAndUpdate(sec.id, {
+            coInstructors:
+              requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
+                .coInstructors || [],
+          });
+        });
+        await Promise.all(updateSectionPromises);
+      }
+      updateCourse = await this.model
+        .findById(courseId)
+        .populate({
+          path: 'sections',
+          populate: [
+            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+          ],
+        })
+        .select('-sections.isActive')
+        .sort([['sectionNo', 'asc']]);
+      return updateCourse;
     } catch (error) {
       throw error;
     }
