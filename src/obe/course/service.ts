@@ -4,13 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { Course } from './schemas/schema';
 import { User } from '../user/schemas/schema';
 import { Section } from '../section/schemas/schema';
-import { CourseManagementService } from '../courseManagement/service';
 import { CourseManagement } from '../courseManagement/schemas/schema';
-import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { CourseSearchDTO } from './dto/search.dto';
 import {
   setWhereWithSearchCourse,
@@ -184,6 +182,15 @@ export class CourseService {
         ),
       ].map((email) => ({ email, role: ROLE.INSTRUCTOR }));
 
+      let [existCourseManagement, course] = await Promise.all([
+        this.courseManagementModel.findOne({
+          courseNo: requestDTO.courseNo,
+        }),
+        this.model.findOne({
+          academicYear: requestDTO.academicYear,
+          courseNo: requestDTO.courseNo,
+        }),
+      ]);
       for (const instructor of coInstructors) {
         let user = await this.userModel.findOne({
           email: instructor.email,
@@ -198,33 +205,19 @@ export class CourseService {
         });
       }
 
-      const existCourseManagement = await this.courseManagementModel.findOne({
-        courseNo: requestDTO.courseNo,
-      });
+      if (!course?.addFirstTime) {
+        requestDTO.sections.forEach((sec) => {
+          sec.addFirstTime = true;
+        });
+      }
 
       if (existCourseManagement) {
-        // const existSection = [];
-        // requestDTO.sections.forEach((section: any) => {
-        //   if (
-        //     existCourseManagement.sections.find(
-        //       (existSec: any) => existSec.sectionNo == section.sectionNo,
-        //     )
-        //   ) {
-        //     existSection.push(section.sectionNo);
-        //   }
-        // });
-        // if (existSection.length) {
-        //   throw new BadRequestException(
-        //     `Section ${existSection.join(', ')} has been already added.`,
-        //   );
-        // } else {
         await existCourseManagement.updateOne({
           updatedYear: requestDTO.updatedYear,
           updatedSemester: requestDTO.updatedSemester,
           courseName: requestDTO.courseName,
           $push: { sections: requestDTO.sections },
         });
-        // }
       } else {
         await this.courseManagementModel.create(requestDTO);
       }
@@ -239,10 +232,6 @@ export class CourseService {
         addFirstTime: true,
       };
 
-      let course = await this.model.findOne({
-        academicYear: requestDTO.academicYear,
-        courseNo: requestDTO.courseNo,
-      });
       if (course) {
         await course.updateOne(
           {

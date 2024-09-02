@@ -19,6 +19,9 @@ export class Section {
   @Prop({ required: true })
   sectionNo: number;
 
+  @Prop()
+  addFirstTime: boolean;
+
   @Prop({ required: true, default: true })
   isActive: boolean;
 
