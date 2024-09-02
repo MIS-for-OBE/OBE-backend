@@ -99,20 +99,6 @@ export class CourseManagementController {
       });
   }
 
-  @Put('/:id/:section')
-  async updateSectionManagement(
-    @Param() params: any,
-    @Body() requestDTO: any,
-  ): Promise<ResponseDTO<any>> {
-    return this.service
-      .updateSectionManagement(params, requestDTO)
-      .then((result) => {
-        const responseDTO = new ResponseDTO<any>();
-        responseDTO.data = result;
-        return responseDTO;
-      });
-  }
-
   @Put('/:id/coIns')
   async updateCoInsSections(
     @Param('id') courseId: any,
@@ -120,6 +106,20 @@ export class CourseManagementController {
   ): Promise<ResponseDTO<any>> {
     return this.service
       .updateCoInsSections(courseId, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<any>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
+  }
+
+  @Put('/:id/:section')
+  async updateSectionManagement(
+    @Param() params: any,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<any>> {
+    return this.service
+      .updateSectionManagement(params, requestDTO)
       .then((result) => {
         const responseDTO = new ResponseDTO<any>();
         responseDTO.data = result;

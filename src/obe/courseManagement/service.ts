@@ -287,12 +287,9 @@ export class CourseManagementService {
     }
   }
 
-  async updateCoInsSections(
-    courseId: string,
-    requestDTO: any,
-  ): Promise<CourseManagement> {
+  async updateCoInsSections(courseId: string, requestDTO: any): Promise<any> {
     try {
-      let updateCourse: any = await this.model.findById(courseId);
+      let updateCourse = await this.model.findById(courseId);
       if (!updateCourse) {
         throw new NotFoundException('CourseManagement not found');
       }
@@ -318,15 +315,12 @@ export class CourseManagementService {
           (email) => emailToId.get(email) || email,
         );
       });
-
-      const updatePromises = requestDTO.data.map((item) => {
-        return this.model.findOneAndUpdate(
-          { id: courseId, 'sections.sectionNo': item.sectionNo },
-          { $set: { 'sections.$.coInstructors': item.coInstructors } },
-          { new: true },
-        );
+      updateCourse.sections.forEach((sec) => {
+        sec.coInstructors = requestDTO.data.find(
+          (item) => item.sectionNo == sec.sectionNo,
+        ).coInstructors;
       });
-      await Promise.all(updatePromises);
+      await updateCourse.save();
 
       let course = await this.courseModel
         .findOne({
