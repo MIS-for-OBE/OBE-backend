@@ -85,13 +85,13 @@ export class CourseManagementController {
       });
   }
 
-  @Put('/:id')
-  async updateCourseManagement(
-    @Param('id') id: string,
+  @Put('coIns')
+  async updateCoInsSections(
+    @Request() req,
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<any>> {
     return this.service
-      .updateCourseManagement(id, requestDTO)
+      .updateCoInsSections(req.user, requestDTO)
       .then((result) => {
         const responseDTO = new ResponseDTO<any>();
         responseDTO.data = result;
@@ -99,13 +99,13 @@ export class CourseManagementController {
       });
   }
 
-  @Put('/:id/coIns')
-  async updateCoInsSections(
-    @Param('id') courseId: any,
+  @Put('/:id')
+  async updateCourseManagement(
+    @Param('id') id: string,
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<any>> {
     return this.service
-      .updateCoInsSections(courseId, requestDTO)
+      .updateCourseManagement(id, requestDTO)
       .then((result) => {
         const responseDTO = new ResponseDTO<any>();
         responseDTO.data = result;

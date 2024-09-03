@@ -11,7 +11,10 @@ import { User } from '../user/schemas/schema';
 import { LogEventDTO } from '../logEvent/dto/dto';
 import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
 import { FacultyService } from '../faculty/service';
-import { setWhereWithSearchCourse } from 'src/common/function/function';
+import {
+  setWhereWithSearchCourse,
+  sortData,
+} from 'src/common/function/function';
 import { CourseManagementSearchDTO } from './dto/search.dto';
 import { AcademicYear } from '../academicYear/schemas/schema';
 import { Course } from '../course/schemas/schema';
@@ -287,9 +290,11 @@ export class CourseManagementService {
     }
   }
 
-  async updateCoInsSections(courseId: string, requestDTO: any): Promise<any> {
+  async updateCoInsSections(authUser: any, requestDTO: any): Promise<any> {
     try {
-      let updateCourse = await this.model.findById(courseId);
+      let updateCourse = await this.model.findOne({
+        courseNo: requestDTO.courseNo,
+      });
       if (!updateCourse) {
         throw new NotFoundException('CourseManagement not found');
       }
@@ -311,17 +316,16 @@ export class CourseManagementService {
       );
       const emailToId = new Map(users.map(({ email, id }) => [email, id]));
       requestDTO.data.forEach((sec) => {
-        sec.coInstructors = sec.coInstructors.map(
+        sec.coInstructors = sec.coInstructors?.map(
           (email) => emailToId.get(email) || email,
         );
       });
       updateCourse.sections.forEach((sec) => {
-        sec.coInstructors = requestDTO.data.find(
-          (item) => item.sectionNo == sec.sectionNo,
-        ).coInstructors;
+        sec.coInstructors =
+          requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
+            ?.coInstructors ?? sec.coInstructors;
       });
       await updateCourse.save();
-
       let course = await this.courseModel
         .findOne({
           academicYear: requestDTO.academicYear,
@@ -331,26 +335,54 @@ export class CourseManagementService {
 
       if (course) {
         const updateSectionPromises = course.sections.map((sec: any) => {
-          return this.sectionModel.findByIdAndUpdate(sec.id, {
-            coInstructors:
-              requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
-                .coInstructors || [],
-          });
+          const coInstructors = requestDTO.data.find(
+            (item) => item.sectionNo == sec.sectionNo,
+          )?.coInstructors;
+          if (coInstructors) {
+            return this.sectionModel.findByIdAndUpdate(sec.id, {
+              coInstructors,
+            });
+          }
+          return;
         });
         await Promise.all(updateSectionPromises);
       }
-      updateCourse = await this.model
-        .findById(courseId)
-        .populate({
-          path: 'sections',
-          populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
-          ],
+      console.log();
+      const populateSections = {
+        path: 'sections',
+        populate: [
+          { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+          { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+        ],
+      };
+      [updateCourse, course] = await Promise.all([
+        this.model
+          .findOne({ courseNo: requestDTO.courseNo })
+          .populate(populateSections)
+          .select('-sections.isActive')
+          .sort([['sectionNo', 'asc']]),
+        this.courseModel
+          .findOne({
+            academicYear: requestDTO.academicYear,
+            courseNo: requestDTO.courseNo,
+          })
+          .populate(populateSections),
+      ]);
+      const topics = course.sections
+        .map((sec: any) => {
+          if (
+            sec.instructor.id == authUser.id ||
+            sec.coInstructors.some((coIns: any) => coIns.id == authUser.id)
+          )
+            return sec.topic;
         })
-        .select('-sections.isActive')
-        .sort([['sectionNo', 'asc']]);
-      return updateCourse;
+        .filter((topic) => topic);
+      course.sections = course.sections.filter(
+        (section: any) => !section.topic || topics.includes(section.topic),
+      );
+      sortData(course.sections, 'sectionNo');
+      sortData(course.sections, 'isActive', 'boolean');
+      return { course, courseManagement: updateCourse };
     } catch (error) {
       throw error;
     }
