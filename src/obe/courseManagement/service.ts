@@ -347,7 +347,6 @@ export class CourseManagementService {
         });
         await Promise.all(updateSectionPromises);
       }
-      console.log();
       const populateSections = {
         path: 'sections',
         populate: [

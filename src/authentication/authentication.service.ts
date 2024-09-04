@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
 import {
@@ -109,12 +113,9 @@ export class AuthenticationService {
   }
 
   async login(body: LoginDTO): Promise<TokenDTO> {
-    if (!body.code) {
-      throw new BadRequestException('Invalid authorization code.');
-    }
-    if (!body.redirectUri) {
-      throw new BadRequestException('Invalid redirect uri.');
-    }
+    if (!body.code) throw new BadRequestException('Invalid authorization code');
+    else if (!body.redirectUri)
+      throw new BadRequestException('Invalid redirect uri');
 
     //get access token
     const accessToken = await this.getOAuthAccessTokenAsync(
@@ -122,11 +123,19 @@ export class AuthenticationService {
       body.redirectUri,
     );
     if (!accessToken)
-      throw new BadRequestException('Cannot get OAuth access token.');
+      throw new BadRequestException('Cannot get OAuth access token');
 
     //get basic info
     const basicInfo = await this.getCMUBasicInfoAsync(accessToken);
-    if (!basicInfo) throw new BadRequestException('Cannot get CMU basic info.');
+    if (!basicInfo) throw new BadRequestException('Cannot get CMU basic info');
+    else if (
+      // for MISEmp engineering
+      basicInfo.itaccounttype_id == CMU_OAUTH_ROLE.MIS &&
+      basicInfo.organization_code != '06'
+    )
+      throw new ForbiddenException(
+        'Your CMU account was not permission for this website',
+      );
 
     basicInfo.firstname_EN = capitalize(basicInfo.firstname_EN);
     basicInfo.lastname_EN = capitalize(basicInfo.lastname_EN);

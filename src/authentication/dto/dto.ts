@@ -201,6 +201,7 @@ export class TokenDTO extends BaseDTO {
       lastNameEN: 'DOE',
       studentId: '690610696',
       role: 'Student',
+      facultyCode: '06',
     },
   })
   user: User;
