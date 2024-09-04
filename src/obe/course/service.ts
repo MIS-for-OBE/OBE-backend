@@ -16,6 +16,7 @@ import {
 } from 'src/common/function/function';
 import { ROLE } from 'src/common/enum/role.enum';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
+import { COURSE_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
 
 @Injectable()
 export class CourseService {
@@ -208,6 +209,10 @@ export class CourseService {
       if (!course?.addFirstTime) {
         requestDTO.sections.forEach((sec) => {
           sec.addFirstTime = true;
+          if (requestDTO.type != COURSE_TYPE.SEL_TOPIC) {
+            sec.TQF3 = { status: TQF_STATUS.NO_DATA };
+            sec.TQF5 = { status: TQF_STATUS.NO_DATA };
+          }
         });
       }
 
@@ -231,6 +236,11 @@ export class CourseService {
         sections: newSecion.map((section) => section.id),
         addFirstTime: true,
       };
+
+      if (courseData.type != COURSE_TYPE.SEL_TOPIC) {
+        courseData.TQF3 = { status: TQF_STATUS.NO_DATA };
+        courseData.TQF5 = { status: TQF_STATUS.NO_DATA };
+      }
 
       if (course) {
         await course.updateOne(

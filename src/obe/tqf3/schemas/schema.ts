@@ -174,22 +174,22 @@ export class TQF3 {
   status: TQF_STATUS;
 
   @Prop({ type: Part1Schema })
-  part1: Part1;
+  part1?: Part1;
 
   @Prop({ type: Part2Schema })
-  part2: Part2;
+  part2?: Part2;
 
   @Prop({ type: Part3Schema })
-  part3: Part3;
+  part3?: Part3;
 
   @Prop({ type: [Part4Schema] })
-  part4: Part4[];
+  part4?: Part4[];
 
   @Prop({ type: [Part5Schema] })
-  part5: Part5[];
+  part5?: Part5[];
 
   @Prop({ type: [Part6Schema] })
-  part6: Part6[];
+  part6?: Part6[];
 }
 
 export const TQF3Schema = SchemaFactory.createForClass(TQF3);
