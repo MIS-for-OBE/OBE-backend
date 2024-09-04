@@ -3,7 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { AcademicYear } from 'src/obe/academicYear/schemas/schema';
 import { Section } from 'src/obe/section/schemas/schema';
-import { TQF } from 'src/obe/tqf/schemas/schema';
+import { TQF3, TQF3Schema } from 'src/obe/tqf3/schemas/schema';
 
 export type CourseDocument = HydratedDocument<Course>;
 
@@ -42,17 +42,14 @@ export class Course {
   @Prop()
   addFirstTime: boolean;
 
-  @Prop({ type: Object })
-  TQF3: Object;
-
-  @Prop({ type: Object })
-  TQF5: Object;
-
-  // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
-  // TQF3: TQF;
+  @Prop({ type: TQF3Schema, ref: 'TQF3' })
+  TQF3: TQF3;
 
   // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
   // TQF5: TQF;
+
+  @Prop({ type: Object })
+  TQF5: Object;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course).index(

@@ -13,6 +13,8 @@ import { LogEventModule } from './obe/logEvent/module';
 import { CourseModule } from './obe/course/module';
 import { SectionModule } from './obe/section/module';
 import { PLOModule } from './obe/plo/module';
+import { TQF3Module } from './obe/tqf3/module';
+import { TQF5Module } from './obe/tqf5/module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { PLOModule } from './obe/plo/module';
     CourseManagementModule,
     CourseModule,
     SectionModule,
+    TQF3Module,
+    TQF5Module,
   ],
   controllers: [],
   providers: [],

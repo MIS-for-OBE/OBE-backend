@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 // import { Assignment } from 'src/obe/assignment/schemas/assignment.schema';
-import { TQF } from 'src/obe/tqf/schemas/schema';
+import { TQF3 } from 'src/obe/tqf3/schemas/schema';
 import { User } from 'src/obe/user/schemas/schema';
 
 export type SectionDocument = HydratedDocument<Section>;
@@ -49,10 +49,13 @@ export class Section {
   topic: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
-  TQF3: TQF;
+  TQF3: TQF3;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
-  TQF5: TQF;
+  // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF' })
+  // TQF5: TQF;
+
+  @Prop({ type: Object })
+  TQF5: Object;
 }
 
 export const SectionSchema = SchemaFactory.createForClass(Section);
