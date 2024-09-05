@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { PLONo } from 'src/obe/plo/schemas/schema';
 // import { Assignment } from 'src/obe/assignment/schemas/assignment.schema';
-import { TQF3, TQF3Schema } from 'src/obe/tqf3/schemas/schema';
-import { TQF5, TQF5Schema } from 'src/obe/tqf5/schemas/schema';
+import { TQF3 } from 'src/obe/tqf3/schemas/schema';
+import { TQF5 } from 'src/obe/tqf5/schemas/schema';
 import { User } from 'src/obe/user/schemas/schema';
 
 export type SectionDocument = HydratedDocument<Section>;
@@ -49,10 +50,15 @@ export class Section {
   @Prop()
   topic: string;
 
-  @Prop({ type: TQF3Schema, ref: 'TQF3' })
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+  })
+  plos: PLONo[];
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF3' })
   TQF3: TQF3;
 
-  @Prop({ type: TQF5Schema, ref: 'TQF5' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF5' })
   TQF5: TQF5;
 }
 

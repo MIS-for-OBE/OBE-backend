@@ -439,6 +439,32 @@ export class CourseManagementService {
     }
   }
 
+  async ploMapping(authUser: any, requestDTO: any): Promise<any> {
+    try {
+      const updateCourses = await Promise.all(
+        requestDTO.data.map(async (course) => {
+          if (course.sections) {
+            const updatedSections = course.sections.map((section) => {
+              return this.model.findByIdAndUpdate(
+                course.id,
+                { $set: { 'sections.$[elem].plos': section.plos } },
+                { arrayFilters: [{ 'elem.topic': section.topic }] },
+              );
+            });
+            return await Promise.all(updatedSections);
+          } else {
+            return await this.model.findByIdAndUpdate(course.id, {
+              plos: course.plos,
+            });
+          }
+        }),
+      );
+      return updateCourses;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   private async createSection(course: any, requestDTO: any) {
     const data = course.find(
       (sec) => sec.sectionNo == requestDTO.data.sectionNo,

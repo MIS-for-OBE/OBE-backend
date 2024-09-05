@@ -3,8 +3,8 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { AcademicYear } from 'src/obe/academicYear/schemas/schema';
 import { Section } from 'src/obe/section/schemas/schema';
-import { TQF3, TQF3Schema } from 'src/obe/tqf3/schemas/schema';
-import { TQF5, TQF5Schema } from 'src/obe/tqf5/schemas/schema';
+import { TQF3 } from 'src/obe/tqf3/schemas/schema';
+import { TQF5 } from 'src/obe/tqf5/schemas/schema';
 
 export type CourseDocument = HydratedDocument<Course>;
 
@@ -43,10 +43,10 @@ export class Course {
   @Prop()
   addFirstTime: boolean;
 
-  @Prop({ type: TQF3Schema, ref: 'TQF3' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF3' })
   TQF3: TQF3;
 
-  @Prop({ type: TQF5Schema, ref: 'TQF5' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF5' })
   TQF5: TQF5;
 }
 

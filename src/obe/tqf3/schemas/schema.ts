@@ -68,11 +68,11 @@ class Part1 {
   @Prop({ type: [Number] })
   studentYear: number[];
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
-  instructors: mongoose.Schema.Types.ObjectId[];
+  @Prop({ type: [String] })
+  instructors: string[];
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
-  coInstructors: mongoose.Schema.Types.ObjectId[];
+  @Prop({ type: [String] })
+  coInstructors: string[];
 
   @Prop()
   lecPlace: string;
@@ -112,14 +112,14 @@ class Part3 {
   @Prop()
   gradingPolicy: string;
 
-  @Prop({ type: [{ type: EvalSchema, ref: 'Eval' }] })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Eval' }] })
   eval: Eval[];
 }
 export const Part3Schema = SchemaFactory.createForClass(Part3);
 
 @Schema()
 class Part4 {
-  @Prop({ type: CLOSchema, ref: 'CLO' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'CLO' })
   clo: CLO;
 
   @Prop({

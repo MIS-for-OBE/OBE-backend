@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
+import { PLONo } from 'src/obe/plo/schemas/schema';
 import { User } from 'src/obe/user/schemas/schema';
 
 export type CourseManagementDocument = HydratedDocument<CourseManagement>;
@@ -19,6 +20,11 @@ export class SectionManagement {
 
   @Prop()
   topic: string;
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+  })
+  plos: PLONo[];
 
   @Prop({ required: true })
   semester: number[];
@@ -68,6 +74,11 @@ export class CourseManagement {
 
   @Prop({ type: [SectionManagementSchema] })
   sections: SectionManagement[];
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+  })
+  plos: PLONo[];
 }
 
 export const CourseManagementSchema =

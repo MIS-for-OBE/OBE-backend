@@ -85,6 +85,18 @@ export class CourseManagementController {
       });
   }
 
+  @Put('ploMapping')
+  async ploMapping(
+    @Request() req,
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<any>> {
+    return this.service.ploMapping(req.user, requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<any>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Put('coIns')
   async updateCoInsSections(
     @Request() req,
