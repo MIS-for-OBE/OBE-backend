@@ -13,7 +13,7 @@ export class TQF3Service {
       const updateTQF3 = await this.model.findByIdAndUpdate(
         id,
         { status: TQF_STATUS.IN_PROGRESS, part1: requestDTO },
-        { new: true, fields: 'part1 updatedAt' },
+        { new: true, fields: 'status part1 updatedAt' },
       );
       if (!updateTQF3) {
         throw new NotFoundException('TQF3 not found.');
