@@ -39,6 +39,8 @@ export class CourseService {
               { path: 'instructor', select: 'firstNameEN lastNameEN email' },
             ],
           })
+          .populate('TQF3', 'status')
+          .populate('TQF5', 'status')
           .sort([[searchDTO.orderBy, searchDTO.orderType]])
           .skip((searchDTO.page - 1) * searchDTO.limit)
           .limit(searchDTO.limit);
@@ -62,6 +64,8 @@ export class CourseService {
               { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
             ],
           })
+          .populate('TQF3', 'status')
+          .populate('TQF5', 'status')
           .sort([[searchDTO.orderBy, searchDTO.orderType]])
           .skip((searchDTO.page - 1) * searchDTO.limit)
           .limit(searchDTO.limit);
@@ -107,7 +111,9 @@ export class CourseService {
             { path: 'instructor', select: 'firstNameEN lastNameEN email' },
             { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
           ],
-        });
+        })
+        .populate('TQF3')
+        .populate('TQF5');
       if (!course) {
         throw new NotFoundException('Course not found');
       }
