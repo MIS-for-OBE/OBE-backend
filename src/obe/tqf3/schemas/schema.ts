@@ -54,7 +54,15 @@ export class Eval {
 }
 export const EvalSchema = SchemaFactory.createForClass(Eval);
 
-@Schema()
+@Schema({
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret.id ?? ret._id;
+      delete ret._id;
+    },
+  },
+  timestamps: { createdAt: false, updatedAt: true },
+})
 class Part1 {
   @Prop({ type: String, enum: COURSE_TYPE })
   courseType: COURSE_TYPE;
@@ -88,7 +96,15 @@ class Part1 {
 }
 export const Part1Schema = SchemaFactory.createForClass(Part1);
 
-@Schema()
+@Schema({
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret.id ?? ret._id;
+      delete ret._id;
+    },
+  },
+  timestamps: { createdAt: false, updatedAt: true },
+})
 class Part2 {
   @Prop({ type: [{ type: CLOSchema, ref: 'CLO' }] })
   clo: CLO[];
@@ -107,7 +123,15 @@ class Part2 {
 }
 export const Part2Schema = SchemaFactory.createForClass(Part2);
 
-@Schema()
+@Schema({
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret.id ?? ret._id;
+      delete ret._id;
+    },
+  },
+  timestamps: { createdAt: false, updatedAt: true },
+})
 class Part3 {
   @Prop()
   gradingPolicy: string;
@@ -117,43 +141,86 @@ class Part3 {
 }
 export const Part3Schema = SchemaFactory.createForClass(Part3);
 
-@Schema()
+@Schema({
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret.id ?? ret._id;
+      delete ret._id;
+    },
+  },
+  timestamps: { createdAt: false, updatedAt: true },
+})
 class Part4 {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'CLO' })
-  clo: CLO;
-
   @Prop({
     type: [
       {
-        eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
-        evalWeek: [Number],
+        clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
+        evals: [
+          {
+            eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
+            evalWeek: { type: [Number] },
+          },
+        ],
       },
     ],
   })
-  evals: {
-    eval: Eval;
-    evalWeek: number[];
+  data: {
+    clo: CLO;
+    evals: {
+      eval: Eval;
+      evalWeek: number[];
+    }[];
   }[];
 }
 export const Part4Schema = SchemaFactory.createForClass(Part4);
 
-@Schema()
+@Schema({
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret.id ?? ret._id;
+      delete ret._id;
+    },
+  },
+  timestamps: { createdAt: false, updatedAt: true },
+})
 class Part5 {
-  @Prop({ type: [{ type: CLOSchema, ref: 'CLO' }] })
-  clo: CLO;
-
-  @Prop({ type: { type: PLONoSchema, ref: 'PLONo' } })
-  plo: PLONo[];
+  @Prop({
+    type: [
+      {
+        clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
+        plo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+      },
+    ],
+  })
+  data: {
+    clo: CLO;
+    plo: PLONo[];
+  }[];
 }
 export const Part5Schema = SchemaFactory.createForClass(Part5);
 
-@Schema()
+@Schema({
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret.id ?? ret._id;
+      delete ret._id;
+    },
+  },
+  timestamps: { createdAt: false, updatedAt: true },
+})
 class Part6 {
-  @Prop()
-  topic: string;
-
-  @Prop({ type: [String] })
-  detail: String[];
+  @Prop({
+    type: [
+      {
+        topic: { type: String, required: true },
+        detail: { type: [String], required: true },
+      },
+    ],
+  })
+  data: {
+    topic: string;
+    detail: string[];
+  }[];
 }
 export const Part6Schema = SchemaFactory.createForClass(Part6);
 
@@ -167,7 +234,7 @@ export type TQF3Document = HydratedDocument<TQF3>;
       delete ret._id;
     },
   },
-  timestamps: true,
+  timestamps: { createdAt: false, updatedAt: true },
 })
 export class TQF3 {
   @Prop({ required: true, enum: TQF_STATUS })
@@ -182,14 +249,14 @@ export class TQF3 {
   @Prop({ type: Part3Schema })
   part3?: Part3;
 
-  @Prop({ type: [Part4Schema] })
-  part4?: Part4[];
+  @Prop({ type: Part4Schema })
+  part4?: Part4;
 
-  @Prop({ type: [Part5Schema] })
-  part5?: Part5[];
+  @Prop({ type: Part5Schema })
+  part5?: Part5;
 
-  @Prop({ type: [Part6Schema] })
-  part6?: Part6[];
+  @Prop({ type: Part6Schema })
+  part6?: Part6;
 }
 
 export const TQF3Schema = SchemaFactory.createForClass(TQF3);

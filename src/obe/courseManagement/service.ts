@@ -59,8 +59,8 @@ export class CourseManagementService {
         .populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+            { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
           ],
         })
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
@@ -226,8 +226,8 @@ export class CourseManagementService {
         .populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+            { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
           ],
         })
         .select('-sections.isActive')
@@ -350,8 +350,8 @@ export class CourseManagementService {
       const populateSections = {
         path: 'sections',
         populate: [
-          { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-          { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+          { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+          { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
         ],
       };
       [updateCourse, course] = await Promise.all([

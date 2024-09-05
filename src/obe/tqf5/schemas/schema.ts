@@ -12,7 +12,7 @@ export type TQF5Document = HydratedDocument<TQF5>;
       delete ret._id;
     },
   },
-  timestamps: true,
+  timestamps: { createdAt: false, updatedAt: true },
 })
 export class TQF5 {
   @Prop({ required: true, enum: TQF_STATUS })

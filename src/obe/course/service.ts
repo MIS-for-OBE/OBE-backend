@@ -36,7 +36,7 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+              { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
               { path: 'TQF3', select: 'status' },
               { path: 'TQF5', select: 'status' },
             ],
@@ -62,8 +62,8 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-              { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+              { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+              { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
               { path: 'TQF3', select: 'status' },
               { path: 'TQF5', select: 'status' },
             ],
@@ -112,8 +112,8 @@ export class CourseService {
         .populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+            { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
             { path: 'TQF3' },
             { path: 'TQF5' },
           ],
@@ -275,8 +275,8 @@ export class CourseService {
         await course.populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+            { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+            { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
           ],
         });
         const topics = course.sections
