@@ -37,6 +37,8 @@ export class CourseService {
             path: 'sections',
             populate: [
               { path: 'instructor', select: 'firstNameEN lastNameEN email' },
+              { path: 'TQF3', select: 'status' },
+              { path: 'TQF5', select: 'status' },
             ],
           })
           .populate('TQF3', 'status')
@@ -62,6 +64,8 @@ export class CourseService {
             populate: [
               { path: 'instructor', select: 'firstNameEN lastNameEN email' },
               { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+              { path: 'TQF3', select: 'status' },
+              { path: 'TQF5', select: 'status' },
             ],
           })
           .populate('TQF3', 'status')
@@ -110,6 +114,8 @@ export class CourseService {
           populate: [
             { path: 'instructor', select: 'firstNameEN lastNameEN email' },
             { path: 'coInstructors', select: 'firstNameEN lastNameEN email' },
+            { path: 'TQF3' },
+            { path: 'TQF5' },
           ],
         })
         .populate('TQF3')
