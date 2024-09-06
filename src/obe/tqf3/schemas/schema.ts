@@ -79,8 +79,8 @@ class Part1 {
   @Prop({ type: [String] })
   instructors: string[];
 
-  @Prop({ type: [String] })
-  coInstructors: string[];
+  @Prop()
+  coordinator: string;
 
   @Prop()
   lecPlace: string;
