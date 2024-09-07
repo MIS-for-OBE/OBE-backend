@@ -15,6 +15,9 @@ export class ErrorInterceptor implements NestInterceptor {
     return next.handle().pipe(
       catchError((err) =>
         throwError(() => {
+          if (err.name === 'CastError') {
+            throw new BadRequestException(`Invalid ${err.path}: ${err.value}`);
+          }
           if (err instanceof HttpException) {
             throw err;
           }
