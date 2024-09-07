@@ -24,17 +24,24 @@ export class FacultyService {
   async getCourseCode(
     facultyCode: string,
     departmentCode: string[],
-  ): Promise<number[]> {
+  ): Promise<{ [key: string]: number }> {
     try {
       const res = await this.model.findOne({ facultyCode: facultyCode });
       if (!res) {
         throw new NotFoundException('Faculty not found');
       }
-      const courseCode = res.department
+      const courseCodeMap = res.department
         .filter((dep) => departmentCode.includes(dep.departmentCode))
-        .map((dep) => dep.courseCode)
-        .filter((code) => code !== null && code !== undefined);
-      return courseCode;
+        .reduce(
+          (acc, dep) => {
+            if (dep.courseCode !== null && dep.courseCode !== undefined) {
+              acc[dep.departmentCode] = dep.courseCode;
+            }
+            return acc;
+          },
+          {} as { [key: string]: number },
+        );
+      return courseCodeMap;
     } catch (error) {
       throw error;
     }

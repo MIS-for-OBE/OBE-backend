@@ -46,7 +46,7 @@ export class CourseManagementService {
       );
       const where = {
         courseNo: {
-          $in: courseCode.map(
+          $in: Object.values(courseCode).map(
             (code) => new RegExp('^' + ('000' + code).slice(-3)),
           ),
         },
@@ -59,8 +59,14 @@ export class CourseManagementService {
         .populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+            {
+              path: 'instructor',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+            {
+              path: 'coInstructors',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
           ],
         })
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
@@ -92,7 +98,7 @@ export class CourseManagementService {
       });
       if (searchDTO.page == 1) {
         const totalCount = await this.model.countDocuments(where);
-        return { totalCount, courses };
+        return { totalCount, courses, courseCode };
       }
       return courses;
     } catch (error) {
@@ -226,8 +232,14 @@ export class CourseManagementService {
         .populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+            {
+              path: 'instructor',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+            {
+              path: 'coInstructors',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
           ],
         })
         .select('-sections.isActive')
@@ -350,8 +362,14 @@ export class CourseManagementService {
       const populateSections = {
         path: 'sections',
         populate: [
-          { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
-          { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+          {
+            path: 'instructor',
+            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+          },
+          {
+            path: 'coInstructors',
+            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+          },
         ],
       };
       [updateCourse, course] = await Promise.all([

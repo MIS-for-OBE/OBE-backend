@@ -31,11 +31,11 @@ export class FacultyController {
   async getCourseCode(
     @Request() req,
     @Query('departmentCode') departmentCode: string[],
-  ): Promise<ResponseDTO<number[]>> {
+  ): Promise<ResponseDTO<{ [key: string]: number }>> {
     return this.service
       .getCourseCode(req.user.facultyCode, departmentCode)
       .then((result) => {
-        const responseDTO = new ResponseDTO<number[]>();
+        const responseDTO = new ResponseDTO<{ [key: string]: number }>();
         responseDTO.data = result;
         return responseDTO;
       });
