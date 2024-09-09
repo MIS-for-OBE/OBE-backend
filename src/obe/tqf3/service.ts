@@ -8,12 +8,19 @@ import { TQF_STATUS } from 'src/common/enum/type.enum';
 export class TQF3Service {
   constructor(@InjectModel(TQF3.name) private readonly model: Model<TQF3>) {}
 
-  async savePart1(id: string, requestDTO: any): Promise<TQF3> {
+  async saveEachPart(
+    params: { id: string; part: string },
+    requestDTO: any,
+  ): Promise<TQF3> {
     try {
       const updateTQF3 = await this.model.findByIdAndUpdate(
-        id,
-        { status: TQF_STATUS.IN_PROGRESS, part1: requestDTO },
-        { new: true, fields: 'status part1 updatedAt' },
+        params.id,
+        {
+          status:
+            params.part == 'part6' ? TQF_STATUS.DONE : TQF_STATUS.IN_PROGRESS,
+          [params.part]: requestDTO,
+        },
+        { new: true, fields: `status ${params.part} updatedAt` },
       );
       if (!updateTQF3) {
         throw new NotFoundException('TQF3 not found.');

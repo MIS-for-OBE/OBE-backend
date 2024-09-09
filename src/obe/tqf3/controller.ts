@@ -18,12 +18,12 @@ import { TQF3 } from './schemas/schema';
 export class TQF3Controller {
   constructor(private service: TQF3Service) {}
 
-  @Put('/:id/part1')
+  @Put('/:id/:part')
   async updateCourse(
-    @Param('id') id: string,
+    @Param() params: { id: string; part: string },
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<TQF3>> {
-    return this.service.savePart1(id, requestDTO).then((result) => {
+    return this.service.saveEachPart(params, requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<TQF3>();
       responseDTO.data = result;
       return responseDTO;
