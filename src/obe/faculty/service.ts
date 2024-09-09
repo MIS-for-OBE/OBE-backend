@@ -39,7 +39,7 @@ export class FacultyService {
             }
             return acc;
           },
-          {} as { [key: string]: number },
+          { [res.code]: res.courseCode } as { [key: string]: number },
         );
       return courseCodeMap;
     } catch (error) {

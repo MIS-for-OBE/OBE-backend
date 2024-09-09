@@ -38,6 +38,9 @@ export class Faculty {
   facultyEN: string;
 
   @Prop({ required: true })
+  code: string;
+
+  @Prop({ required: true })
   courseCode: number;
 
   @Prop()
