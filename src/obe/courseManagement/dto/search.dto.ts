@@ -8,7 +8,7 @@ export class CourseManagementSearchDTO extends SearchDTO {
     if (transformFn.value === 'true') return true;
     else return false;
   })
-  manage = false;
+  isPloMapping = false;
 
   @IsString()
   @Type(() => String)

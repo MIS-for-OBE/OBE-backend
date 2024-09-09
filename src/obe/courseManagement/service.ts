@@ -44,6 +44,9 @@ export class CourseManagementService {
         facultyCode,
         searchDTO.departmentCode,
       );
+      if (searchDTO.isPloMapping) {
+        delete courseCode[Object.keys(courseCode)[0]];
+      }
       const where = {
         courseNo: {
           $in: Object.values(courseCode).map(
@@ -127,6 +130,9 @@ export class CourseManagementService {
     try {
       return await this.model.create(requestDTO);
     } catch (error) {
+      if (error.code == 11000) {
+        throw new BadRequestException('Course No already exists');
+      }
       throw error;
     }
   }

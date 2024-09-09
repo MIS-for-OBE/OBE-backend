@@ -26,10 +26,10 @@ export class SectionManagement {
   })
   plos: PLONo[];
 
-  @Prop({ required: true })
+  @Prop()
   semester: number[];
 
-  @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   instructor: User;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
@@ -72,8 +72,8 @@ export class CourseManagement {
   // @Prop({ required: true, enum: DEPARTMENT_CODE })
   // dapartmentCode: DEPARTMENT_CODE;
 
-  @Prop({ type: [SectionManagementSchema] })
-  sections: SectionManagement[];
+  @Prop({ type: [SectionManagementSchema], default: [] })
+  sections?: SectionManagement[];
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
