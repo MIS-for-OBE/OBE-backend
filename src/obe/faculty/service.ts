@@ -31,15 +31,15 @@ export class FacultyService {
         throw new NotFoundException('Faculty not found');
       }
       const courseCodeMap = res.department
-        .filter((dep) => departmentCode.includes(dep.departmentCode))
+        .filter((dep) => departmentCode.includes(dep.codeEN))
         .reduce(
           (acc, dep) => {
             if (dep.courseCode !== null && dep.courseCode !== undefined) {
-              acc[dep.departmentCode] = dep.courseCode;
+              acc[dep.codeEN] = dep.courseCode;
             }
             return acc;
           },
-          { [res.code]: res.courseCode } as { [key: string]: number },
+          { [res.codeEN]: res.courseCode } as { [key: string]: number },
         );
       return courseCodeMap;
     } catch (error) {

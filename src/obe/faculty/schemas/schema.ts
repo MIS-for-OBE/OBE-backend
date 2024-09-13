@@ -3,11 +3,16 @@ import { HydratedDocument } from 'mongoose';
 
 export type FacultyDocument = HydratedDocument<Faculty>;
 
-@Schema()
+@Schema({
+  versionKey: false,
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret.id ?? ret._id;
+      delete ret._id;
+    },
+  },
+})
 export class Department {
-  @Prop({ required: true })
-  departmentCode: string;
-
   @Prop({ required: true })
   departmentTH: string;
 
@@ -16,6 +21,12 @@ export class Department {
 
   @Prop()
   courseCode: number;
+
+  @Prop({ required: true })
+  codeEN: string;
+
+  @Prop({ required: true })
+  codeTH: string;
 }
 
 @Schema({
@@ -38,10 +49,13 @@ export class Faculty {
   facultyEN: string;
 
   @Prop({ required: true })
-  code: string;
+  courseCode: number;
 
   @Prop({ required: true })
-  courseCode: number;
+  codeEN: string;
+
+  @Prop({ required: true })
+  codeTH: string;
 
   @Prop()
   department: Department[];

@@ -22,7 +22,7 @@ export class AcademicYearController {
   constructor(private service: AcademicYearService) {}
 
   @Get()
-  async searchAll(
+  async searchAcademicYear(
     @Query() searchDTO: AcademicYearSearchDTO,
   ): Promise<ResponseDTO<AcademicYear[]>> {
     return this.service.searchAcademicYear(searchDTO).then((result) => {

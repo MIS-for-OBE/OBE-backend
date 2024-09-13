@@ -215,7 +215,7 @@ export class AuthenticationService {
         .then(
           (result) =>
             result.department.find((dep) => dep.departmentTH == departmentTH)
-              .departmentCode,
+              .codeEN,
         ),
     ];
   }

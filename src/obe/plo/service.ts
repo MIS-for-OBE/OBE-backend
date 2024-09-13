@@ -40,14 +40,13 @@ export class PLOService {
         return { totalCount, plos: data };
       }
       const departmentCodes = isSAdmin
-        ? faculty.department.map((dep) => dep.departmentCode)
+        ? faculty.department.map((dep) => dep.codeEN)
         : searchDTO.departmentCode;
       const plos = departmentCodes.map((dep) => {
         return {
           departmentCode: dep,
-          departmentEN: faculty.department.find(
-            (code) => code.departmentCode == dep,
-          ).departmentEN,
+          departmentEN: faculty.department.find((code) => code.codeEN == dep)
+            .departmentEN,
           collections: [],
         };
       });
