@@ -25,6 +25,12 @@ export class CLO {
 
   @Prop({ required: true })
   cloDescEN: string;
+
+  @Prop({ type: [String] })
+  learningMethod: string[];
+
+  @Prop()
+  other?: string;
 }
 export const CLOSchema = SchemaFactory.createForClass(CLO);
 
@@ -64,35 +70,26 @@ export const EvalSchema = SchemaFactory.createForClass(Eval);
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part1 {
+  @Prop()
+  curriculum: string;
+
   @Prop({ type: String, enum: COURSE_TYPE })
   courseType: COURSE_TYPE;
-
-  @Prop({ type: [String], enum: TEACHING_METHOD })
-  teachingMethod: TEACHING_METHOD[];
-
-  @Prop({ type: String, enum: EVALUATE_TYPE })
-  evaluate: EVALUATE_TYPE;
 
   @Prop({ type: [Number] })
   studentYear: number[];
 
+  @Prop()
+  mainInstructor: string;
+
   @Prop({ type: [String] })
   instructors: string[];
 
-  @Prop()
-  coordinator: string;
+  @Prop({ type: { in: String, out: String }, _id: false })
+  teachingLocation: { in: string; out: string };
 
   @Prop()
-  lecPlace: string;
-
-  @Prop()
-  labPlace: string;
-
-  @Prop()
-  mainRef: string;
-
-  @Prop()
-  recDoc: string;
+  consultHoursWk: number;
 }
 export const Part1Schema = SchemaFactory.createForClass(Part1);
 
@@ -106,6 +103,12 @@ export const Part1Schema = SchemaFactory.createForClass(Part1);
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part2 {
+  @Prop({ type: [String], enum: TEACHING_METHOD })
+  teachingMethod: TEACHING_METHOD[];
+
+  @Prop({ type: String, enum: EVALUATE_TYPE })
+  evaluate: EVALUATE_TYPE;
+
   @Prop({ type: [{ type: CLOSchema, ref: 'CLO' }] })
   clo: CLO[];
 
@@ -184,6 +187,12 @@ export const Part4Schema = SchemaFactory.createForClass(Part4);
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part5 {
+  @Prop()
+  mainRef: string;
+
+  @Prop()
+  recDoc: string;
+
   @Prop({
     type: [
       {
@@ -214,12 +223,14 @@ class Part6 {
       {
         topic: { type: String, required: true },
         detail: { type: [String], required: true },
+        other: { type: String },
       },
     ],
   })
   data: {
     topic: string;
     detail: string[];
+    other?: string;
   }[];
 }
 export const Part6Schema = SchemaFactory.createForClass(Part6);
