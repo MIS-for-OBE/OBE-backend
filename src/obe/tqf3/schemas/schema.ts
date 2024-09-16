@@ -137,7 +137,7 @@ class Part3 {
   @Prop()
   gradingPolicy: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Eval' }] })
+  @Prop({ type: [{ type: EvalSchema, ref: 'Eval' }] })
   eval: Eval[];
 }
 export const Part3Schema = SchemaFactory.createForClass(Part3);
