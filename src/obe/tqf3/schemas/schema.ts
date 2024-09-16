@@ -18,13 +18,13 @@ import { PLONo, PLONoSchema } from 'src/obe/plo/schemas/schema';
 })
 export class CLO {
   @Prop({ required: true, unique: true })
-  cloNo: number;
+  no: number;
 
   @Prop({ required: true })
-  cloDescTH: string;
+  descTH: string;
 
   @Prop({ required: true })
-  cloDescEN: string;
+  descEN: string;
 
   @Prop({ type: [String] })
   learningMethod: string[];
@@ -44,19 +44,19 @@ export const CLOSchema = SchemaFactory.createForClass(CLO);
 })
 export class Eval {
   @Prop({ required: true, unique: true })
-  evalNo: number;
+  no: number;
 
   @Prop({ required: true })
-  evalTopicTH: string;
+  topicTH: string;
 
   @Prop({ required: true })
-  evalTopicEN: string;
+  topicEN: string;
 
   @Prop({ required: true })
-  evalDesc: string;
+  desc: string;
 
   @Prop({ required: true })
-  evalPercent: number;
+  percent: number;
 }
 export const EvalSchema = SchemaFactory.createForClass(Eval);
 
@@ -113,13 +113,11 @@ class Part2 {
   clo: CLO[];
 
   @Prop({
-    type: [
-      { weekNo: Number, topicDesc: String, lecHour: Number, labHour: Number },
-    ],
+    type: [{ weekNo: Number, topic: String, lecHour: Number, labHour: Number }],
   })
   schedule: {
     weekNo: number;
-    topicDesc: string;
+    topic: string;
     lecHour: number;
     labHour: number;
   }[];
