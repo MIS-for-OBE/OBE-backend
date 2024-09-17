@@ -11,6 +11,8 @@ import {
 import { Faculty, FacultySchema } from '../faculty/schemas/schema';
 import { Section, SectionSchema } from '../section/schemas/schema';
 import { User, UserSchema } from '../user/schemas/schema';
+import { TQF3, TQF3Schema } from '../tqf3/schemas/schema';
+import { TQF5, TQF5Schema } from '../tqf5/schemas/schema';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { User, UserSchema } from '../user/schemas/schema';
         name: Faculty.name,
         schema: FacultySchema,
       },
+      { name: TQF3.name, schema: TQF3Schema },
+      { name: TQF5.name, schema: TQF5Schema },
     ]),
   ],
   controllers: [CourseController],

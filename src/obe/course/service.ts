@@ -17,6 +17,8 @@ import {
 import { ROLE } from 'src/common/enum/role.enum';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
 import { COURSE_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
+import { TQF3 } from '../tqf3/schemas/schema';
+import { TQF5 } from '../tqf5/schemas/schema';
 
 @Injectable()
 export class CourseService {
@@ -26,6 +28,8 @@ export class CourseService {
     @InjectModel(CourseManagement.name)
     private readonly courseManagementModel: Model<CourseManagement>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(TQF3.name) private readonly tqf3Model: Model<TQF3>,
+    @InjectModel(TQF5.name) private readonly tqf5Model: Model<TQF5>,
   ) {}
 
   async searchCourse(id: string, searchDTO: CourseSearchDTO): Promise<any> {
@@ -36,7 +40,10 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+              {
+                path: 'instructor',
+                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+              },
               { path: 'TQF3', select: 'status' },
               { path: 'TQF5', select: 'status' },
             ],
@@ -62,8 +69,14 @@ export class CourseService {
           .populate({
             path: 'sections',
             populate: [
-              { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
-              { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+              {
+                path: 'instructor',
+                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+              },
+              {
+                path: 'coInstructors',
+                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+              },
               { path: 'TQF3', select: 'status' },
               { path: 'TQF5', select: 'status' },
             ],
@@ -112,8 +125,14 @@ export class CourseService {
         .populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+            {
+              path: 'instructor',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+            {
+              path: 'coInstructors',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
             { path: 'TQF3' },
             { path: 'TQF5' },
           ],
@@ -217,13 +236,24 @@ export class CourseService {
           );
         });
       }
-
+      const statusArray = Array.from(
+        {
+          length:
+            requestDTO.type == COURSE_TYPE.SEL_TOPIC
+              ? new Set(requestDTO.sections.map((section) => section.topic))
+                  .size
+              : requestDTO.sections.length,
+        },
+        () => ({ status: TQF_STATUS.NO_DATA }),
+      );
+      const tqf3List = await this.tqf3Model.insertMany(statusArray);
+      const tqf5List = await this.tqf5Model.insertMany(statusArray);
       if (!course?.addFirstTime) {
-        requestDTO.sections.forEach((sec) => {
+        requestDTO.sections.forEach((sec, index) => {
           sec.addFirstTime = true;
           if (requestDTO.type != COURSE_TYPE.SEL_TOPIC) {
-            sec.TQF3 = { status: TQF_STATUS.NO_DATA };
-            sec.TQF5 = { status: TQF_STATUS.NO_DATA };
+            sec.TQF3 = tqf3List[index].id;
+            sec.TQF5 = tqf5List[index].id;
           }
         });
       }
@@ -250,8 +280,8 @@ export class CourseService {
       };
 
       if (courseData.type != COURSE_TYPE.SEL_TOPIC) {
-        courseData.TQF3 = { status: TQF_STATUS.NO_DATA };
-        courseData.TQF5 = { status: TQF_STATUS.NO_DATA };
+        courseData.TQF3 = tqf3List[0].id;
+        courseData.TQF5 = tqf5List[0].id;
       }
 
       if (course) {
@@ -275,8 +305,14 @@ export class CourseService {
         await course.populate({
           path: 'sections',
           populate: [
-            { path: 'instructor', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
-            { path: 'coInstructors', select: 'firstNameEN lastNameEN firstNameTH lastNameTH email' },
+            {
+              path: 'instructor',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+            {
+              path: 'coInstructors',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
           ],
         });
         const topics = course.sections

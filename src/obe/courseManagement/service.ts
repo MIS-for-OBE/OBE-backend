@@ -9,7 +9,7 @@ import { CourseManagement, CourseManagementDocument } from './schemas/schema';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../user/schemas/schema';
 import { LogEventDTO } from '../logEvent/dto/dto';
-import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
+import { LOG_EVENT_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
 import { FacultyService } from '../faculty/service';
 import {
   setWhereWithSearchCourse,
@@ -21,6 +21,8 @@ import { Course } from '../course/schemas/schema';
 import { Section } from '../section/schemas/schema';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
 import { ROLE } from 'src/common/enum/role.enum';
+import { TQF3 } from '../tqf3/schemas/schema';
+import { TQF5 } from '../tqf5/schemas/schema';
 
 @Injectable()
 export class CourseManagementService {
@@ -32,6 +34,8 @@ export class CourseManagementService {
     @InjectModel(AcademicYear.name)
     private readonly academicYearModel: Model<AcademicYear>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(TQF3.name) private readonly tqf3Model: Model<TQF3>,
+    @InjectModel(TQF5.name) private readonly tqf5Model: Model<TQF5>,
     private readonly facultyService: FacultyService,
   ) {}
 
@@ -275,7 +279,7 @@ export class CourseManagementService {
             isActive: requestDTO.openThisTerm,
           });
         } else if (requestDTO.openThisTerm) {
-          secId = await this.createSection(updateSection, requestDTO);
+          secId = await this.createSection(updateSection, { ...requestDTO });
           await this.courseModel.findOneAndUpdate(
             {
               academicYear: requestDTO.academicYear,
@@ -291,7 +295,7 @@ export class CourseManagementService {
           secId,
         };
       } else if (requestDTO.openThisTerm) {
-        let secId = await this.createSection(updateSection, requestDTO);
+        let secId = await this.createSection(updateSection, { ...requestDTO });
         course = await this.courseModel.create({
           academicYear: requestDTO.academicYear,
           courseNo: requestDTO.courseNo,
@@ -494,7 +498,17 @@ export class CourseManagementService {
       (sec) => sec.sectionNo == requestDTO.data.sectionNo,
     )._doc;
     delete data._id;
-    return await this.sectionModel.create(data);
+    const tqf3 = await this.tqf3Model.create({
+      status: TQF_STATUS.NO_DATA,
+    });
+    const tqf5 = await this.tqf5Model.create({
+      status: TQF_STATUS.NO_DATA,
+    });
+    return await this.sectionModel.create({
+      ...data,
+      TQF3: tqf3.id,
+      TQF5: tqf5.id,
+    });
   }
 
   private setLogEvent(
