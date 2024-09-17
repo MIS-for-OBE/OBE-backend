@@ -160,6 +160,7 @@ class Part4 {
           {
             eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
             evalWeek: { type: [Number] },
+            percent: { type: Number },
           },
         ],
       },
@@ -170,6 +171,7 @@ class Part4 {
     evals: {
       eval: Eval;
       evalWeek: number[];
+      percent: number;
     }[];
   }[];
 }
@@ -190,19 +192,6 @@ class Part5 {
 
   @Prop()
   recDoc: string;
-
-  @Prop({
-    type: [
-      {
-        clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
-        plo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
-      },
-    ],
-  })
-  data: {
-    clo: CLO;
-    plo: PLONo[];
-  }[];
 }
 export const Part5Schema = SchemaFactory.createForClass(Part5);
 
@@ -232,6 +221,31 @@ class Part6 {
   }[];
 }
 export const Part6Schema = SchemaFactory.createForClass(Part6);
+
+@Schema({
+  toJSON: {
+    transform(doc, ret) {
+      ret.id = ret.id ?? ret._id;
+      delete ret._id;
+    },
+  },
+  timestamps: { createdAt: false, updatedAt: true },
+})
+class Part7 {
+  @Prop({
+    type: [
+      {
+        clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
+        plo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+      },
+    ],
+  })
+  data: {
+    clo: CLO;
+    plo: PLONo[];
+  }[];
+}
+export const Part7Schema = SchemaFactory.createForClass(Part7);
 
 export type TQF3Document = HydratedDocument<TQF3>;
 
@@ -266,6 +280,9 @@ export class TQF3 {
 
   @Prop({ type: Part6Schema })
   part6?: Part6;
+
+  @Prop({ type: Part7Schema })
+  part7?: Part7;
 }
 
 export const TQF3Schema = SchemaFactory.createForClass(TQF3);
