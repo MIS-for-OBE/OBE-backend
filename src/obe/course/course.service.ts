@@ -354,13 +354,26 @@ export class CourseService {
 
   async deleteCourse(id: string): Promise<Course> {
     try {
-      const deleteCourse = await this.model.findByIdAndDelete(id);
+      const deleteCourse = await this.model
+        .findByIdAndDelete(id)
+        .populate('sections');
       if (!deleteCourse) {
         throw new NotFoundException('Course not found');
       }
-      await this.sectionModel.deleteMany({
-        _id: { $in: deleteCourse.sections },
-      });
+      await Promise.all([
+        deleteCourse.sections.map(async (section: any) => {
+          if (section.TQF3) {
+            await this.tqf3Model.findByIdAndDelete(section.TQF3);
+          }
+          if (section.TQF5) {
+            await this.tqf5Model.findByIdAndDelete(section.TQF5);
+          }
+          await this.sectionModel.findByIdAndDelete(section._id);
+        }),
+        this.tqf3Model.findByIdAndDelete(deleteCourse.TQF3),
+        this.tqf5Model.findByIdAndDelete(deleteCourse.TQF5),
+      ]);
+
       if (deleteCourse.addFirstTime) {
         await this.courseManagementModel.findOneAndDelete({
           courseNo: deleteCourse.courseNo,

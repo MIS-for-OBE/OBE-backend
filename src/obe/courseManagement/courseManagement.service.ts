@@ -435,9 +435,23 @@ export class CourseManagementService {
         academicYear: requestDTO.academicYear,
         courseNo: requestDTO.courseNo,
       });
-      await this.sectionModel.deleteMany({
-        _id: { $in: deleteCourse.sections },
-      });
+
+      if (deleteCourse) {
+        await Promise.all([
+          deleteCourse.sections.map(async (section: any) => {
+            if (section.TQF3) {
+              await this.tqf3Model.findByIdAndDelete(section.TQF3);
+            }
+            if (section.TQF5) {
+              await this.tqf5Model.findByIdAndDelete(section.TQF5);
+            }
+            await this.sectionModel.findByIdAndDelete(section._id);
+          }),
+          this.tqf3Model.findByIdAndDelete(deleteCourse.TQF3),
+          this.tqf5Model.findByIdAndDelete(deleteCourse.TQF5),
+        ]);
+      }
+
       return { id, courseId: deleteCourse.id };
     } catch (error) {
       throw error;
