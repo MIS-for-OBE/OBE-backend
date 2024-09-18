@@ -156,6 +156,7 @@ class Part4 {
     type: [
       {
         clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
+        percent: { type: Number },
         evals: [
           {
             eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
@@ -168,6 +169,7 @@ class Part4 {
   })
   data: {
     clo: CLO;
+    percent: number;
     evals: {
       eval: Eval;
       evalWeek: number[];
