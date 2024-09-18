@@ -5,11 +5,18 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { CourseManagement, CourseManagementDocument } from './schemas/courseManagement.schema';
+import {
+  CourseManagement,
+  CourseManagementDocument,
+} from './schemas/courseManagement.schema';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../user/schemas/user.schema';
 import { LogEventDTO } from '../logEvent/dto/dto';
-import { LOG_EVENT_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
+import {
+  COURSE_TYPE,
+  LOG_EVENT_TYPE,
+  TQF_STATUS,
+} from 'src/common/enum/type.enum';
 import { FacultyService } from '../faculty/faculty.service';
 import {
   setWhereWithSearchCourse,
@@ -260,6 +267,7 @@ export class CourseManagementService {
       const updateSection = updateCourse.sections.sort(
         (a, b) => a.sectionNo - b.sectionNo,
       );
+      updateSection.type = updateCourse.type;
       let course: any = await this.courseModel
         .findOne({
           academicYear: requestDTO.academicYear,
@@ -427,6 +435,9 @@ export class CourseManagementService {
         academicYear: requestDTO.academicYear,
         courseNo: requestDTO.courseNo,
       });
+      await this.sectionModel.deleteMany({
+        _id: { $in: deleteCourse.sections },
+      });
       return { id, courseId: deleteCourse.id };
     } catch (error) {
       throw error;
@@ -455,9 +466,9 @@ export class CourseManagementService {
         )?.id;
         if (secId) {
           await Promise.all([
-            // this.courseModel.findByIdAndUpdate(course.id, {
-            //   $pull: { sections: secId },
-            // }),
+            this.courseModel.findByIdAndUpdate(course.id, {
+              $pull: { sections: secId },
+            }),
             this.sectionModel.findByIdAndDelete(secId),
           ]);
         }
@@ -500,17 +511,18 @@ export class CourseManagementService {
       (sec) => sec.sectionNo == requestDTO.data.sectionNo,
     )._doc;
     delete data._id;
-    const tqf3 = await this.tqf3Model.create({
-      status: TQF_STATUS.NO_DATA,
-    });
-    const tqf5 = await this.tqf5Model.create({
-      status: TQF_STATUS.NO_DATA,
-    });
-    return await this.sectionModel.create({
-      ...data,
-      TQF3: tqf3.id,
-      TQF5: tqf5.id,
-    });
+    if (course.type == COURSE_TYPE.SEL_TOPIC) {
+      const tqf3 = await this.tqf3Model.create({
+        status: TQF_STATUS.NO_DATA,
+      });
+      const tqf5 = await this.tqf5Model.create({
+        status: TQF_STATUS.NO_DATA,
+      });
+      data.TQF3 = tqf3.id;
+      data.TQF5 = tqf5.id;
+    }
+
+    return await this.sectionModel.create({ ...data });
   }
 
   private setLogEvent(

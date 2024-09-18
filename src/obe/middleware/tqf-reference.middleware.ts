@@ -53,15 +53,15 @@ export class TQFReferenceMiddleware implements NestMiddleware {
     }
   }
 
-  async removeReferences(sectionId: string) {
-    try {
-      const section = await this.sectionModel.findById(sectionId);
-      if (section) {
-        await this.tqf3Model.findByIdAndDelete(section.TQF3);
-        await this.tqf5Model.findByIdAndDelete(section.TQF5);
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
+  // async removeReferences(sectionId: string) {
+  //   try {
+  //     const section = await this.sectionModel.findById(sectionId);
+  //     if (section) {
+  //       await this.tqf3Model.findByIdAndDelete(section.TQF3);
+  //       await this.tqf5Model.findByIdAndDelete(section.TQF5);
+  //     }
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 }

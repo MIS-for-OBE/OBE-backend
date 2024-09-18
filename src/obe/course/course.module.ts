@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CourseController } from './course.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -40,8 +45,11 @@ import { TQFReferenceMiddleware } from '../middleware/tqf-reference.middleware';
   providers: [CourseService, FacultyService],
 })
 export class CourseModule {}
+
 // implements NestModule {
 //   configure(consumer: MiddlewareConsumer) {
-//     consumer.apply(TQFReferenceMiddleware).forRoutes(CourseController);
+//     consumer
+//       .apply(TQFReferenceMiddleware)
+//       .forRoutes({ path: 'course', method: RequestMethod.POST });
 //   }
 // }

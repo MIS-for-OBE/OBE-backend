@@ -83,9 +83,9 @@ export class SectionService {
       if (!updateCourse) {
         throw new NotFoundException('Course not found');
       }
-      // await this.courseModel.findByIdAndUpdate(requestDTO.courseId, {
-      //   $pull: { sections: id },
-      // });
+      await this.courseModel.findByIdAndUpdate(requestDTO.courseId, {
+        $pull: { sections: id },
+      });
       const deleteSection = await this.model.findByIdAndDelete(id);
       if (!deleteSection) {
         throw new NotFoundException('Section not found');

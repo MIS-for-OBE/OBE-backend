@@ -358,6 +358,9 @@ export class CourseService {
       if (!deleteCourse) {
         throw new NotFoundException('Course not found');
       }
+      await this.sectionModel.deleteMany({
+        _id: { $in: deleteCourse.sections },
+      });
       if (deleteCourse.addFirstTime) {
         await this.courseManagementModel.findOneAndDelete({
           courseNo: deleteCourse.courseNo,

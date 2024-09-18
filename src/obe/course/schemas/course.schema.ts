@@ -55,12 +55,20 @@ export const CourseSchema = SchemaFactory.createForClass(Course).index(
   { unique: true },
 );
 
-CourseSchema.pre('findOneAndDelete', async function (next) {
-  const course = await this.model.findOne(this.getFilter());
-  if (course) {
-    await mongoose.model('Section').deleteMany({
-      _id: { $in: course.sections },
-    });
-  }
-  next();
-});
+// CourseSchema.pre('findOneAndDelete', async function (next) {
+//   try {
+//     const course = await this.model.findOne(this.getFilter());
+//     if (course) {
+//       await Promise.all([
+//         mongoose.model(TQF3.name).findByIdAndDelete(course.TQF3),
+//         mongoose.model(TQF5.name).findByIdAndDelete(course.TQF5),
+//         mongoose
+//           .model(Section.name)
+//           .deleteMany({ _id: { $in: course.sections } }),
+//       ]);
+//     }
+//     next();
+//   } catch (error) {
+//     next();
+//   }
+// });

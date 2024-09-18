@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Course } from 'src/obe/course/schemas/course.schema';
 import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 // import { Assignment } from 'src/obe/assignment/schemas/assignment.schema';
 import { TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
@@ -64,16 +65,20 @@ export class Section {
 
 export const SectionSchema = SchemaFactory.createForClass(Section);
 
-SectionSchema.pre('findOneAndDelete', async function (next) {
-  const section = await this.model.findOne(this.getFilter());
+// SectionSchema.pre('findOneAndDelete', async function (next) {
+//   try {
+//     const section = await this.model.findOne(this.getFilter());
 
-  if (section) {
-    await mongoose
-      .model('Course')
-      .updateMany(
-        { sections: section._id },
-        { $pull: { sections: section._id } },
-      );
-  }
-  next();
-});
+//     if (section) {
+//       await mongoose
+//         .model(Course.name)
+//         .updateMany(
+//           { sections: section._id },
+//           { $pull: { sections: section._id } },
+//         );
+//     }
+//     next();
+//   } catch (error) {
+//     next();
+//   }
+// });

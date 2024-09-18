@@ -6,10 +6,13 @@ import { join } from 'path';
 import { DocumentInterceptor } from './common/interceptor/repo.interceptor';
 import { json } from 'express';
 import { ErrorInterceptor } from './common/interceptor/error.interceptor';
+import { registerModels } from './database/database.config';
 
 async function bootstrap() {
   const app: NestExpressApplication = await NestFactory.create(AppModule);
   app.useGlobalInterceptors(new DocumentInterceptor(), new ErrorInterceptor());
+
+  // registerModels();
 
   app.setGlobalPrefix('api/v1');
   app.enableCors();
