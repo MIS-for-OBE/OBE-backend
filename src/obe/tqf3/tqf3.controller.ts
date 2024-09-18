@@ -14,7 +14,6 @@ import { TQF3Service } from './tqf3.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { TQF3 } from './schemas/tqf3.schema';
 import * as fs from 'fs';
-import * as html2canvas from 'html2canvas';
 
 @Controller('/tqf3')
 @UsePipes(new ValidationPipe({ transform: true }))
