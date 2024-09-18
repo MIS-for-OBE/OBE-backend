@@ -43,33 +43,35 @@ export class TQF3Controller {
   ): Promise<void> {
     try {
       const files = await this.service.generatePDF(requestDTO);
-      // res.setHeader('Content-disposition', `attachment; filename=${files}`);
-      // res.setHeader('Content-type', 'application/pdf');
+      // single file
+      res.setHeader('Content-disposition', `attachment; filename=${files}`);
+      res.setHeader('Content-type', 'application/pdf');
 
-      // res.sendFile(files, { root: process.cwd() }, (err) => {
-      //   if (err) {
-      //     throw err;
-      //   }
-      //   fs.unlinkSync(files);
+      res.sendFile(files, { root: process.cwd() }, (err) => {
+        if (err) {
+          throw err;
+        }
+        fs.unlinkSync(files);
+      });
+
+      // multiple file (.zip)
+      // res.setHeader('Content-disposition', 'attachment; filename=TQF3.zip');
+      // res.setHeader('Content-type', 'application/zip');
+      // const archive = archiver('zip', {
+      //   zlib: { level: 9 },
       // });
-
-      res.setHeader('Content-disposition', 'attachment; filename=TQF3.zip');
-      res.setHeader('Content-type', 'application/zip');
-      const archive = archiver('zip', {
-        zlib: { level: 9 },
-      });
-      archive.on('error', (err) => {
-        throw err;
-      });
-      res.on('close', () => {
-        files.forEach((file) => fs.unlinkSync(file));
-      });
-      archive.pipe(res);
-      files.forEach((file) => {
-        const filePath = join(process.cwd(), file);
-        archive.file(filePath, { name: file });
-      });
-      await archive.finalize();
+      // archive.on('error', (err) => {
+      //   throw err;
+      // });
+      // res.on('close', () => {
+      //   files.forEach((file) => fs.unlinkSync(file));
+      // });
+      // archive.pipe(res);
+      // files.forEach((file) => {
+      //   const filePath = join(process.cwd(), file);
+      //   archive.file(filePath, { name: file });
+      // });
+      // await archive.finalize();
     } catch (error) {
       throw error;
     }

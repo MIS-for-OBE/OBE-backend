@@ -2,6 +2,9 @@ import { IsOptional, IsString } from 'class-validator';
 import { BaseDTO } from 'src/common/dto/base.dto';
 
 export class GeneratePdfDTO extends BaseDTO {
+  @IsString()
+  tqf3: string;
+
   @IsOptional()
   @IsString()
   part1?: string;

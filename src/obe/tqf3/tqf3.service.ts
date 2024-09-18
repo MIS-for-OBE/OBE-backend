@@ -3,11 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { TQF3 } from './schemas/tqf3.schema';
 import { Model } from 'mongoose';
 import { TQF_STATUS } from 'src/common/enum/type.enum';
+import { GeneratePdfDTO } from './dto/dto';
 import * as fs from 'fs';
 import { join } from 'path';
 import * as puppeteer from 'puppeteer';
+import * as ejs from 'ejs';
 import * as moment from 'moment';
-import { GeneratePdfDTO } from './dto/dto';
 
 @Injectable()
 export class TQF3Service {
@@ -38,17 +39,19 @@ export class TQF3Service {
 
   async generatePDF(requestDTO: GeneratePdfDTO): Promise<any> {
     try {
-      console.log(requestDTO.part1, requestDTO.part3);
-
+      const tqf3 = await this.model.findById(requestDTO.tqf3);
       const date = moment().format('DD-MM-YYYY');
       const prefix = 'src/obe/tqf3/templates';
       const files = [];
+
       if (requestDTO.part1 !== undefined) {
         const part1 = await this.generatePdfEachPart(
           1,
           `${prefix}/part1.html`,
           date,
+          tqf3.part1,
         );
+        return part1; // single file
         files.push(part1);
       }
       if (requestDTO.part2 !== undefined) {
@@ -56,11 +59,12 @@ export class TQF3Service {
           2,
           `${prefix}/part2.html`,
           date,
+          tqf3.part2,
         );
         files.push(part2);
       }
 
-      return files;
+      return files; // multiple file
     } catch (error) {
       throw error;
     }
@@ -70,14 +74,15 @@ export class TQF3Service {
     part: number,
     path: string,
     date: string,
+    data: any,
   ): Promise<string> {
     try {
       const htmlPath = join(process.cwd(), path);
-      console.log(htmlPath);
       const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+      const renderedHtml = ejs.render(htmlContent, { data });
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
-      await page.setContent(htmlContent, { waitUntil: 'load' });
+      await page.setContent(renderedHtml, { waitUntil: 'load' });
 
       const filename = `TQF3_Part${part}_${date}.pdf`;
       await page.pdf({
