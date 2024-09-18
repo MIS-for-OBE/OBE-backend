@@ -395,20 +395,22 @@ export class CourseManagementService {
           })
           .populate(populateSections),
       ]);
-      const topics = course.sections
-        .map((sec: any) => {
-          if (
-            sec.instructor.id == authUser.id ||
-            sec.coInstructors.some((coIns: any) => coIns.id == authUser.id)
-          )
-            return sec.topic;
-        })
-        .filter((topic) => topic);
-      course.sections = course.sections.filter(
-        (section: any) => !section.topic || topics.includes(section.topic),
-      );
-      sortData(course.sections, 'sectionNo');
-      sortData(course.sections, 'isActive', 'boolean');
+      if (course) {
+        const topics = course.sections
+          .map((sec: any) => {
+            if (
+              sec.instructor.id == authUser.id ||
+              sec.coInstructors.some((coIns: any) => coIns.id == authUser.id)
+            )
+              return sec.topic;
+          })
+          .filter((topic) => topic);
+        course.sections = course.sections.filter(
+          (section: any) => !section.topic || topics.includes(section.topic),
+        );
+        sortData(course.sections, 'sectionNo');
+        sortData(course.sections, 'isActive', 'boolean');
+      }
       return { course, courseManagement: updateCourse };
     } catch (error) {
       throw error;
