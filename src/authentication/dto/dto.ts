@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { BaseDTO } from 'src/common/dto/base.dto';
-import { User } from 'src/obe/user/schemas/schema';
+import { User } from 'src/obe/user/schemas/user.schema';
 
 export class LoginDTO extends BaseDTO {
   @IsString()
