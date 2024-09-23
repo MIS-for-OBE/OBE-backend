@@ -5,15 +5,7 @@ import { Course } from 'src/obe/course/schemas/course.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = doc._id;
-      delete ret._id;
-    },
-  },
-})
+@Schema()
 export class User {
   @Prop()
   studentId: string;

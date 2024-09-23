@@ -15,6 +15,8 @@ import { SectionModule } from './obe/section/section.module';
 import { PLOModule } from './obe/plo/plo.module';
 import { TQF3Module } from './obe/tqf3/tqf3.module';
 import { TQF5Module } from './obe/tqf5/tqf5.module';
+import mongoose from 'mongoose';
+import { globalTransformPlugin } from './common/plugins/globalTransform.plugin';
 
 @Module({
   imports: [
@@ -37,4 +39,8 @@ import { TQF5Module } from './obe/tqf5/tqf5.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    mongoose.plugin(globalTransformPlugin);
+  }
+}

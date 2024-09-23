@@ -8,15 +8,7 @@ import { TQF5 } from 'src/obe/tqf5/schemas/tqf5.schema';
 
 export type CourseDocument = HydratedDocument<Course>;
 
-@Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-})
+@Schema()
 export class Course {
   @Prop({
     required: true,

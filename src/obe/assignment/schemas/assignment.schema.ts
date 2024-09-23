@@ -5,7 +5,7 @@ import { Section } from 'src/obe/section/schemas/section.schema';
 
 export type AssignmentDocument = HydratedDocument<Assignment>;
 
-@Schema({ versionKey: false })
+@Schema()
 export class Assignment {
   @Prop({
     required: true,

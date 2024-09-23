@@ -3,15 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type FacultyDocument = HydratedDocument<Faculty>;
 
-@Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-})
+@Schema()
 export class Department {
   @Prop({ required: true })
   departmentTH: string;
@@ -29,15 +21,7 @@ export class Department {
   codeTH: string;
 }
 
-@Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-})
+@Schema()
 export class Faculty {
   @Prop({ required: true, unique: true })
   facultyCode: string;

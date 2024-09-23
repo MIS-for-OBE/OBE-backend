@@ -6,14 +6,7 @@ import { User } from 'src/obe/user/schemas/user.schema';
 
 export type CourseManagementDocument = HydratedDocument<CourseManagement>;
 
-@Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-})
+@Schema()
 export class SectionManagement {
   @Prop({ required: true })
   sectionNo: number;
@@ -43,13 +36,6 @@ export const SectionManagementSchema =
   SchemaFactory.createForClass(SectionManagement);
 
 @Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: true,
   collection: 'courseManagements',
 })

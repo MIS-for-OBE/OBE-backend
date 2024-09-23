@@ -3,14 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type PLODocument = HydratedDocument<PLO>;
 
-@Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-})
+@Schema()
 export class PLONo {
   @Prop({ required: true })
   no: number;
@@ -24,16 +17,7 @@ export class PLONo {
 
 export const PLONoSchema = SchemaFactory.createForClass(PLONo);
 
-@Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-  collection: 'PLOs',
-})
+@Schema({ collection: 'PLOs' })
 export class PLO {
   @Prop({ required: true, unique: true })
   name: string;

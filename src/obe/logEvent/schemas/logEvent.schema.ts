@@ -7,13 +7,6 @@ import { User } from 'src/obe/user/schemas/user.schema';
 export type LogEventDocument = HydratedDocument<LogEvent>;
 
 @Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: true, updatedAt: false },
   collection: 'logEvents',
 })
