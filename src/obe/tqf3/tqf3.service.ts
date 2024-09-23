@@ -89,7 +89,7 @@ export class TQF3Service {
         path: filename,
         format: 'A4',
         margin: {
-          top: '1.0in',
+          top: '0.5in',
           left: '0.75in',
           right: '0.75in',
           bottom: '1.44in',
