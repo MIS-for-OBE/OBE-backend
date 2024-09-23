@@ -5,13 +5,6 @@ import { TQF_STATUS } from 'src/common/enum/type.enum';
 export type TQF5Document = HydratedDocument<TQF5>;
 
 @Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: false, updatedAt: true },
 })
 export class TQF5 {

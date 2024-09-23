@@ -8,14 +8,7 @@ import {
 } from 'src/common/enum/type.enum';
 import { PLONo, PLONoSchema } from 'src/obe/plo/schemas/plo.schema';
 
-@Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-})
+@Schema()
 export class CLO {
   @Prop({ required: true, unique: true })
   no: number;
@@ -34,14 +27,7 @@ export class CLO {
 }
 export const CLOSchema = SchemaFactory.createForClass(CLO);
 
-@Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-})
+@Schema()
 export class Eval {
   @Prop({ required: true, unique: true })
   no: number;
@@ -61,12 +47,6 @@ export class Eval {
 export const EvalSchema = SchemaFactory.createForClass(Eval);
 
 @Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part1 {
@@ -94,12 +74,6 @@ class Part1 {
 export const Part1Schema = SchemaFactory.createForClass(Part1);
 
 @Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part2 {
@@ -125,12 +99,6 @@ class Part2 {
 export const Part2Schema = SchemaFactory.createForClass(Part2);
 
 @Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part3 {
@@ -143,12 +111,6 @@ class Part3 {
 export const Part3Schema = SchemaFactory.createForClass(Part3);
 
 @Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part4 {
@@ -180,12 +142,6 @@ class Part4 {
 export const Part4Schema = SchemaFactory.createForClass(Part4);
 
 @Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part5 {
@@ -198,12 +154,6 @@ class Part5 {
 export const Part5Schema = SchemaFactory.createForClass(Part5);
 
 @Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part6 {
@@ -225,12 +175,6 @@ class Part6 {
 export const Part6Schema = SchemaFactory.createForClass(Part6);
 
 @Schema({
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: false, updatedAt: true },
 })
 class Part7 {
@@ -252,13 +196,6 @@ export const Part7Schema = SchemaFactory.createForClass(Part7);
 export type TQF3Document = HydratedDocument<TQF3>;
 
 @Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
   timestamps: { createdAt: false, updatedAt: true },
 })
 export class TQF3 {

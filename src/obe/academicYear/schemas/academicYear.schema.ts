@@ -3,16 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type AcademicYearDocument = HydratedDocument<AcademicYear>;
 
-@Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-  collection: 'academicYears',
-})
+@Schema({ collection: 'academicYears' })
 export class AcademicYear {
   @Prop({ required: true })
   year: number;

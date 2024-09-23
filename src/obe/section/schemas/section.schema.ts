@@ -9,15 +9,7 @@ import { User } from 'src/obe/user/schemas/user.schema';
 
 export type SectionDocument = HydratedDocument<Section>;
 
-@Schema({
-  versionKey: false,
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret.id ?? ret._id;
-      delete ret._id;
-    },
-  },
-})
+@Schema()
 export class Section {
   @Prop({ required: true })
   sectionNo: number;
