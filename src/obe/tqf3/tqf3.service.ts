@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { TQF_STATUS } from 'src/common/enum/type.enum';
 import { GeneratePdfDTO } from './dto/dto';
 import * as fs from 'fs';
+import * as PDFDocument from 'pdfkit';
 import { join } from 'path';
 import * as puppeteer from 'puppeteer';
 import * as ejs from 'ejs';
@@ -47,6 +48,7 @@ export class TQF3Service {
       if (requestDTO.part1 !== undefined) {
         const part1 = await this.generatePdfEachPart(
           1,
+          prefix,
           `${prefix}/part1.html`,
           date,
           tqf3.part1,
@@ -57,6 +59,7 @@ export class TQF3Service {
       if (requestDTO.part2 !== undefined) {
         const part2 = await this.generatePdfEachPart(
           2,
+          prefix,
           `${prefix}/part2.html`,
           date,
           tqf3.part2,
@@ -72,6 +75,7 @@ export class TQF3Service {
 
   private async generatePdfEachPart(
     part: number,
+    prefixPath: string,
     path: string,
     date: string,
     data: any,
@@ -80,10 +84,19 @@ export class TQF3Service {
       const htmlPath = join(process.cwd(), path);
       const htmlContent = fs.readFileSync(htmlPath, 'utf8');
       const renderedHtml = ejs.render(htmlContent, { data });
-      const browser = await puppeteer.launch();
-      const page = await browser.newPage();
-      await page.setContent(renderedHtml, { waitUntil: 'load' });
+      // const doc = new PDFDocument({
+      //   size: 'A4',
+      //   bufferPages: true,
+      // });
+      // doc.file(renderedHtml);
 
+      const browser = await puppeteer.launch({
+        args: ['--font-render-hinting=none'],
+      });
+      const page = await browser.newPage();
+      await page.setContent(renderedHtml, { waitUntil: 'networkidle0' });
+      await page.addStyleTag({ path: `${prefixPath}/style.css` });
+      await page.evaluateHandle('document.fonts.ready');
       const filename = `TQF3_Part${part}_${date}.pdf`;
       await page.pdf({
         path: filename,
