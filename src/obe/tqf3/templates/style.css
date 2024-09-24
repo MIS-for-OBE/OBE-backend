@@ -1,12 +1,77 @@
-@font-face {
-  font-family: 'TH_Niramit';
-  src: url('file:///src/assets/TH_Niramit.ttf') format('truetype');
+.niramit-extralight {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.niramit-light {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.niramit-regular {
+  font-family: 'Niramit', sans-serif;
   font-weight: 400;
   font-style: normal;
 }
 
+.niramit-medium {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.niramit-semibold {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.niramit-bold {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.niramit-extralight-italic {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 200;
+  font-style: italic;
+}
+
+.niramit-light-italic {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.niramit-regular-italic {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.niramit-medium-italic {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.niramit-semibold-italic {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.niramit-bold-italic {
+  font-family: 'Niramit', sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
 body {
-  font-family: 'TH_Niramit', sans-serif;
+  font-family: 'Niramit', sans-serif;
   line-height: 1.6;
 }
 
@@ -15,7 +80,7 @@ h2,
 h3,
 h4,
 h5 {
-  font-family: 'TH_Niramit', sans-serif;
+  font-family: 'Niramit', sans-serif;
 }
 
 h1,
