@@ -1,12 +1,10 @@
 @font-face {
-  font-family: 'TH_Niramit';
-  src: url('file:///src/assets/TH_Niramit.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
+  font-family: 'TH Niramit AS';
+  src: url('../../../assets/fonts/TH\ Niramit\ AS\ Regular.ttf');
 }
 
 body {
-  font-family: 'TH_Niramit', sans-serif;
+  font-family: 'TH Niramit AS', sans-serif;
   line-height: 1.6;
 }
 
@@ -15,7 +13,7 @@ h2,
 h3,
 h4,
 h5 {
-  font-family: 'TH_Niramit', sans-serif;
+  font-family: 'TH Niramit AS', sans-serif;
 }
 
 h1,

@@ -46,7 +46,7 @@ export class TQF3Controller {
       // single file
       res.setHeader('Content-disposition', `attachment; filename=${files}`);
       res.setHeader('Content-type', 'application/pdf');
-
+      res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
       res.sendFile(files, { root: process.cwd() }, (err) => {
         if (err) {
           throw err;
@@ -55,11 +55,10 @@ export class TQF3Controller {
       });
 
       // multiple file (.zip)
-      // res.setHeader('Content-disposition', 'attachment; filename=TQF3.zip');
+      // res.setHeader('Content-disposition', 'attachment; filename="TQF3.zip"');
       // res.setHeader('Content-type', 'application/zip');
-      // const archive = archiver('zip', {
-      //   zlib: { level: 9 },
-      // });
+      // res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+      // const archive = archiver('zip', { zlib: { level: 9 } });
       // archive.on('error', (err) => {
       //   throw err;
       // });

@@ -82,7 +82,7 @@ export class TQF3Service {
   ): Promise<string> {
     try {
       const htmlPath = join(process.cwd(), path);
-      const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+      const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
       const renderedHtml = ejs.render(htmlContent, { data });
       // const doc = new PDFDocument({
       //   size: 'A4',
@@ -91,10 +91,17 @@ export class TQF3Service {
       // doc.file(renderedHtml);
 
       const browser = await puppeteer.launch({
-        args: ['--font-render-hinting=none'],
+        headless: 'shell',
+        args: [
+          '--font-render-hinting=none',
+          '--fast-start',
+          '--disable-extensions',
+          '--no-sandbox',
+          '--disable-web-security',
+        ],
       });
       const page = await browser.newPage();
-      await page.setContent(renderedHtml, { waitUntil: 'networkidle0' });
+      await page.setContent(renderedHtml, { waitUntil: 'domcontentloaded' });
       await page.addStyleTag({ path: `${prefixPath}/style.css` });
       await page.evaluateHandle('document.fonts.ready');
       const filename = `TQF3_Part${part}_${date}.pdf`;
