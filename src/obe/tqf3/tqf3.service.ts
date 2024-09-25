@@ -10,6 +10,11 @@ import { join } from 'path';
 import * as puppeteer from 'puppeteer';
 import * as ejs from 'ejs';
 import * as moment from 'moment';
+import axios from 'axios';
+import {
+  CmuApiTqfCourseDTO,
+  CmuApiTqfCourseSearchDTO,
+} from 'src/common/cmu-api/cmu-api.dto';
 
 @Injectable()
 export class TQF3Service {
@@ -40,6 +45,17 @@ export class TQF3Service {
 
   async generatePDF(requestDTO: GeneratePdfDTO): Promise<any> {
     try {
+      const courseInfo = await axios.get(
+        `${process.env.BASE_CMU_API}course-template`,
+        {
+          params: {
+            courseid: requestDTO.courseNo,
+            academicyear: requestDTO.academicYear,
+            academicterm: requestDTO.academicTerm,
+          } as CmuApiTqfCourseSearchDTO,
+        },
+      );
+      const data: CmuApiTqfCourseDTO = courseInfo.data[0];
       const tqf3 = await this.model.findById(requestDTO.tqf3);
       const date = moment().format('DD-MM-YYYY');
       const prefix = 'src/obe/tqf3/templates';
@@ -51,7 +67,7 @@ export class TQF3Service {
           prefix,
           `${prefix}/part1.html`,
           date,
-          tqf3.part1,
+          { ...data, ...tqf3.part1 },
         );
         return part1; // single file
         files.push(part1);
@@ -62,7 +78,7 @@ export class TQF3Service {
           prefix,
           `${prefix}/part2.html`,
           date,
-          tqf3.part2,
+          { ...data, ...tqf3.part2 },
         );
         files.push(part2);
       }
