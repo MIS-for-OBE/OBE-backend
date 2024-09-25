@@ -19,6 +19,11 @@ import { TEXT_ENUM } from 'src/common/enum/text.enum';
 import { COURSE_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
 import { TQF5 } from '../tqf5/schemas/tqf5.schema';
+import axios from 'axios';
+import {
+  CmuApiTqfCourseSearchDTO,
+  CmuApiTqfCourseDTO,
+} from 'src/common/cmu-api/cmu-api.dto';
 
 @Injectable()
 export class CourseService {
@@ -162,13 +167,30 @@ export class CourseService {
     }
   }
 
-  async getExistsCourseName(courseNo: string): Promise<String> {
+  async getExistsCourseName(
+    courseNo: string,
+    requestDTO: any,
+  ): Promise<String> {
     try {
       const course = await this.courseManagementModel.findOne({
         courseNo,
       });
       if (course) return course.courseName;
-      else return '';
+      else {
+        const courseInfo = await axios.get(
+          `${process.env.BASE_CMU_API}course-template`,
+          {
+            params: {
+              courseid: courseNo,
+              ...requestDTO,
+            } as CmuApiTqfCourseSearchDTO,
+          },
+        );
+        if (courseInfo.data.length) {
+          const data: CmuApiTqfCourseDTO = courseInfo.data[0];
+          return data.CourseTitleEng;
+        } else return '';
+      }
     } catch (error) {
       throw error;
     }

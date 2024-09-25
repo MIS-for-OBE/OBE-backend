@@ -17,32 +17,37 @@
       <div class="flex-col" style="gap: 1.2rem">
         <h5 style="text-align: center">รายละเอียดของกระบวนวิชา</h5>
         <div class="flex-col" style="gap: 10px">
-          <div class="flex-row" style="gap: 1rem">
+          <div class="flex-row">
             <h5>1. ชื่อสถาบันอุดมศึกษา</h5>
+            &ensp;
             <h5>มหาวิทยาลัยเชียงใหม่ (CHIANG MAI UNIVERSITY)</h5>
           </div>
-          <div class="flex-row" style="gap: 3rem">
+          <div class="flex-row">
             <h5>2. คณะ/ภาควิชา:</h5>
-            <div class="flex-col" style="gap: 10px">
-              <p>คณะวิศวกรรมศาสตร์/ภาควิชาวิศวกรรมคอมพิวเตอร์</p>
+            &emsp;&emsp;
+            <div class="flex-col">
+              <p><%= data.FacultyNameTha %>/ภาควิชาวิศวกรรมคอมพิวเตอร์</p>
               <p>Faculty of Engineering / Department Computer Engineering</p>
             </div>
           </div>
-
-          <div class="flex-row" style="gap: 2.1rem">
+          <div class="flex-row">
             <h5>3. รหัสกระบวนวิชา:</h5>
-            <p>วศ.คพ. 497 (261497)</p>
+            &nbsp;&ensp;&ensp;
+            <p><%= data.CourseCodeTha %> 497 (261497)</p>
           </div>
-          <div class="flex-row" style="gap: 2.5rem">
-            <h5 style="margin-left: 1rem">ชื่อกระบวนวิชา:</h5>
+          <div class="flex-row">
+            &ensp;
+            <h5>ชื่อกระบวนวิชา:</h5>
+            &emsp;&emsp;
             <p>
               หัวข้อเลือกสรรทางคอมพิวเตอร์ซอฟต์แวร์ (Selected Topics in Computer
               Software)
             </p>
           </div>
-          <div class="flex-row" style="gap: 5rem">
+          <div class="flex-row">
             <h5>4. หน่วยกิต:</h5>
-            <p>3(3-0-6)</p>
+            &ensp;&emsp;&emsp;&emsp;
+            <p><%= data.Credit %></p>
           </div>
         </div>
       </div>

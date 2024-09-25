@@ -50,12 +50,15 @@ export class CourseController {
   @Get('courseName/:courseNo')
   async getExistCourseName(
     @Param('courseNo') courseNo: string,
+    @Query() requestDTO: any,
   ): Promise<ResponseDTO<any>> {
-    return this.service.getExistsCourseName(courseNo).then((result) => {
-      const responseDTO = new ResponseDTO<any>();
-      responseDTO.data = result;
-      return responseDTO;
-    });
+    return this.service
+      .getExistsCourseName(courseNo, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<any>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
   }
 
   @Get('check')
