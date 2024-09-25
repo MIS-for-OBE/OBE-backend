@@ -96,46 +96,62 @@ export class TQF3Service {
     date: string,
     data: any,
   ): Promise<string> {
-    try {
-      const htmlPath = join(process.cwd(), path);
-      const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
-      const renderedHtml = ejs.render(htmlContent, { data });
-      // const doc = new PDFDocument({
-      //   size: 'A4',
-      //   bufferPages: true,
-      // });
-      // doc.file(renderedHtml);
-
-      const browser = await puppeteer.launch({
-        headless: 'shell',
-        args: [
-          '--font-render-hinting=none',
-          '--fast-start',
-          '--disable-extensions',
-          '--no-sandbox',
-          '--disable-web-security',
-        ],
-      });
-      const page = await browser.newPage();
-      await page.setContent(renderedHtml, { waitUntil: 'domcontentloaded' });
-      await page.addStyleTag({ path: `${prefixPath}/style.css` });
-      await page.evaluateHandle('document.fonts.ready');
-      const filename = `TQF3_Part${part}_${date}.pdf`;
-      await page.pdf({
-        path: filename,
-        format: 'A4',
-        margin: {
-          top: '0.5in',
-          left: '0.75in',
-          right: '0.75in',
-          bottom: '1.44in',
-        },
-        printBackground: true,
-      });
-      await browser.close();
-      return filename;
-    } catch (error) {
-      throw error;
-    }
+    return new Promise((resolve, reject) => {
+      try {
+        const filename = `TQF3_Part${part}_${date}.pdf`;
+        const filePath = join(process.cwd(), filename);
+        // const htmlPath = join(process.cwd(), path);
+        // const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
+        // const renderedHtml = ejs.render(htmlContent, { data });
+        const doc = new PDFDocument({
+          size: 'A4',
+          bufferPages: true,
+        });
+        const writeStream = fs.createWriteStream(filePath);
+        doc.pipe(writeStream);
+        doc.registerFont(
+          'TH Niramit AS',
+          'src/assets/fonts/TH Niramit AS Regular.ttf',
+        );
+        doc.font('TH Niramit AS');
+        const title = 'มคอ 3'
+        const pageWidth = doc.page.width; // Default A4 width is 595.28
+        const textWidth = doc.widthOfString(title);
+        const xPosition = (pageWidth - textWidth) / 2;
+        doc.fontSize(20).text(title, xPosition, 50);
+        doc.end();
+        writeStream.on('finish', () => resolve(filename));
+        writeStream.on('error', reject);
+        // const browser = await puppeteer.launch({
+        //   headless: 'shell',
+        //   args: [
+        //     '--font-render-hinting=none',
+        //     '--fast-start',
+        //     '--disable-extensions',
+        //     '--no-sandbox',
+        //     '--disable-web-security',
+        //   ],
+        // });
+        // const page = await browser.newPage();
+        // await page.setContent(renderedHtml, { waitUntil: 'domcontentloaded' });
+        // await page.addStyleTag({ path: `${prefixPath}/style.css` });
+        // await page.evaluateHandle('document.fonts.ready');
+        // await page.pdf({
+        //   path: filename,
+        //   format: 'A4',
+        //   margin: {
+        //     top: '0.5in',
+        //     left: '0.75in',
+        //     right: '0.75in',
+        //     bottom: '1.44in',
+        //   },
+        //   printBackground: true,
+        // });
+        // await browser.close();
+        // return filename;
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 }
