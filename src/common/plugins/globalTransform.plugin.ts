@@ -6,8 +6,10 @@ export const globalTransformPlugin = (schema: Schema) => {
   schema.set('toJSON', {
     transform(doc, ret) {
       // Convert _id to id
-      ret.id = ret._id;
-      delete ret._id;
+      if (ret._id) {
+        ret.id = ret._id;
+        delete ret._id;
+      }
 
       // Check if there's a schedule field and convert _id to id inside it
       if (ret.schedule && Array.isArray(ret.schedule)) {
