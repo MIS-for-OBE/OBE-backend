@@ -1,10 +1,11 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import {
   CourseManagement,
   CourseManagementDocument,
@@ -70,19 +71,6 @@ export class CourseManagementService {
       }
       const courses = await this.model
         .find(where)
-        .populate({
-          path: 'sections',
-          populate: [
-            {
-              path: 'instructor',
-              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-            },
-            {
-              path: 'coInstructors',
-              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-            },
-          ],
-        })
         .sort([[searchDTO.orderBy, searchDTO.orderType]])
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
@@ -128,9 +116,10 @@ export class CourseManagementService {
       if (!course) {
         throw new NotFoundException('Course not found');
       }
+      course.sections.sort((a, b) => a.sectionNo - b.sectionNo);
       return course;
     } catch (error) {
-      throw error;
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -175,18 +164,18 @@ export class CourseManagementService {
     }
   }
 
-  async createSectionManagement(id: string, requestDTO: any): Promise<any> {
-    try {
-      const updateCourse = await this.model.findByIdAndUpdate(
-        id,
-        { $push: { sections: requestDTO.sections } },
-        { new: true },
-      );
-      return updateCourse;
-    } catch (error) {
-      throw error;
-    }
-  }
+  // async createSectionManagement(id: string, requestDTO: any): Promise<any> {
+  //   try {
+  //     const updateCourse = await this.model.findByIdAndUpdate(
+  //       id,
+  //       { $push: { sections: requestDTO.sections } },
+  //       { new: true },
+  //     );
+  //     return updateCourse;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   async updateCourseManagement(id: string, requestDTO: any): Promise<any> {
     try {
@@ -236,6 +225,12 @@ export class CourseManagementService {
           throw new BadRequestException('Section No already exists');
         }
       }
+      const oldSection = updateCourse.sections.find(
+        (sec: any) => sec.id === params.section,
+      );
+      const oldTopic = oldSection?.topic;
+      const newTopic = requestDTO.data.topic;
+
       const updateFields = {};
       for (const key in requestDTO.data) {
         updateFields[`sections.$[sec].${key}`] = requestDTO.data[key];
@@ -246,19 +241,6 @@ export class CourseManagementService {
           { $set: updateFields },
           { arrayFilters: [{ 'sec._id': params.section }], new: true },
         )
-        .populate({
-          path: 'sections',
-          populate: [
-            {
-              path: 'instructor',
-              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-            },
-            {
-              path: 'coInstructors',
-              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-            },
-          ],
-        })
         .select('-sections.isActive')
         .sort([['sectionNo', 'asc']]);
       if (!updateCourse) {
@@ -274,6 +256,24 @@ export class CourseManagementService {
           courseNo: requestDTO.courseNo,
         })
         .populate('sections');
+
+      if (oldTopic && newTopic && oldTopic !== newTopic) {
+        await Promise.all([
+          this.model.findOneAndUpdate(
+            { courseNo: requestDTO.courseNo },
+            { $set: { 'sections.$[sec].topic': newTopic } },
+            { arrayFilters: [{ 'sec.topic': oldTopic }] },
+          ),
+          this.sectionModel.updateMany(
+            {
+              id: { $in: course.sections.map((sec) => sec.id) },
+              topic: oldTopic,
+            },
+            { $set: { topic: newTopic } },
+          ),
+        ]);
+      }
+
       if (course) {
         if (!requestDTO.oldSectionNo) {
           requestDTO.oldSectionNo = requestDTO.data.sectionNo;
@@ -287,7 +287,9 @@ export class CourseManagementService {
             isActive: requestDTO.openThisTerm,
           });
         } else if (requestDTO.openThisTerm) {
-          secId = await this.createSection(updateSection, { ...requestDTO });
+          secId = await this.createSection(course, updateSection, {
+            ...requestDTO,
+          });
           await this.courseModel.findOneAndUpdate(
             {
               academicYear: requestDTO.academicYear,
@@ -303,14 +305,25 @@ export class CourseManagementService {
           secId,
         };
       } else if (requestDTO.openThisTerm) {
-        let secId = await this.createSection(updateSection, { ...requestDTO });
-        course = await this.courseModel.create({
+        let secId = await this.createSection(course, updateSection, {
+          ...requestDTO,
+        });
+        const data: any = {
           academicYear: requestDTO.academicYear,
           courseNo: requestDTO.courseNo,
           courseName: updateCourse.courseName,
           type: updateCourse.type,
           sections: [secId],
-        });
+        };
+        if (updateCourse.type != COURSE_TYPE.SEL_TOPIC) {
+          const [tqf3, tqf5] = await Promise.all([
+            this.tqf3Model.create({ status: TQF_STATUS.NO_DATA }),
+            this.tqf5Model.create({ status: TQF_STATUS.NO_DATA }),
+          ]);
+          data.TQF3 = tqf3.id;
+          data.TQF5 = tqf5.id;
+        }
+        course = await this.courseModel.create(data);
       }
       return {
         updateSection: updateSection.find((sec) => sec.id == params.section),
@@ -377,23 +390,9 @@ export class CourseManagementService {
         });
         await Promise.all(updateSectionPromises);
       }
-      const populateSections = {
-        path: 'sections',
-        populate: [
-          {
-            path: 'instructor',
-            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-          },
-          {
-            path: 'coInstructors',
-            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-          },
-        ],
-      };
       [updateCourse, course] = await Promise.all([
         this.model
           .findOne({ courseNo: requestDTO.courseNo })
-          .populate(populateSections)
           .select('-sections.isActive')
           .sort([['sectionNo', 'asc']]),
         this.courseModel
@@ -401,7 +400,19 @@ export class CourseManagementService {
             academicYear: requestDTO.academicYear,
             courseNo: requestDTO.courseNo,
           })
-          .populate(populateSections),
+          .populate({
+            path: 'sections',
+            populate: [
+              {
+                path: 'instructor',
+                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+              },
+              {
+                path: 'coInstructors',
+                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+              },
+            ],
+          }),
       ]);
       if (course) {
         const topics = course.sections
@@ -479,12 +490,23 @@ export class CourseManagementService {
           (sec) => sec.sectionNo == requestDTO.sectionNo,
         )?.id;
         if (secId) {
-          await Promise.all([
-            this.courseModel.findByIdAndUpdate(course.id, {
-              $pull: { sections: secId },
-            }),
+          const [updatedCourse, delSec] = await Promise.all([
+            this.courseModel.findByIdAndUpdate(
+              course.id,
+              { $pull: { sections: secId } },
+              { new: true },
+            ),
             this.sectionModel.findByIdAndDelete(secId),
           ]);
+          if (
+            course.type == COURSE_TYPE.SEL_TOPIC &&
+            !updatedCourse.sections.some((sec) => sec.topic == delSec.topic)
+          ) {
+            await Promise.all([
+              this.tqf3Model.findByIdAndDelete(delSec.TQF3),
+              this.tqf5Model.findByIdAndDelete(delSec.TQF5),
+            ]);
+          }
         }
         return { updateCourse, courseId: course.id, secId };
       }
@@ -520,22 +542,28 @@ export class CourseManagementService {
     }
   }
 
-  private async createSection(course: any, requestDTO: any) {
-    const data = course.find(
+  private async createSection(course, sections: any, requestDTO: any) {
+    const data = sections.find(
       (sec) => sec.sectionNo == requestDTO.data.sectionNo,
     )._doc;
     delete data._id;
-    if (course.type == COURSE_TYPE.SEL_TOPIC) {
-      const tqf3 = await this.tqf3Model.create({
-        status: TQF_STATUS.NO_DATA,
-      });
-      const tqf5 = await this.tqf5Model.create({
-        status: TQF_STATUS.NO_DATA,
-      });
+    if (sections.type == COURSE_TYPE.SEL_TOPIC) {
+      let tqf3, tqf5;
+      if (
+        course &&
+        course.sections.find((sec) => requestDTO.data.topic == sec.topic)
+      ) {
+        tqf3 = sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF3;
+        tqf5 = sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF5;
+      } else {
+        [tqf3, tqf5] = await Promise.all([
+          this.tqf3Model.create({ status: TQF_STATUS.NO_DATA }),
+          this.tqf5Model.create({ status: TQF_STATUS.NO_DATA }),
+        ]);
+      }
       data.TQF3 = tqf3.id;
       data.TQF5 = tqf5.id;
     }
-
     return await this.sectionModel.create({ ...data });
   }
 
