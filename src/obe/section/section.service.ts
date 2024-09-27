@@ -33,6 +33,13 @@ export class SectionService {
           `Section No ${('000' + requestDTO.data.sectionNo).slice(-3)} already exists`,
         );
       }
+
+      const oldSection = check.sections.find(
+        (sec: any) => sec.sectionNo === requestDTO.oldSectionNo,
+      );
+      const oldTopic = oldSection?.topic;
+      const newTopic = requestDTO.data.topic;
+
       const updateFields = {};
       for (const key in requestDTO.data) {
         updateFields[`sections.$[sec].${key}`] = requestDTO.data[key];
@@ -50,6 +57,29 @@ export class SectionService {
       );
       if (!updateCourse) {
         throw new NotFoundException('Course not found');
+      }
+
+      if (oldTopic && newTopic && oldTopic !== newTopic) {
+        const course = await this.courseModel
+          .findOne({
+            academicYear: requestDTO.academicYear,
+            courseNo: requestDTO.courseNo,
+          })
+          .select('sections');
+        await Promise.all([
+          this.courseManagementModel.findOneAndUpdate(
+            { courseNo: requestDTO.courseNo },
+            { $set: { 'sections.$[sec].topic': newTopic } },
+            { arrayFilters: [{ 'sec.topic': oldTopic }] },
+          ),
+          this.model.updateMany(
+            {
+              _id: { $in: [...course.sections] },
+              topic: oldTopic,
+            },
+            { $set: { topic: newTopic } },
+          ),
+        ]);
       }
       const updateSection = await this.model.findByIdAndUpdate(
         id,

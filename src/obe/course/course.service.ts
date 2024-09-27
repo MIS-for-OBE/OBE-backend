@@ -240,10 +240,12 @@ export class CourseService {
         this.courseManagementModel.findOne({
           courseNo: requestDTO.courseNo,
         }),
-        this.model.findOne({
-          academicYear: requestDTO.academicYear,
-          courseNo: requestDTO.courseNo,
-        }),
+        this.model
+          .findOne({
+            academicYear: requestDTO.academicYear,
+            courseNo: requestDTO.courseNo,
+          })
+          .populate('sections'),
       ]);
       for (const instructor of coInstructors) {
         let user = await this.userModel.findOne({
@@ -259,21 +261,29 @@ export class CourseService {
         });
       }
 
-      const tqf3 = await this.tqf3Model.create({
-        status: TQF_STATUS.NO_DATA,
-      });
-      const tqf5 = await this.tqf5Model.create({
-        status: TQF_STATUS.NO_DATA,
-      });
-      if (!course?.addFirstTime) {
-        requestDTO.sections.forEach((sec, index) => {
-          sec.addFirstTime = true;
-          if (requestDTO.type == COURSE_TYPE.SEL_TOPIC) {
-            sec.TQF3 = tqf3.id;
-            sec.TQF5 = tqf5.id;
-          }
-        });
+      let tqf3, tqf5;
+      if (
+        course &&
+        course.type == COURSE_TYPE.SEL_TOPIC &&
+        course.sections.some((e) => requestDTO.sections[0].topic == e.topic)
+      ) {
+        tqf3 = course.sections.find(
+          (sec) => sec.topic == requestDTO.sections[0].topic,
+        ).TQF3;
+        tqf5 = course.sections.find(
+          (sec) => sec.topic == requestDTO.sections[0].topic,
+        ).TQF5;
+      } else {
+        tqf3 = (await this.tqf3Model.create({ status: TQF_STATUS.NO_DATA })).id;
+        tqf5 = (await this.tqf5Model.create({ status: TQF_STATUS.NO_DATA })).id;
       }
+      requestDTO.sections.forEach((sec, index) => {
+        if (!course?.addFirstTime) sec.addFirstTime = true;
+        if (requestDTO.type == COURSE_TYPE.SEL_TOPIC) {
+          sec.TQF3 = tqf3;
+          sec.TQF5 = tqf5;
+        }
+      });
 
       if (existCourseManagement) {
         await existCourseManagement.updateOne({
@@ -319,19 +329,25 @@ export class CourseService {
         }
       }
       if (course) {
-        await course.populate({
-          path: 'sections',
-          populate: [
-            {
-              path: 'instructor',
-              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-            },
-            {
-              path: 'coInstructors',
-              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-            },
-          ],
-        });
+        await course.populate([
+          {
+            path: 'sections',
+            populate: [
+              {
+                path: 'instructor',
+                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+              },
+              {
+                path: 'coInstructors',
+                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+              },
+              { path: 'TQF3', select: 'status' },
+              { path: 'TQF5', select: 'status' },
+            ],
+          },
+          { path: 'TQF3', select: 'status' },
+          { path: 'TQF5', select: 'status' },
+        ]);
         const topics = course.sections
           .map((sec: any) => {
             if (
@@ -345,7 +361,7 @@ export class CourseService {
           (section: any) => !section.topic || topics.includes(section.topic),
         );
       }
-      return course ?? [];
+      return course ?? {};
     } catch (error) {
       throw error;
     }
