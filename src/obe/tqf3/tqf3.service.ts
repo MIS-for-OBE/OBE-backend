@@ -91,6 +91,15 @@ export class TQF3Service {
         return filename;
         files.push(filename);
       }
+      if (requestDTO.part3 !== undefined) {
+        const filename = await this.generatePdfPart(3, date, {
+          ...data,
+          ...requestDTO,
+          ...tqf3.part3._doc,
+        });
+        return filename;
+        files.push(filename);
+      }
 
       return files; // multiple file
     } catch (error) {
@@ -123,6 +132,9 @@ export class TQF3Service {
             break;
           case 2:
             this.buildPart2Content(doc, font, data);
+            break;
+          case 3:
+            this.buildPart3Content(doc, font, data);
             break;
         }
         doc.end();
@@ -558,64 +570,13 @@ export class TQF3Service {
       doc.moveDown(0.6);
     }
 
-    // กรณีของกระบวนการวิชา Selected Topic
-    {
-      doc.font(fontBold).text('กรณีของกระบวนการวิชา Selected Topic', {
-        align: 'left',
-        continued: true,
-      });
-
-      // 1
-      doc
-        .font(emoji)
-        .text(
-          this.setSymbol(data.evaluate === EVALUATE_TYPE.A_F),
-          doc.x + 10,
-          doc.y - 2,
-          { continued: true },
-        );
-      doc
-        .font(fontNormal)
-        .text(
-          'นับจำนวนหน่วยกิตสะสมเพื่อการสำเร็จการศึกษาทุกครั้ง',
-          doc.x + 5,
-          doc.y + 2,
-        );
-      doc.moveDown(0.6);
-
-      // 2
-      doc
-        .font(emoji)
-        .text(
-          this.setSymbol(data.evaluate === EVALUATE_TYPE.A_F),
-          doc.x + 10 + 176.5,
-          doc.y - 2,
-          { continued: true },
-        );
-      doc
-        .font(fontNormal)
-        .text(
-          'นับจำนวนหน่วยกิตสะสมเพื่อการสำเร็จการศึกษาเพียงครั้งเดียว',
-          doc.x + 5,
-          doc.y + 2,
-        );
-
-      doc.moveDown(0.6);
-    }
-
     // เงื่อนไขที่ต้องผ่านก่อน (Prerequisite Conditions)
     {
       doc.font(fontBold).text('เงื่อนไขที่ต้องผ่านก่อน', 55.5, doc.y, {
         continued: true,
       });
 
-      doc
-        .font(fontNormal)
-        .text(
-          'นับจำนวนหน่วยกิตสะสมเพื่อการสำเร็จการศึกษาเพียงครั้งเดียว',
-          doc.x + 10,
-          doc.y,
-        );
+      doc.font(fontNormal).text(data.PreText, doc.x + 10, doc.y);
 
       doc.moveDown(0.6);
     }
@@ -627,11 +588,7 @@ export class TQF3Service {
 
       doc
         .font(fontNormal)
-        .text(
-          'หัวข้อเลือกสรรเกี่ยวกับความก้าวหน้าและกำลังเป็นที่สนใจในทางคอมพิวเตอร์ซอฟต์แวร์',
-          doc.x + 40,
-          doc.y,
-        );
+        .text(data.CourseDescriptionTha, { indent: 40, lineGap: 0.6 });
 
       doc.moveDown(0.6);
     }
@@ -666,6 +623,8 @@ export class TQF3Service {
             learningMethod.push(clo.other);
           }
 
+          // return ['1', 0];
+
           return [`CLO ${clo.no}: ${clo.descTH}`, learningMethod.join('\n')];
         });
 
@@ -689,6 +648,8 @@ export class TQF3Service {
               rowHeight = cellHeight;
             }
           });
+
+          doc.lineWidth(0.5);
 
           row.forEach((cell, i) => {
             doc
@@ -728,6 +689,110 @@ export class TQF3Service {
 
         function drawTable() {
           let currentY = tableTop + 34.5;
+          let totalTableHeight = 0; // to track total height of table
+
+          rows.forEach((row) => {
+            const rowHeight = drawRow(currentY, row);
+            totalTableHeight += rowHeight; // adding row height to total table height
+            currentY += rowHeight;
+          });
+
+          // Adjust doc.y by the table height
+          doc.y = currentY;
+          return totalTableHeight;
+        }
+
+        drawHeaders();
+        const tableHeight = drawTable();
+
+        // Adding 100pt space between tables
+        doc.y -= 10;
+      }
+    }
+
+    doc.addPage();
+
+    // Course content and Schedule
+    {
+      doc
+        .font(fontBold)
+        .text('เนื้อหากระบวนวิชา (Course Content)', 55.5, doc.y + 20);
+
+      doc.moveDown(0.6);
+
+      {
+        const headers = [
+          'สัปดาห์',
+          'เนื้อหากระบวนวิชา',
+          'จำนวน\nชั่วโมง\nปฏิบัติ',
+          'จำนวน\nชั่วโมง\nบรรยาย',
+        ];
+
+        const rows = data.schedule.map((item) => {
+          return [item.weekNo, item.topic, item.lecHour, item.labHour];
+        });
+
+        const tableTop = doc.y + 2;
+        const tableLeft = 50;
+        const columnWidth = [50, 310, 70, 70];
+
+        function calculateRowHeight(text, columnWidth) {
+          const textHeight = doc.heightOfString(text, {
+            width: columnWidth - 20,
+          });
+          return textHeight + 20;
+        }
+
+        function drawRow(y, row, isHeader = false) {
+          let rowHeight = 0;
+
+          row.forEach((cell, i) => {
+            const cellHeight = calculateRowHeight(cell, columnWidth[i]);
+            if (cellHeight > rowHeight) {
+              rowHeight = cellHeight;
+            }
+          });
+
+          doc.lineWidth(0.5);
+
+          row.forEach((cell, i) => {
+            doc
+              .rect(
+                tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0),
+                y,
+                columnWidth[i],
+                rowHeight,
+              )
+              .stroke();
+
+            if (isHeader) {
+              doc.font(fontBold);
+            } else {
+              doc.font(fontNormal);
+            }
+
+            doc.text(
+              cell,
+              tableLeft +
+                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                10,
+              y + 10,
+              {
+                width: columnWidth[i] - 20,
+                align: 'left',
+              },
+            );
+          });
+
+          return rowHeight;
+        }
+
+        function drawHeaders() {
+          drawRow(tableTop, headers, true);
+        }
+
+        function drawTable() {
+          let currentY = tableTop + 63;
           rows.forEach((row) => {
             const rowHeight = drawRow(currentY, row);
             currentY += rowHeight;
@@ -740,66 +805,242 @@ export class TQF3Service {
     }
   }
 
-  // private async generatePdfEachPart(
-  //   part: number,
-  //   prefixPath: string,
-  //   path: string,
-  //   date: string,
-  //   data: any,
-  // ): Promise<string> {
-  //   return new Promise((resolve, reject) => {
-  //     try {
-  //       const filename = `TQF3_Part${part}_${date}.pdf`;
-  //       const filePath = join(process.cwd(), filename);
-  //       const htmlPath = join(process.cwd(), path);
-  //       const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
-  //       const renderedHtml = ejs.render(htmlContent, { data });
-  //       const doc = new PDFDocument({
-  //         size: 'A4',
-  //         bufferPages: true,
-  //         margin: 50,
-  //       });
-  //       const writeStream = fs.createWriteStream(filePath);
-  //       doc.pipe(writeStream);
-  //       doc.registerFont(
-  //         'TH Niramit AS',
-  //         'src/assets/fonts/TH Niramit AS Regular.ttf',
-  //       );
-  //       doc.font('TH Niramit AS');
+  private buildPart3Content(
+    doc: PDFKit.PDFDocument,
+    font: {
+      fontNormal: string;
+      fontBold: string;
+      emoji: string;
+    },
+    data: CmuApiTqfCourseDTO & Record<string, any>,
+  ) {
+    const { fontNormal, fontBold, emoji } = font;
 
-  //       doc.end();
-  //       writeStream.on('finish', () => resolve(filename));
-  //       writeStream.on('error', reject);
-  //       // const browser = await puppeteer.launch({
-  //       //   headless: 'shell',
-  //       //   args: [
-  //       //     '--font-render-hinting=none',
-  //       //     '--fast-start',
-  //       //     '--disable-extensions',
-  //       //     '--no-sandbox',
-  //       //     '--disable-web-security',
-  //       //   ],
-  //       // });
-  //       // const page = await browser.newPage();
-  //       // await page.setContent(renderedHtml, { waitUntil: 'domcontentloaded' });
-  //       // await page.addStyleTag({ path: `${prefixPath}/style.css` });
-  //       // await page.evaluateHandle('document.fonts.ready');
-  //       // await page.pdf({
-  //       //   path: filename,
-  //       //   format: 'A4',
-  //       //   margin: {
-  //       //     top: '0.6in',
-  //       //     left: '0.75in',
-  //       //     right: '0.75in',
-  //       //     bottom: '1.44in',
-  //       //   },
-  //       //   printBackground: true,
-  //       // });
-  //       // await browser.close();
-  //       // return filename;
-  //     } catch (error) {
-  //       reject(error);
-  //     }
-  //   });
-  // }
+    // Section: หมวดที่ 3
+    doc
+      .font(fontBold, 14)
+      .text('หมวดที่ 3 ', { align: 'center' })
+      .moveDown(0.6);
+
+    // Evaluation
+    {
+      doc.font(fontBold).text('การกำหนดเกรด (Grading)', {
+        align: 'left',
+        continued: true,
+      });
+
+      // A-F
+      doc
+        .font(emoji)
+        .text(
+          this.setSymbol(
+            data.gradingPolicy === 'แบบอิงกลุ่ม (Norm-Referenced Grading)',
+            'radio',
+          ),
+          doc.x + 10,
+          doc.y - 2,
+          { continued: true },
+        );
+      doc
+        .font(fontNormal)
+        .text('แบบอิงกลุ่ม (Norm-Referenced Grading)', doc.x + 5, doc.y + 2);
+
+      doc.x += 115.5;
+      doc.moveDown(0.6);
+      // 2
+      doc
+        .font(emoji)
+        .text(
+          this.setSymbol(
+            data.gradingPolicy === 'แบบอิงเกณฑ์ (Criterion-Referenced Grading)',
+            'radio',
+          ),
+          doc.x + 10,
+          doc.y - 2,
+          { continued: true },
+        );
+      doc
+        .font(fontNormal)
+        .text(
+          'แบบอิงเกณฑ์ (Criterion-Referenced Grading)',
+          doc.x + 5,
+          doc.y + 2,
+        );
+      doc.x -= 10;
+      doc.moveDown(0.6);
+      // 3
+      doc
+        .font(emoji)
+        .text(
+          this.setSymbol(
+            data.gradingPolicy ===
+              'แบบอิงเกณฑ์และอิงกลุ่ม (Criterion and Norm-Referenced Grading)',
+            'radio',
+          ),
+          doc.x + 10,
+          doc.y - 2,
+          { continued: true },
+        );
+      doc
+        .font(fontNormal)
+        .text(
+          'แบบอิงเกณฑ์และอิงกลุ่ม (Criterion and Norm-Referenced Grading)',
+          doc.x + 5,
+          doc.y + 2,
+        );
+    }
+
+    // Course content and Schedule
+    {
+      doc.font(fontBold).text('Course Syllabus', 55.5, doc.y + 20);
+
+      doc.moveDown(0.6);
+
+      {
+        const headers = [
+          'ลำดับที่',
+          'หัวข้อ',
+          'รายละเอียด',
+          'สัดส่วน\nของการ\nประเมิน',
+        ];
+
+        const rows = data.eval.map((eva) => {
+          return [eva.no, eva.topicTH, eva.desc, eva.percent];
+        });
+
+        const tableTop = doc.y + 2;
+        const tableLeft = 50;
+        const columnWidth = [70, 130, 220, 70];
+
+        function calculateRowHeight(text, columnWidth) {
+          const textHeight = doc.heightOfString(text, {
+            width: columnWidth - 20,
+          });
+          return textHeight + 20;
+        }
+
+        function drawRow(y, row, isHeader = false) {
+          let rowHeight = 0;
+
+          row.forEach((cell, i) => {
+            const cellHeight = calculateRowHeight(cell, columnWidth[i]);
+            if (cellHeight > rowHeight) {
+              rowHeight = cellHeight;
+            }
+          });
+
+          doc.lineWidth(0.5);
+
+          row.forEach((cell, i) => {
+            doc
+              .rect(
+                tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0),
+                y,
+                columnWidth[i],
+                rowHeight,
+              )
+              .stroke();
+
+            if (isHeader) {
+              doc.font(fontBold);
+            } else {
+              doc.font(fontNormal);
+            }
+
+            doc.text(
+              cell,
+              tableLeft +
+                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                10,
+              y + 10,
+              {
+                width: columnWidth[i] - 20,
+                align: 'left',
+              },
+            );
+          });
+
+          return rowHeight;
+        }
+
+        function drawHeaders() {
+          drawRow(tableTop, headers, true);
+        }
+
+        function drawTable() {
+          let currentY = tableTop + 63;
+          rows.forEach((row) => {
+            const rowHeight = drawRow(currentY, row);
+            currentY += rowHeight;
+          });
+        }
+
+        drawHeaders();
+        drawTable();
+      }
+    }
+  }
+
+  private async generatePdfEachPart(
+    part: number,
+    prefixPath: string,
+    path: string,
+    date: string,
+    data: any,
+  ): Promise<string> {
+    return new Promise((resolve, reject) => {
+      try {
+        const filename = `TQF3_Part${part}_${date}.pdf`;
+        const filePath = join(process.cwd(), filename);
+        const htmlPath = join(process.cwd(), path);
+        const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
+        const renderedHtml = ejs.render(htmlContent, { data });
+        const doc = new PDFDocument({
+          size: 'A4',
+          bufferPages: true,
+          margin: 50,
+        });
+        const writeStream = fs.createWriteStream(filePath);
+        doc.pipe(writeStream);
+        doc.registerFont(
+          'TH Niramit AS',
+          'src/assets/fonts/TH Niramit AS Regular.ttf',
+        );
+        doc.font('TH Niramit AS');
+
+        doc.end();
+        writeStream.on('finish', () => resolve(filename));
+        writeStream.on('error', reject);
+        // const browser = await puppeteer.launch({
+        //   headless: 'shell',
+        //   args: [
+        //     '--font-render-hinting=none',
+        //     '--fast-start',
+        //     '--disable-extensions',
+        //     '--no-sandbox',
+        //     '--disable-web-security',
+        //   ],
+        // });
+        // const page = await browser.newPage();
+        // await page.setContent(renderedHtml, { waitUntil: 'domcontentloaded' });
+        // await page.addStyleTag({ path: `${prefixPath}/style.css` });
+        // await page.evaluateHandle('document.fonts.ready');
+        // await page.pdf({
+        //   path: filename,
+        //   format: 'A4',
+        //   margin: {
+        //     top: '0.6in',
+        //     left: '0.75in',
+        //     right: '0.75in',
+        //     bottom: '1.44in',
+        //   },
+        //   printBackground: true,
+        // });
+        // await browser.close();
+        // return filename;
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }
