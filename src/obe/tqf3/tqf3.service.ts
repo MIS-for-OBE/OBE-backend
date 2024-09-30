@@ -72,13 +72,6 @@ export class TQF3Service {
           ...requestDTO,
           ...tqf3.part1._doc,
         });
-        // const part1 = await this.generatePdfEachPart(
-        //   1,
-        //   prefix,
-        //   `${prefix}/part1.html`,
-        //   date,
-        //   { ...data, ...tqf3.part1 },
-        // );
         return filename; // single file
         files.push(filename);
       }
@@ -96,6 +89,42 @@ export class TQF3Service {
           ...data,
           ...requestDTO,
           ...tqf3.part3._doc,
+        });
+        return filename;
+        files.push(filename);
+      }
+      if (requestDTO.part4 !== undefined) {
+        const filename = await this.generatePdfPart(4, date, {
+          ...data,
+          ...requestDTO,
+          ...tqf3.part4._doc,
+        });
+        return filename;
+        files.push(filename);
+      }
+      if (requestDTO.part5 !== undefined) {
+        const filename = await this.generatePdfPart(5, date, {
+          ...data,
+          ...requestDTO,
+          ...tqf3.part5._doc,
+        });
+        return filename;
+        files.push(filename);
+      }
+      if (requestDTO.part6 !== undefined) {
+        const filename = await this.generatePdfPart(6, date, {
+          ...data,
+          ...requestDTO,
+          ...tqf3.part6._doc,
+        });
+        return filename;
+        files.push(filename);
+      }
+      if (requestDTO.part7 !== undefined) {
+        const filename = await this.generatePdfPart(7, date, {
+          ...data,
+          ...requestDTO,
+          ...tqf3.part7?._doc,
         });
         return filename;
         files.push(filename);
@@ -135,6 +164,18 @@ export class TQF3Service {
             break;
           case 3:
             this.buildPart3Content(doc, font, data);
+            break;
+          case 4:
+            this.buildPart4Content(doc, font, data);
+            break;
+          case 5:
+            this.buildPart5Content(doc, font, data);
+            break;
+          case 6:
+            this.buildPart6Content(doc, font, data);
+            break;
+          case 7:
+            this.buildPart7Content(doc, font, data);
             break;
         }
         doc.end();
@@ -520,7 +561,7 @@ export class TQF3Service {
         );
       doc.font(fontNormal).text('สหกิจศึกษา', doc.x + 5, doc.y + 2);
 
-      doc.moveDown(0.6);
+      doc.moveDown(0.75);
     }
 
     // Evaluation
@@ -584,13 +625,13 @@ export class TQF3Service {
     // คำอธิบายลักษณะกระบวนวิชา
     {
       doc.font(fontBold).text('คำอธิบายลักษณะกระบวนวิชา', doc.x, doc.y);
-      doc.moveDown(0.6);
+      doc.moveDown(0.75);
 
       doc
         .font(fontNormal)
-        .text(data.CourseDescriptionTha, { indent: 40, lineGap: 0.6 });
+        .text(data.CourseDescriptionTha, { indent: 40, lineGap: 2 });
 
-      doc.moveDown(0.6);
+      doc.moveDown(0.75);
     }
 
     // Course Learning Outcomes: CLO
@@ -605,7 +646,7 @@ export class TQF3Service {
         );
 
       doc.font(fontNormal).text('นักศึกษาสามารถ', doc.x + 10, doc.y);
-      doc.moveDown(0.6);
+      doc.moveDown(0.75);
 
       // Table
       {
@@ -628,7 +669,7 @@ export class TQF3Service {
           return [`CLO ${clo.no}: ${clo.descTH}`, learningMethod.join('\n')];
         });
 
-        const tableTop = doc.y;
+        const tableTop = doc.y + 0.6;
         const tableLeft = 50;
         const columnWidth = [375, 125];
 
@@ -654,7 +695,9 @@ export class TQF3Service {
           row.forEach((cell, i) => {
             doc
               .rect(
-                tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0),
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  6.5,
                 y,
                 columnWidth[i],
                 rowHeight,
@@ -671,11 +714,12 @@ export class TQF3Service {
               cell,
               tableLeft +
                 columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                10,
+                10 +
+                8,
               y + 10,
               {
                 width: columnWidth[i] - 20,
-                align: 'left',
+                align: isHeader ? 'center' : 'left',
               },
             );
           });
@@ -712,29 +756,30 @@ export class TQF3Service {
 
     doc.addPage();
 
-    // Course content and Schedule
+    // Course content
     {
       doc
         .font(fontBold)
         .text('เนื้อหากระบวนวิชา (Course Content)', 55.5, doc.y + 20);
 
-      doc.moveDown(0.6);
+      doc.moveDown(0.75);
 
+      // Table
       {
         const headers = [
-          'สัปดาห์',
+          ['สัปดาห์', 'ที่'],
           'เนื้อหากระบวนวิชา',
-          'จำนวน\nชั่วโมง\nปฏิบัติ',
-          'จำนวน\nชั่วโมง\nบรรยาย',
+          ['จำนวนชั่วโมง', 'บรรยาย'],
+          ['จำนวนชั่วโมง', 'ปฏิบัติ'],
         ];
 
         const rows = data.schedule.map((item) => {
           return [item.weekNo, item.topic, item.lecHour, item.labHour];
         });
 
-        const tableTop = doc.y + 2;
+        const tableTop = doc.y + 0.6;
         const tableLeft = 50;
-        const columnWidth = [50, 310, 70, 70];
+        const columnWidth = [70, 230, 100, 100];
 
         function calculateRowHeight(text, columnWidth) {
           const textHeight = doc.heightOfString(text, {
@@ -758,7 +803,9 @@ export class TQF3Service {
           row.forEach((cell, i) => {
             doc
               .rect(
-                tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0),
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  6.5,
                 y,
                 columnWidth[i],
                 rowHeight,
@@ -771,17 +818,23 @@ export class TQF3Service {
               doc.font(fontNormal);
             }
 
-            doc.text(
-              cell,
-              tableLeft +
-                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                10,
-              y + 10,
-              {
-                width: columnWidth[i] - 20,
-                align: 'left',
-              },
-            );
+            const lines = Array.isArray(cell) ? cell : [cell];
+            const lineHeight = doc.heightOfString(lines[0]);
+
+            lines.forEach((line, index) => {
+              doc.text(
+                line,
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  10 +
+                  8,
+                y + 10 + (isHeader && index * lineHeight),
+                {
+                  width: columnWidth[i] - 20,
+                  align: isHeader ? 'center' : 'left',
+                },
+              );
+            });
           });
 
           return rowHeight;
@@ -792,7 +845,7 @@ export class TQF3Service {
         }
 
         function drawTable() {
-          let currentY = tableTop + 63;
+          let currentY = tableTop + 49;
           rows.forEach((row) => {
             const rowHeight = drawRow(currentY, row);
             currentY += rowHeight;
@@ -820,7 +873,7 @@ export class TQF3Service {
     doc
       .font(fontBold, 14)
       .text('หมวดที่ 3 ', { align: 'center' })
-      .moveDown(0.6);
+      .moveDown(0.75);
 
     // Evaluation
     {
@@ -846,7 +899,7 @@ export class TQF3Service {
         .text('แบบอิงกลุ่ม (Norm-Referenced Grading)', doc.x + 5, doc.y + 2);
 
       doc.x += 115.5;
-      doc.moveDown(0.6);
+      doc.moveDown(0.75);
       // 2
       doc
         .font(emoji)
@@ -867,7 +920,7 @@ export class TQF3Service {
           doc.y + 2,
         );
       doc.x -= 10;
-      doc.moveDown(0.6);
+      doc.moveDown(0.75);
       // 3
       doc
         .font(emoji)
@@ -890,28 +943,30 @@ export class TQF3Service {
         );
     }
 
-    // Course content and Schedule
+    // Course Syllabus Table
     {
-      doc.font(fontBold).text('Course Syllabus', 55.5, doc.y + 20);
+      doc.font(fontBold).text('Course Syllabus', 57, doc.y);
 
-      doc.moveDown(0.6);
+      doc.moveDown(0.75);
 
+      // Table
       {
         const headers = [
-          'ลำดับที่',
+          ['ลำดับ', 'ที่'],
           'หัวข้อ',
           'รายละเอียด',
-          'สัดส่วน\nของการ\nประเมิน',
+          ['สัดส่วน', 'ของการ', 'ประเมิน'],
         ];
 
         const rows = data.eval.map((eva) => {
           return [eva.no, eva.topicTH, eva.desc, eva.percent];
         });
 
-        const tableTop = doc.y + 2;
+        const tableTop = doc.y + 0.6;
         const tableLeft = 50;
-        const columnWidth = [70, 130, 220, 70];
+        const columnWidth = [60, 130, 230, 70];
 
+        // Calculates row height
         function calculateRowHeight(text, columnWidth) {
           const textHeight = doc.heightOfString(text, {
             width: columnWidth - 20,
@@ -919,11 +974,14 @@ export class TQF3Service {
           return textHeight + 20;
         }
 
+        // Draws each row
         function drawRow(y, row, isHeader = false) {
           let rowHeight = 0;
 
+          // Calculate row height based on the tallest cell
           row.forEach((cell, i) => {
-            const cellHeight = calculateRowHeight(cell, columnWidth[i]);
+            const content = Array.isArray(cell) ? cell.join('\n') : cell;
+            const cellHeight = calculateRowHeight(content, columnWidth[i]);
             if (cellHeight > rowHeight) {
               rowHeight = cellHeight;
             }
@@ -931,42 +989,55 @@ export class TQF3Service {
 
           doc.lineWidth(0.5);
 
+          // Draw each cell in the row
           row.forEach((cell, i) => {
+            // Draw cell border
             doc
               .rect(
-                tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0),
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  8,
                 y,
                 columnWidth[i],
                 rowHeight,
               )
               .stroke();
 
+            // Set font style
             if (isHeader) {
               doc.font(fontBold);
             } else {
               doc.font(fontNormal);
             }
 
-            doc.text(
-              cell,
-              tableLeft +
-                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                10,
-              y + 10,
-              {
-                width: columnWidth[i] - 20,
-                align: 'left',
-              },
-            );
+            const lines = Array.isArray(cell) ? cell : [cell];
+            const lineHeight = doc.heightOfString(lines[0]);
+
+            lines.forEach((line, index) => {
+              doc.text(
+                line,
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  10 +
+                  8,
+                y + 10 + (isHeader && index * lineHeight),
+                {
+                  width: columnWidth[i] - 20,
+                  align: isHeader ? 'center' : 'left',
+                },
+              );
+            });
           });
 
           return rowHeight;
         }
 
+        // Draw the headers
         function drawHeaders() {
           drawRow(tableTop, headers, true);
         }
 
+        // Draw the table
         function drawTable() {
           let currentY = tableTop + 63;
           rows.forEach((row) => {
@@ -978,6 +1049,506 @@ export class TQF3Service {
         drawHeaders();
         drawTable();
       }
+    }
+  }
+
+  private buildPart4Content(
+    doc: PDFKit.PDFDocument,
+    font: {
+      fontNormal: string;
+      fontBold: string;
+      emoji: string;
+    },
+    data: CmuApiTqfCourseDTO & Record<string, any>,
+  ) {
+    const { fontNormal, fontBold, emoji } = font;
+
+    // Section: หมวดที่ 4
+    doc
+      .font(fontBold, 14)
+      .text('หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา', { align: 'center' })
+      .moveDown(0.75);
+
+    // Course Syllabus Table
+    {
+      doc.font(fontBold).text('Course Syllabus', 57, doc.y);
+
+      doc.moveDown(0.75);
+
+      // Table
+      // {
+      //   const headers = [
+      //     ['ลำดับ', 'ที่'],
+      //     'หัวข้อ',
+      //     'รายละเอียด',
+      //     ['สัดส่วน', 'ของการ', 'ประเมิน'],
+      //   ];
+
+      //   const rows = data.eval.map((eva) => {
+      //     return [eva.no, eva.topicTH, eva.desc, eva.percent];
+      //   });
+
+      //   const tableTop = doc.y + 0.6;
+      //   const tableLeft = 50;
+      //   const columnWidth = [60, 130, 230, 70];
+
+      //   // Calculates row height
+      //   function calculateRowHeight(text, columnWidth) {
+      //     const textHeight = doc.heightOfString(text, {
+      //       width: columnWidth - 20,
+      //     });
+      //     return textHeight + 20;
+      //   }
+
+      //   // Draws each row
+      //   function drawRow(y, row, isHeader = false) {
+      //     let rowHeight = 0;
+
+      //     // Calculate row height based on the tallest cell
+      //     row.forEach((cell, i) => {
+      //       const content = Array.isArray(cell) ? cell.join('\n') : cell;
+      //       const cellHeight = calculateRowHeight(content, columnWidth[i]);
+      //       if (cellHeight > rowHeight) {
+      //         rowHeight = cellHeight;
+      //       }
+      //     });
+
+      //     doc.lineWidth(0.5);
+
+      //     // Draw each cell in the row
+      //     row.forEach((cell, i) => {
+      //       // Draw cell border
+      //       doc
+      //         .rect(
+      //           tableLeft +
+      //             columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+      //             8,
+      //           y,
+      //           columnWidth[i],
+      //           rowHeight,
+      //         )
+      //         .stroke();
+
+      //       // Set font style
+      //       if (isHeader) {
+      //         doc.font(fontBold);
+      //       } else {
+      //         doc.font(fontNormal);
+      //       }
+
+      //       const lines = Array.isArray(cell) ? cell : [cell];
+      //       const lineHeight = doc.heightOfString(lines[0]);
+
+      //       lines.forEach((line, index) => {
+      //         doc.text(
+      //           line,
+      //           tableLeft +
+      //             columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+      //             10 +
+      //             8,
+      //           y + 10 + (isHeader && index * lineHeight),
+      //           {
+      //             width: columnWidth[i] - 20,
+      //             align: isHeader ? 'center' : 'left',
+      //           },
+      //         );
+      //       });
+      //     });
+
+      //     return rowHeight;
+      //   }
+
+      //   // Draw the headers
+      //   function drawHeaders() {
+      //     drawRow(tableTop, headers, true);
+      //   }
+
+      //   // Draw the table
+      //   function drawTable() {
+      //     let currentY = tableTop + 63;
+      //     rows.forEach((row) => {
+      //       const rowHeight = drawRow(currentY, row);
+      //       currentY += rowHeight;
+      //     });
+      //   }
+
+      //   drawHeaders();
+      //   drawTable();
+      // }
+    }
+  }
+
+  private buildPart5Content(
+    doc: PDFKit.PDFDocument,
+    font: {
+      fontNormal: string;
+      fontBold: string;
+      emoji: string;
+    },
+    data: CmuApiTqfCourseDTO & Record<string, any>,
+  ) {
+    const { fontNormal, fontBold, emoji } = font;
+
+    // Section: หมวดที่ 5
+    doc
+      .font(fontBold, 14)
+      .text('หมวดที่ 5 ทรัพยากรประกอบการเรียนการสอน', { align: 'center' })
+      .moveDown(0.6);
+    {
+      doc.font(fontBold).text('1. ตำราและเอกสารหลัก').moveDown(0.4);
+      doc.x += 10.5;
+      doc.font(fontNormal).text(data.mainRef).moveDown(0.6);
+    }
+
+    {
+      doc.x -= 10.5;
+      doc.font(fontBold).text('2. เอกสารและข้อมูลแนะนำ').moveDown(0.4);
+      doc.x += 10.5;
+      doc.font(fontNormal).text(data.recDoc).moveDown(0.6);
+    }
+  }
+
+  private buildPart6Content(
+    doc: PDFKit.PDFDocument,
+    font: {
+      fontNormal: string;
+      fontBold: string;
+      emoji: string;
+    },
+    data: CmuApiTqfCourseDTO & Record<string, any>,
+  ) {
+    const { fontNormal, fontBold, emoji } = font;
+    fontNormal;
+
+    // Section: หมวดที่ 6
+    doc
+      .font(fontBold, 14)
+      .text('หมวดที่ 6 การประเมินกระบวนวิชาการและกระบวนการปรับปรุง', {
+        align: 'center',
+      })
+      .moveDown(0.8);
+
+    // Course Syllabus Table
+    {
+      let topics = [
+        {
+          no: 1,
+          en: 'Strategies for evaluating course effectiveness by students',
+          th: 'กลยุทธ์การประเมินประสิทธิผลของกระบวนวิชาโดยนักศึกษา',
+          list: [
+            { label: 'ไม่มี (None)', labelTH: 'ไม่มี' },
+            {
+              label: 'แบบประเมินกระบวนวิชา \n(Course assessment form)',
+              labelTH: 'แบบประเมินกระบวนวิชา',
+            },
+            {
+              label:
+                'การสนทนากลุ่มระหว่างผู้สอนและผู้เรียน \n(Instructor-student group discussion)',
+              labelTH: 'การสนทนากลุ่มระหว่างผู้สอนและผู้เรียน',
+            },
+            {
+              label:
+                'การสะท้อนคิดจากพฤติกรรมของผู้เรียน \n(Student behavior reflection)',
+              labelTH: 'การสะท้อนคิดจากพฤติกรรมของผู้เรียน',
+            },
+            {
+              label:
+                "ข้อเสนอแนะผ่านเวบบอร์ดที่อาจารย์ผู้สอนได้จัดทำเป็นช่องทางการสื่อสารกับนักศึกษา \n(Suggestions through the instructor's webboard for student communication.)",
+              labelTH:
+                'ข้อเสนอแนะผ่านเวบบอร์ดที่อาจารย์ผู้สอนได้จัดทำเป็นช่องทางการสื่อสารกับนักศึกษา',
+            },
+            { label: 'อื่นๆ (Other)', labelTH: 'อื่นๆ' },
+          ],
+        },
+        {
+          no: 2,
+          en: 'Strategies for teaching assessment',
+          th: 'กลยุทธ์การประเมินการสอน',
+          list: [
+            { label: 'ไม่มี (None)', labelTH: 'ไม่มี' },
+            {
+              label: 'แบบประเมินผู้สอน \n(Instructor evaluation form)',
+              labelTH: 'แบบประเมินผู้สอน',
+            },
+            { label: 'ผลการสอบ \n(Examination results)', labelTH: 'ผลการสอบ' },
+            {
+              label:
+                'การทวนสอบผลประเมินการเรียนรู้ \n(Review of assessment results)',
+              labelTH: 'การทวนสอบผลประเมินการเรียนรู้',
+            },
+            {
+              label:
+                'การประเมินโดยคณะกรรมการประเมินข้อสอบ \n(Evaluation by the Exam Committee)',
+              labelTH: 'การประเมินโดยคณะกรรมการประเมินข้อสอบ',
+            },
+            {
+              label:
+                'การสังเกตการณ์สอนของผู้ร่วมทีมการสอน \n(Teaching observation by Co-Instructor)',
+              labelTH: 'การสังเกตการณ์สอนของผู้ร่วมทีมการสอน',
+            },
+            { label: 'อื่นๆ (Other)', labelTH: 'อื่นๆ' },
+          ],
+        },
+        {
+          no: 3,
+          en: 'Examination improvement ',
+          th: 'กลไกการปรับปรับปรุงการสอบ',
+          list: [
+            { label: 'ไม่มี (None)', labelTH: 'ไม่มี' },
+            {
+              label:
+                'สัมมนาการจัดการเรียนการสอน \n(Teaching Management Seminar)',
+              labelTH: 'สัมมนาการจัดการเรียนการสอน',
+            },
+            {
+              label:
+                'การวิจัยในและนอกชั้นเรียน \n(Research in and out of the classroom)',
+              labelTH: 'การวิจัยในและนอกชั้นเรียน',
+            },
+
+            { label: 'อื่นๆ (Other)', labelTH: 'อื่นๆ' },
+          ],
+        },
+        {
+          no: 4,
+          en: 'The process of reviewing the standards of student course achievement',
+          th: 'กระบวนการทวนสอบมาตรฐานผลสัมฤทธิ์กระบวนวิชาของนักศึกษา',
+          list: [
+            { label: 'ไม่มี (None)', labelTH: 'ไม่มี' },
+            {
+              label:
+                'มีการตั้งคณะกรรมการในสาขาวิชา ตรวจสอบผลการประเมินการเรียนรู้ของนักศึกษา โดยตรวจสอบข้อรายงาน วิธีการการให้คะแนนสอบ และการให้คะแนนพฤติกรรม \n(A department-specific committee reviews student assessments, reports, scoring methods and behavioral evaluations.)',
+              labelTH:
+                'มีการตั้งคณะกรรมการในสาขาวิชา ตรวจสอบผลการประเมินการเรียนรู้ของนักศึกษา โดยตรวจสอบข้อรายงาน วิธีการการให้คะแนนสอบ และการให้คะแนนพฤติกรรม',
+            },
+            {
+              label:
+                'การทวนสอบการให้คะแนนการตรวจผลงานของนักศึกษาโดยกรรมการวิชาการประจำภาควิชาและคณะ \n(Department and faculty committees review student grading.)',
+              labelTH:
+                'การทวนสอบการให้คะแนนการตรวจผลงานของนักศึกษาโดยกรรมการวิชาการประจำภาควิชาและคณะ',
+            },
+            {
+              label:
+                'การทวนสอบการให้คะแนนจาก การสุ่มตรวจผลงานของนักศึกษาโดยอาจารย์ หรือผู้ทรงคุณวุฒิอื่นๆ \n(Random grading checks by teachers or qualified reviewers.)',
+              labelTH:
+                'การทวนสอบการให้คะแนนจาก การสุ่มตรวจผลงานของนักศึกษาโดยอาจารย์ หรือผู้ทรงคุณวุฒิอื่นๆ',
+            },
+            { label: 'อื่นๆ (Other)', labelTH: 'อื่นๆ' },
+          ],
+        },
+        {
+          no: 5,
+          en: 'Reviewing and planning to enhance course effectiveness',
+          th: 'การดำเนินการทบทวนและการวางแผนปรับปรุงประสิทธิผลของกระบวนวิชา',
+          list: [
+            { label: 'ไม่มี (None)', labelTH: 'ไม่มี' },
+            {
+              label:
+                'ปรับปรุงกระบวนวิชาในแต่ละปี ตามข้อเสนอแนะและผลการทวนสอบมาตรฐานผลสัมฤทธิ์ตามข้อ 4 \n(Improve the course annually based on recommendations and No.4 - The standard of student course achievement )',
+              labelTH:
+                'ปรับปรุงกระบวนวิชาในแต่ละปี ตามข้อเสนอแนะและผลการทวนสอบมาตรฐานผลสัมฤทธิ์ตามข้อ 4',
+            },
+            {
+              label:
+                'ปรับปรุงกระบวนวิชาในแต่ละปี ตามผลการประเมินผู้สอนโดยนักศึกษา \n(Improve the course annually based on instructor evaluations from students.)',
+              labelTH:
+                'ปรับปรุงกระบวนวิชาในแต่ละปี ตามผลการประเมินผู้สอนโดยนักศึกษา',
+            },
+            {
+              label:
+                'ปรับปรุงกระบวนวิชาช่วงเวลาการปรับปรุงหลักสูตร \n(Improving the course during the curriculum improvement period)',
+              labelTH: 'ปรับปรุงกระบวนวิชาช่วงเวลาการปรับปรุงหลักสูตร',
+            },
+            { label: 'อื่นๆ (Other)', labelTH: 'ไม่มี' },
+          ],
+        },
+      ];
+
+      topics.forEach((item, index) => {
+        if (index !== 0) doc.x += 15;
+
+        doc.font(fontBold).text(`${item.no}. ${item.th}`, {
+          align: 'left',
+        });
+        doc.moveDown(0.3);
+
+        item.list.forEach((e, eIndex) => {
+          const checkboxSymbol = this.setSymbol(
+            data.data[index].detail.includes(e.label),
+          );
+
+          doc.font(emoji).text(checkboxSymbol, doc.x, doc.y);
+
+          doc.font(fontNormal).text(e.labelTH, doc.x + 15, doc.y - 15.3, {
+            align: 'left',
+            lineGap: index === 3 && eIndex === 1 ? 6 : 0,
+            continued: false,
+          });
+
+          doc.x -= 15;
+
+          doc.moveDown(0.3);
+        });
+
+        if (data.data[index].detail.includes('อื่นๆ (Other)')) {
+          doc.font(fontNormal).text(data.data[index].other, doc.x + 15, doc.y, {
+            align: 'left',
+            continued: false,
+          });
+          doc.x -= 15;
+        }
+        doc.moveDown(0.3);
+
+        doc.x -= 15;
+      });
+
+      // Additional Topic
+
+      doc.moveDown(0.3);
+      if (data.data.length > 5) {
+        data.data.slice(5).map((item, index) => {
+          doc
+            .font(fontBold)
+            .text(`${6 + index}. ${item.topic}`, doc.x + 15, doc.y, {
+              align: 'left',
+              continued: false,
+            });
+          doc.x -= 15;
+          doc.moveDown(0.4);
+          doc.font(fontNormal).text(item.detail[0], doc.x + 26.5, doc.y, {
+            align: 'left',
+            continued: false,
+          });
+          doc.x -= 26.5;
+          doc.moveDown(0.5);
+        });
+      }
+    }
+  }
+
+  private buildPart7Content(
+    doc: PDFKit.PDFDocument,
+    font: {
+      fontNormal: string;
+      fontBold: string;
+      emoji: string;
+    },
+    data: CmuApiTqfCourseDTO & Record<string, any>,
+  ) {
+    const { fontNormal, fontBold, emoji } = font;
+
+    // Section: หมวดที่ 4
+    doc
+      .font(fontBold, 14)
+      .text('หมวดที่ 7 ', { align: 'center' })
+      .moveDown(0.6);
+
+    // Course Syllabus Table
+    {
+      doc.font(fontBold).text('Course Syllabus', 57, doc.y);
+
+      doc.moveDown(0.6);
+
+      // Table
+      // {
+      //   const headers = [
+      //     ['ลำดับ', 'ที่'],
+      //     'หัวข้อ',
+      //     'รายละเอียด',
+      //     ['สัดส่วน', 'ของการ', 'ประเมิน'],
+      //   ];
+
+      //   const rows = data.eval.map((eva) => {
+      //     return [eva.no, eva.topicTH, eva.desc, eva.percent];
+      //   });
+
+      //   const tableTop = doc.y + 0.6;
+      //   const tableLeft = 50;
+      //   const columnWidth = [60, 130, 230, 70];
+
+      //   // Calculates row height
+      //   function calculateRowHeight(text, columnWidth) {
+      //     const textHeight = doc.heightOfString(text, {
+      //       width: columnWidth - 20,
+      //     });
+      //     return textHeight + 20;
+      //   }
+
+      //   // Draws each row
+      //   function drawRow(y, row, isHeader = false) {
+      //     let rowHeight = 0;
+
+      //     // Calculate row height based on the tallest cell
+      //     row.forEach((cell, i) => {
+      //       const content = Array.isArray(cell) ? cell.join('\n') : cell;
+      //       const cellHeight = calculateRowHeight(content, columnWidth[i]);
+      //       if (cellHeight > rowHeight) {
+      //         rowHeight = cellHeight;
+      //       }
+      //     });
+
+      //     doc.lineWidth(0.5);
+
+      //     // Draw each cell in the row
+      //     row.forEach((cell, i) => {
+      //       // Draw cell border
+      //       doc
+      //         .rect(
+      //           tableLeft +
+      //             columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+      //             8,
+      //           y,
+      //           columnWidth[i],
+      //           rowHeight,
+      //         )
+      //         .stroke();
+
+      //       // Set font style
+      //       if (isHeader) {
+      //         doc.font(fontBold);
+      //       } else {
+      //         doc.font(fontNormal);
+      //       }
+
+      //       const lines = Array.isArray(cell) ? cell : [cell];
+      //       const lineHeight = doc.heightOfString(lines[0]);
+
+      //       lines.forEach((line, index) => {
+      //         doc.text(
+      //           line,
+      //           tableLeft +
+      //             columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+      //             10 +
+      //             8,
+      //           y + 10 + (isHeader && index * lineHeight),
+      //           {
+      //             width: columnWidth[i] - 20,
+      //             align: isHeader ? 'center' : 'left',
+      //           },
+      //         );
+      //       });
+      //     });
+
+      //     return rowHeight;
+      //   }
+
+      //   // Draw the headers
+      //   function drawHeaders() {
+      //     drawRow(tableTop, headers, true);
+      //   }
+
+      //   // Draw the table
+      //   function drawTable() {
+      //     let currentY = tableTop + 63;
+      //     rows.forEach((row) => {
+      //       const rowHeight = drawRow(currentY, row);
+      //       currentY += rowHeight;
+      //     });
+      //   }
+
+      //   drawHeaders();
+      //   drawTable();
+      // }
     }
   }
 
