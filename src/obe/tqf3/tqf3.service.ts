@@ -63,7 +63,6 @@ export class TQF3Service {
       const data: CmuApiTqfCourseDTO = courseInfo.data[0];
       const tqf3: any = await this.model.findById(requestDTO.tqf3);
       const date = moment().format('DD-MM-YYYY');
-      const prefix = 'src/obe/tqf3/templates';
       const files = [];
 
       if (requestDTO.part1 !== undefined) {
@@ -72,8 +71,7 @@ export class TQF3Service {
           ...requestDTO,
           ...tqf3.part1._doc,
         });
-        return filename; // single file
-        files.push(filename);
+        return filename;
       }
       if (requestDTO.part2 !== undefined) {
         const filename = await this.generatePdfPart(2, date, {
@@ -82,7 +80,6 @@ export class TQF3Service {
           ...tqf3.part2._doc,
         });
         return filename;
-        files.push(filename);
       }
       if (requestDTO.part3 !== undefined) {
         const filename = await this.generatePdfPart(3, date, {
@@ -91,7 +88,6 @@ export class TQF3Service {
           ...tqf3.part3._doc,
         });
         return filename;
-        files.push(filename);
       }
       if (requestDTO.part4 !== undefined) {
         const filename = await this.generatePdfPart(4, date, {
@@ -100,7 +96,6 @@ export class TQF3Service {
           ...tqf3.part4._doc,
         });
         return filename;
-        files.push(filename);
       }
       if (requestDTO.part5 !== undefined) {
         const filename = await this.generatePdfPart(5, date, {
@@ -109,7 +104,6 @@ export class TQF3Service {
           ...tqf3.part5._doc,
         });
         return filename;
-        files.push(filename);
       }
       if (requestDTO.part6 !== undefined) {
         const filename = await this.generatePdfPart(6, date, {
@@ -118,7 +112,6 @@ export class TQF3Service {
           ...tqf3.part6._doc,
         });
         return filename;
-        files.push(filename);
       }
       if (requestDTO.part7 !== undefined) {
         const filename = await this.generatePdfPart(7, date, {
@@ -127,10 +120,7 @@ export class TQF3Service {
           ...tqf3.part7?._doc,
         });
         return filename;
-        files.push(filename);
       }
-
-      return files; // multiple file
     } catch (error) {
       throw error;
     }
@@ -421,7 +411,7 @@ export class TQF3Service {
       doc
         .font(emoji)
         .text(
-          this.setSymbol(data.teachingLocation.in.length > 0),
+          this.setSymbol(data.teachingLocation.in !== undefined),
           doc.x,
           doc.y - 2,
           { continued: true },
@@ -433,7 +423,7 @@ export class TQF3Service {
       doc
         .font(emoji)
         .text(
-          this.setSymbol(data.teachingLocation.out.length > 0),
+          this.setSymbol(data.teachingLocation.out !== undefined),
           doc.x,
           doc.y - 2,
           { continued: true },
@@ -1550,68 +1540,5 @@ export class TQF3Service {
       //   drawTable();
       // }
     }
-  }
-
-  private async generatePdfEachPart(
-    part: number,
-    prefixPath: string,
-    path: string,
-    date: string,
-    data: any,
-  ): Promise<string> {
-    return new Promise((resolve, reject) => {
-      try {
-        const filename = `TQF3_Part${part}_${date}.pdf`;
-        const filePath = join(process.cwd(), filename);
-        const htmlPath = join(process.cwd(), path);
-        const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
-        const renderedHtml = ejs.render(htmlContent, { data });
-        const doc = new PDFDocument({
-          size: 'A4',
-          bufferPages: true,
-          margin: 50,
-        });
-        const writeStream = fs.createWriteStream(filePath);
-        doc.pipe(writeStream);
-        doc.registerFont(
-          'TH Niramit AS',
-          'src/assets/fonts/TH Niramit AS Regular.ttf',
-        );
-        doc.font('TH Niramit AS');
-
-        doc.end();
-        writeStream.on('finish', () => resolve(filename));
-        writeStream.on('error', reject);
-        // const browser = await puppeteer.launch({
-        //   headless: 'shell',
-        //   args: [
-        //     '--font-render-hinting=none',
-        //     '--fast-start',
-        //     '--disable-extensions',
-        //     '--no-sandbox',
-        //     '--disable-web-security',
-        //   ],
-        // });
-        // const page = await browser.newPage();
-        // await page.setContent(renderedHtml, { waitUntil: 'domcontentloaded' });
-        // await page.addStyleTag({ path: `${prefixPath}/style.css` });
-        // await page.evaluateHandle('document.fonts.ready');
-        // await page.pdf({
-        //   path: filename,
-        //   format: 'A4',
-        //   margin: {
-        //     top: '0.6in',
-        //     left: '0.75in',
-        //     right: '0.75in',
-        //     bottom: '1.44in',
-        //   },
-        //   printBackground: true,
-        // });
-        // await browser.close();
-        // return filename;
-      } catch (error) {
-        reject(error);
-      }
-    });
   }
 }
