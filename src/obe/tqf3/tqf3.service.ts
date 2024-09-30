@@ -268,7 +268,7 @@ export class TQF3Service {
       doc
         .font(fontNormal)
         .text(
-          `${data.CourseCodeTha} ${data.CourseID.slice(-3)} (${data.CourseID})`,
+          `${data.CourseCodeTha} ${data.CourseID ? data.CourseID.slice(-3) : ''} `,
         )
         .moveDown(0.6);
 
