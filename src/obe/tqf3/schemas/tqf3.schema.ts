@@ -66,7 +66,7 @@ class Part1 {
   instructors: string[];
 
   @Prop({ type: { in: String, out: String }, _id: false })
-  teachingLocation: { in: string; out: string };
+  teachingLocation: { in?: string; out?: string };
 
   @Prop()
   consultHoursWk: number;
