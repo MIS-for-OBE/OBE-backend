@@ -34,7 +34,7 @@ export class TQF3Service {
         params.id,
         {
           status:
-            params.part == 'part6' ? TQF_STATUS.DONE : TQF_STATUS.IN_PROGRESS,
+            params.part == 'part7' ? TQF_STATUS.DONE : TQF_STATUS.IN_PROGRESS,
           [params.part]: requestDTO,
         },
         { new: true, fields: `status ${params.part} updatedAt` },
