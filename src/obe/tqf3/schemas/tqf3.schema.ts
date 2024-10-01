@@ -122,7 +122,7 @@ class Part4 {
         evals: [
           {
             eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
-            evalWeek: { type: [Number] },
+            evalWeek: { type: [String] },
             percent: { type: Number },
           },
         ],
@@ -134,7 +134,7 @@ class Part4 {
     percent: number;
     evals: {
       eval: Eval;
-      evalWeek: number[];
+      evalWeek: string[];
       percent: number;
     }[];
   }[];
