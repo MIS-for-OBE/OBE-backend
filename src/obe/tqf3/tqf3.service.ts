@@ -63,6 +63,7 @@ export class TQF3Service {
       let data: CmuApiTqfCourseDTO = courseInfo.data[0];
       data = { ...data, ...requestDTO };
       const tqf3: any = await this.model.findById(requestDTO.tqf3);
+
       const date = moment().format('DD-MM-YYYY');
       const files = [];
 
@@ -90,7 +91,9 @@ export class TQF3Service {
       if (requestDTO.part4 !== undefined) {
         const filename = await this.generatePdfPart(4, date, {
           ...data,
-          ...tqf3.part4._doc,
+          part2: { ...tqf3.part2._doc },
+          part3: { ...tqf3.part3._doc },
+          part4: { ...tqf3.part4._doc },
         });
         files.push(filename);
       }
@@ -1055,112 +1058,150 @@ export class TQF3Service {
       .text('หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา', { align: 'center' })
       .moveDown(0.75);
 
-    // Course Syllabus Table
+    //Table
     {
       doc.font(fontBold).text('Course Syllabus', 57, doc.y);
 
       doc.moveDown(0.75);
 
-      // Table
-      // {
-      //   const headers = [
-      //     ['ลำดับ', 'ที่'],
-      //     'หัวข้อ',
-      //     'รายละเอียด',
-      //     ['สัดส่วน', 'ของการ', 'ประเมิน'],
-      //   ];
+      const headers = [
+        'ผลลัพธ์การเรียนรู้ (CLO)',
+        'วิธีการประเมินผลการเรียนรู้',
+        ['สัปดาห์', 'ที่ประเมิน'],
+        ['สัดส่วน', 'ของการ', 'ประเมิน'],
+      ];
 
-      //   const rows = data.eval.map((eva) => {
-      //     return [eva.no, eva.topicTH, eva.desc, eva.percent];
-      //   });
+      const rows = data.part2.clo.map((clo: any) => [
+        `CLO: ${clo.no} ${clo.descTH}`,
+        ['ผลลัพธ์การเรียนรู้ (CLO)', 22, 222, 2222],
+        ['ผลลัพธ์การเรียนรู้ (CLO)', 22, 222, 2222],
+        ['ผลลัพธ์การเรียนรู้ (CLO)', 22, 222, 2222],
+      ]);
 
-      //   const tableTop = doc.y + 0.6;
-      //   const tableLeft = 50;
-      //   const columnWidth = [60, 130, 230, 70];
+      const tableTop = doc.y + 0.6;
+      const tableLeft = 50;
+      const columnWidth = [175, 175, 80, 70];
 
-      //   // Calculates row height
-      //   function calculateRowHeight(text, columnWidth) {
-      //     const textHeight = doc.heightOfString(text, {
-      //       width: columnWidth - 20,
-      //     });
-      //     return textHeight + 20;
-      //   }
+      function calculateRowHeight(text, columnWidth) {
+        const textHeight = doc.heightOfString(text, {
+          width: columnWidth - 20,
+        });
+        return textHeight + 20;
+      }
 
-      //   // Draws each row
-      //   function drawRow(y, row, isHeader = false) {
-      //     let rowHeight = 0;
+      function drawSubTable(x, y, data, columnWidth) {
+        let subTableY = y;
 
-      //     // Calculate row height based on the tallest cell
-      //     row.forEach((cell, i) => {
-      //       const content = Array.isArray(cell) ? cell.join('\n') : cell;
-      //       const cellHeight = calculateRowHeight(content, columnWidth[i]);
-      //       if (cellHeight > rowHeight) {
-      //         rowHeight = cellHeight;
-      //       }
-      //     });
+        data.forEach((row) => {
+          const subCellHeight = calculateRowHeight(row, columnWidth);
 
-      //     doc.lineWidth(0.5);
+          doc.rect(x, subTableY, columnWidth, subCellHeight).stroke();
 
-      //     // Draw each cell in the row
-      //     row.forEach((cell, i) => {
-      //       // Draw cell border
-      //       doc
-      //         .rect(
-      //           tableLeft +
-      //             columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-      //             8,
-      //           y,
-      //           columnWidth[i],
-      //           rowHeight,
-      //         )
-      //         .stroke();
+          doc.font(fontNormal).text(row, x + 5, subTableY + 5, {
+            width: columnWidth - 10,
+            align: 'left',
+          });
 
-      //       // Set font style
-      //       if (isHeader) {
-      //         doc.font(fontBold);
-      //       } else {
-      //         doc.font(fontNormal);
-      //       }
+          subTableY += subCellHeight;
+        });
 
-      //       const lines = Array.isArray(cell) ? cell : [cell];
-      //       const lineHeight = doc.heightOfString(lines[0]);
+        return subTableY - y;
+      }
 
-      //       lines.forEach((line, index) => {
-      //         doc.text(
-      //           line,
-      //           tableLeft +
-      //             columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-      //             10 +
-      //             8,
-      //           y + 10 + (isHeader && index * lineHeight),
-      //           {
-      //             width: columnWidth[i] - 20,
-      //             align: isHeader ? 'center' : 'left',
-      //           },
-      //         );
-      //       });
-      //     });
+      function drawRow(y, row, isHeader = false) {
+        let rowHeight = 0;
 
-      //     return rowHeight;
-      //   }
+        row.forEach((cell, i) => {
+          let content = cell;
 
-      //   // Draw the headers
-      //   function drawHeaders() {
-      //     drawRow(tableTop, headers, true);
-      //   }
+          if (
+            (i === 1 || i === 2 || i === 3) &&
+            Array.isArray(cell) &&
+            !isHeader
+          ) {
+            // ถ้าเป็นคอลัมน์ที่ 2 และเป็น Array จะให้ถือว่าเป็นตารางซ้อน (1 คอลัมน์)
+            const subTableData = [['20'], ['10'], ['10'], ['10'], ['10']];
 
-      //   // Draw the table
-      //   function drawTable() {
-      //     let currentY = tableTop + 63;
-      //     rows.forEach((row) => {
-      //       const rowHeight = drawRow(currentY, row);
-      //       currentY += rowHeight;
-      //     });
-      //   }
+            // กำหนดความกว้างของตารางย่อย
+            const subTableWidth = columnWidth[i];
+            const subTableHeight = drawSubTable(
+              tableLeft +
+                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                8,
+              y,
+              subTableData, // ส่งข้อมูลตารางย่อยเข้าไป
+              subTableWidth, // ความกว้างของตารางย่อย
+            );
 
-      //   drawHeaders();
-      //   drawTable();
-      // }
+            rowHeight = Math.max(rowHeight, subTableHeight);
+          } else {
+            content = Array.isArray(cell) ? cell.join('\n') : cell;
+            const cellHeight = calculateRowHeight(content, columnWidth[i]);
+            if (cellHeight > rowHeight) {
+              rowHeight = cellHeight;
+            }
+          }
+        });
+
+        // วาดเส้นขอบและข้อความของแต่ละเซลล์
+        row.forEach((cell, i) => {
+          doc
+            .rect(
+              tableLeft +
+                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                8,
+              y,
+              columnWidth[i],
+              rowHeight,
+            )
+            .stroke();
+
+          doc.font(isHeader ? fontBold : fontNormal);
+
+          if (
+            (i === 1 || i === 2 || i === 3) &&
+            Array.isArray(cell) &&
+            !isHeader
+          ) {
+            // ถ้าคอลัมน์ที่ 2 เป็นตารางย่อย จะข้ามการเขียนข้อความเพราะเขียนไปแล้วในฟังก์ชัน drawSubTable
+          } else {
+            const lines = Array.isArray(cell) ? cell : [cell];
+            const lineHeight = doc.heightOfString(lines[0]);
+
+            lines.forEach((line, index) => {
+              doc.text(
+                line,
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  10 +
+                  8,
+                y + 10 + (isHeader && index * lineHeight),
+                {
+                  width: columnWidth[i] - 20,
+                  align: isHeader ? 'center' : 'left',
+                },
+              );
+            });
+          }
+        });
+
+        return rowHeight;
+      }
+
+      function drawHeaders() {
+        drawRow(tableTop, headers, true);
+      }
+
+      function drawTable() {
+        let currentY = tableTop + 63;
+        rows.forEach((row) => {
+          const rowHeight = drawRow(currentY, row);
+          currentY += rowHeight;
+        });
+      }
+
+      drawHeaders();
+      drawTable();
     }
   }
 
