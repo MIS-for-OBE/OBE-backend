@@ -60,7 +60,8 @@ export class TQF3Service {
           } as CmuApiTqfCourseSearchDTO,
         },
       );
-      const data: CmuApiTqfCourseDTO = courseInfo.data[0];
+      let data: CmuApiTqfCourseDTO = courseInfo.data[0];
+      data = { ...data, ...requestDTO };
       const tqf3: any = await this.model.findById(requestDTO.tqf3);
       const date = moment().format('DD-MM-YYYY');
       const files = [];
@@ -68,59 +69,54 @@ export class TQF3Service {
       if (requestDTO.part1 !== undefined) {
         const filename = await this.generatePdfPart(1, date, {
           ...data,
-          ...requestDTO,
           ...tqf3.part1._doc,
         });
-        return filename;
+        files.push(filename);
       }
       if (requestDTO.part2 !== undefined) {
         const filename = await this.generatePdfPart(2, date, {
           ...data,
-          ...requestDTO,
           ...tqf3.part2._doc,
         });
-        return filename;
+        files.push(filename);
       }
       if (requestDTO.part3 !== undefined) {
         const filename = await this.generatePdfPart(3, date, {
           ...data,
-          ...requestDTO,
           ...tqf3.part3._doc,
         });
-        return filename;
+        files.push(filename);
       }
       if (requestDTO.part4 !== undefined) {
         const filename = await this.generatePdfPart(4, date, {
           ...data,
-          ...requestDTO,
           ...tqf3.part4._doc,
         });
-        return filename;
+        files.push(filename);
       }
       if (requestDTO.part5 !== undefined) {
         const filename = await this.generatePdfPart(5, date, {
           ...data,
-          ...requestDTO,
           ...tqf3.part5._doc,
         });
-        return filename;
+        files.push(filename);
       }
       if (requestDTO.part6 !== undefined) {
         const filename = await this.generatePdfPart(6, date, {
           ...data,
-          ...requestDTO,
           ...tqf3.part6._doc,
         });
-        return filename;
+        files.push(filename);
       }
       if (requestDTO.part7 !== undefined) {
         const filename = await this.generatePdfPart(7, date, {
           ...data,
-          ...requestDTO,
           ...tqf3.part7?._doc,
         });
-        return filename;
+        files.push(filename);
       }
+
+      return files;
     } catch (error) {
       throw error;
     }

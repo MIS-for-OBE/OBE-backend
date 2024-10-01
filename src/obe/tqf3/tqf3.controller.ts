@@ -15,6 +15,8 @@ import { ResponseDTO } from 'src/common/dto/response.dto';
 import { TQF3 } from './schemas/tqf3.schema';
 import { GeneratePdfDTO } from './dto/dto';
 import * as fs from 'fs';
+import * as archiver from 'archiver';
+import { join } from 'path';
 
 @Controller('/tqf3')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -40,15 +42,33 @@ export class TQF3Controller {
   ): Promise<void> {
     try {
       const files = await this.service.generatePDF(requestDTO);
-      res.setHeader('Content-disposition', `attachment; filename=${files}`);
-      res.setHeader('Content-type', 'application/pdf');
+
+      // const totalSize = files.reduce((total, file) => {
+      //   const filePath = join(process.cwd(), file);
+      //   const stats = fs.statSync(filePath);
+      //   return total + stats.size;
+      // }, 0);
+
+      res.setHeader(
+        'Content-disposition',
+        `attachment; filename="TQF3_Parts_${requestDTO.academicYear}_${requestDTO.academicTerm}.zip"`,
+      );
+      res.setHeader('Content-type', 'application/zip');
+      // res.setHeader('Content-Length', totalSize);
       res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
-      res.sendFile(files, { root: process.cwd() }, (err) => {
-        if (err) {
-          throw err;
-        }
-        fs.unlinkSync(files);
+      const archive = archiver('zip', { zlib: { level: 9 } });
+      archive.on('error', (err) => {
+        throw err;
       });
+      res.on('close', () => {
+        files.forEach((file) => fs.unlinkSync(file));
+      });
+      archive.pipe(res);
+      files.forEach((file) => {
+        const filePath = join(process.cwd(), file);
+        archive.file(filePath, { name: file });
+      });
+      await archive.finalize();
     } catch (error) {
       throw error;
     }
