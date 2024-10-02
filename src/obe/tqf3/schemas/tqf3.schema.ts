@@ -128,6 +128,7 @@ class Part4 {
         ],
       },
     ],
+    _id: false,
   })
   data: {
     clo: CLO;
@@ -165,6 +166,7 @@ class Part6 {
         other: { type: String },
       },
     ],
+    _id: false,
   })
   data: {
     topic: string;
@@ -202,25 +204,25 @@ export class TQF3 {
   @Prop({ required: true, enum: TQF_STATUS })
   status: TQF_STATUS;
 
-  @Prop({ type: Part1Schema })
+  @Prop({ type: Part1Schema, _id: false })
   part1?: Part1;
 
-  @Prop({ type: Part2Schema })
+  @Prop({ type: Part2Schema, _id: false })
   part2?: Part2;
 
-  @Prop({ type: Part3Schema })
+  @Prop({ type: Part3Schema, _id: false })
   part3?: Part3;
 
-  @Prop({ type: Part4Schema })
+  @Prop({ type: Part4Schema, _id: false })
   part4?: Part4;
 
-  @Prop({ type: Part5Schema })
+  @Prop({ type: Part5Schema, _id: false })
   part5?: Part5;
 
-  @Prop({ type: Part6Schema })
+  @Prop({ type: Part6Schema, _id: false })
   part6?: Part6;
 
-  @Prop({ type: Part7Schema })
+  @Prop({ type: Part7Schema, _id: false })
   part7?: Part7;
 }
 
