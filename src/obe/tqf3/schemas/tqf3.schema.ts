@@ -38,8 +38,8 @@ export class Eval {
   @Prop({ required: true })
   topicEN: string;
 
-  @Prop({ required: true })
-  desc: string;
+  @Prop()
+  desc?: string;
 
   @Prop({ required: true })
   percent: number;

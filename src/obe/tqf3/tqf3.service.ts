@@ -50,80 +50,99 @@ export class TQF3Service {
   ): Promise<TQF3> {
     try {
       const tqf3Document = await this.model.findById(params.id);
-
       if (!tqf3Document) {
         throw new NotFoundException('TQF3 not found.');
       }
 
       if (params.part === 'part2') {
+        tqf3Document.part2.teachingMethod = requestDTO.teachingMethod;
+        tqf3Document.part2.evaluate = requestDTO.evaluate;
+        tqf3Document.part2.schedule = requestDTO.schedule;
         requestDTO.clo.forEach((newCloItem) => {
           const existingCloItem = tqf3Document.part2.clo.find(
             (clo: any) => clo.id == newCloItem.id,
           );
 
           if (existingCloItem) {
+            existingCloItem.no = newCloItem.no;
             existingCloItem.descTH = newCloItem.descTH;
             existingCloItem.descEN = newCloItem.descEN;
             existingCloItem.learningMethod = newCloItem.learningMethod;
             existingCloItem.other = newCloItem.other;
           } else {
             tqf3Document.part2.clo.push(newCloItem);
+            newCloItem.id = (
+              tqf3Document.part2.clo[tqf3Document.part2.clo.length - 1] as any
+            ).id;
           }
         });
-
         tqf3Document.part2.clo = tqf3Document.part2.clo.filter(
           (existingCloItem: any) =>
             requestDTO.clo.some(
               (newCloItem) => newCloItem.id === existingCloItem.id,
             ),
         );
-        if (tqf3Document.part4) {
+        tqf3Document.part2.clo.sort((a: any, b: any) => a.no - b.no);
+        // Map the CLO ID to its index
+        const cloIndexMap: Record<string, number> = {};
+        tqf3Document.part2.clo.forEach((newCloItem: any, index: number) => {
+          cloIndexMap[newCloItem.id] = index;
+        });
+        const validCloIds = tqf3Document.part2.clo.map(
+          (newCloItem: any) => newCloItem.id,
+        );
+        if (tqf3Document.part4?.data.length) {
           tqf3Document.part4.data = tqf3Document.part4.data.filter(
-            (existingCloItem) =>
-              requestDTO.clo.some(
-                (newCloItem) => newCloItem.id === existingCloItem.clo,
-              ),
+            (item: any) => validCloIds.includes(item.clo.toString()),
           );
+          tqf3Document.part4.data.sort((a: any, b: any) => {
+            const aIndex = cloIndexMap[a.clo.toString()];
+            const bIndex = cloIndexMap[b.clo.toString()];
+            return (
+              (aIndex !== undefined ? aIndex : Infinity) -
+              (bIndex !== undefined ? bIndex : Infinity)
+            );
+          });
         }
-
-        tqf3Document.part2.teachingMethod = requestDTO.teachingMethod;
-        tqf3Document.part2.evaluate = requestDTO.evaluate;
-        tqf3Document.part2.schedule = requestDTO.schedule;
+        if (tqf3Document.part7?.data.length) {
+          tqf3Document.part7.data = tqf3Document.part7.data.filter((item) =>
+            validCloIds.includes(item.clo.toString()),
+          );
+          tqf3Document.part7.data.sort((a: any, b: any) => {
+            const aIndex = cloIndexMap[a.clo.toString()];
+            const bIndex = cloIndexMap[b.clo.toString()];
+            return (
+              (aIndex !== undefined ? aIndex : Infinity) -
+              (bIndex !== undefined ? bIndex : Infinity)
+            );
+          });
+        }
       } else if (params.part === 'part3') {
+        tqf3Document.part3.gradingPolicy = requestDTO.gradingPolicy;
         requestDTO.eval.forEach((newEvalItem) => {
           const existingEvalItem = tqf3Document.part3.eval.find(
             (item: any) => item.id == newEvalItem.id,
           );
-
           if (existingEvalItem) {
+            existingEvalItem.no = newEvalItem.no;
             existingEvalItem.topicTH = newEvalItem.topicTH;
             existingEvalItem.topicEN = newEvalItem.topicEN;
             existingEvalItem.desc = newEvalItem.desc;
             existingEvalItem.percent = newEvalItem.percent;
           } else {
             tqf3Document.part3.eval.push(newEvalItem);
-            // delete tqf3Document.part4;
+            newEvalItem.id = (
+              tqf3Document.part3.eval[tqf3Document.part3.eval.length - 1] as any
+            ).id;
           }
         });
-
         tqf3Document.part3.eval = tqf3Document.part3.eval.filter(
           (existingEvalItem: any) =>
-            requestDTO.eval.some(
-              (newEvalItem) => newEvalItem.id === existingEvalItem.id,
-            ),
+            requestDTO.eval.some((item) => item.id === existingEvalItem.id),
         );
-        if (tqf3Document.part4) {
-          tqf3Document.part4.data = tqf3Document.part4.data.filter(
-            (existingCloItem) =>
-              requestDTO.clo.some(
-                (newCloItem) => newCloItem.id === existingCloItem.clo,
-              ),
-          );
-        }
-
-        tqf3Document.part3.gradingPolicy = requestDTO.gradingPolicy;
+        tqf3Document.part3.eval.sort((a: any, b: any) => a.no - b.no);
       } else {
-        tqf3Document[params.part] = requestDTO;
+        tqf3Document[params.part] = { ...requestDTO };
       }
 
       tqf3Document.status =
