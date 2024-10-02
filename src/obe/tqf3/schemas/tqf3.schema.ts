@@ -46,6 +46,7 @@ export class Eval {
 }
 export const EvalSchema = SchemaFactory.createForClass(Eval);
 
+export type Part1TQF3 = Part1;
 @Schema({
   timestamps: { createdAt: false, updatedAt: true },
 })
@@ -73,6 +74,7 @@ class Part1 {
 }
 export const Part1Schema = SchemaFactory.createForClass(Part1);
 
+export type Part2TQF3 = Part2;
 @Schema({
   timestamps: { createdAt: false, updatedAt: true },
 })
@@ -98,6 +100,7 @@ class Part2 {
 }
 export const Part2Schema = SchemaFactory.createForClass(Part2);
 
+export type Part3TQF3 = Part3;
 @Schema({
   timestamps: { createdAt: false, updatedAt: true },
 })
@@ -110,6 +113,7 @@ class Part3 {
 }
 export const Part3Schema = SchemaFactory.createForClass(Part3);
 
+export type Part4TQF3 = Part4;
 @Schema({
   timestamps: { createdAt: false, updatedAt: true },
 })
@@ -142,6 +146,7 @@ class Part4 {
 }
 export const Part4Schema = SchemaFactory.createForClass(Part4);
 
+export type Part5TQF3 = Part5;
 @Schema({
   timestamps: { createdAt: false, updatedAt: true },
 })
@@ -154,6 +159,7 @@ class Part5 {
 }
 export const Part5Schema = SchemaFactory.createForClass(Part5);
 
+export type Part6TQF3 = Part6;
 @Schema({
   timestamps: { createdAt: false, updatedAt: true },
 })
@@ -176,6 +182,7 @@ class Part6 {
 }
 export const Part6Schema = SchemaFactory.createForClass(Part6);
 
+export type Part7TQF3 = Part7;
 @Schema({
   timestamps: { createdAt: false, updatedAt: true },
 })
@@ -196,7 +203,6 @@ class Part7 {
 export const Part7Schema = SchemaFactory.createForClass(Part7);
 
 export type TQF3Document = HydratedDocument<TQF3>;
-
 @Schema({
   timestamps: { createdAt: false, updatedAt: true },
 })
