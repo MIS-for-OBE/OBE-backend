@@ -178,13 +178,13 @@ export const buildPart2Content = (
     doc
       .font(fontBold)
       .text(
-        'ผลลัพธ์การเรียนรู้ของกระบวนวิชา (Course Learning Outcomes: CLO)  :  ',
+        'ผลลัพธ์การเรียนรู้ของกระบวนวิชา (Course Learning Outcomes: CLO) : ',
         55.5,
         doc.y,
         { continued: true },
       );
 
-    doc.font(fontNormal).text('นักศึกษาสามารถ', doc.x + 10, doc.y);
+    doc.font(fontNormal).text('นักศึกษาสามารถ', doc.x, doc.y);
     doc.moveDown(0.75);
 
     // Table
@@ -259,6 +259,7 @@ export const buildPart2Content = (
             {
               width: columnWidth[i] - 20,
               align: isHeader ? 'center' : 'left',
+              wordSpacing: 1,
             },
           );
         });
@@ -308,8 +309,8 @@ export const buildPart2Content = (
       const headers = [
         ['สัปดาห์', 'ที่'],
         'เนื้อหากระบวนวิชา',
-        ['จำนวนชั่วโมง', 'บรรยาย'],
-        ['จำนวนชั่วโมง', 'ปฏิบัติ'],
+        'บรรยาย',
+        'ปฏิบัติ',
       ];
 
       const rows = data.schedule.map((item) => {
@@ -318,7 +319,7 @@ export const buildPart2Content = (
 
       const tableTop = doc.y + 0.6;
       const tableLeft = 50;
-      const columnWidth = [70, 230, 100, 100];
+      const columnWidth = [70, 300, 65, 65];
 
       function calculateRowHeight(text, columnWidth) {
         const textHeight = doc.heightOfString(text, {
@@ -331,7 +332,8 @@ export const buildPart2Content = (
         let rowHeight = 0;
 
         row.forEach((cell, i) => {
-          const cellHeight = calculateRowHeight(cell, columnWidth[i]);
+          const content = Array.isArray(cell) ? cell.join('\n') : cell;
+          const cellHeight = calculateRowHeight(content, columnWidth[i]);
           if (cellHeight > rowHeight) {
             rowHeight = cellHeight;
           }
@@ -339,23 +341,61 @@ export const buildPart2Content = (
 
         doc.lineWidth(0.5);
 
-        row.forEach((cell, i) => {
-          doc
-            .rect(
-              tableLeft +
-                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                6.5,
-              y,
-              columnWidth[i],
-              rowHeight,
-            )
-            .stroke();
+        let heightSubHeader = 0;
 
-          if (isHeader) {
-            doc.font(fontBold);
+        row.forEach((cell, i) => {
+          if (isHeader && i > 1) {
+            rowHeight = rowHeight / 2;
+            if (i === 2) {
+              doc
+                .rect(
+                  tableLeft +
+                    columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                    6.5,
+                  y,
+                  columnWidth[2] + columnWidth[3],
+                  rowHeight,
+                )
+                .stroke();
+
+              doc.text(
+                'จำนวนชั่วโมง',
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  6,
+                y + 5,
+                {
+                  width: columnWidth[2] + columnWidth[3],
+                  align: 'center',
+                },
+              );
+            }
+            doc
+              .rect(
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  6.5,
+                y + rowHeight,
+                columnWidth[i],
+                rowHeight,
+              )
+              .stroke();
+            heightSubHeader = rowHeight;
+            rowHeight = rowHeight * 2;
           } else {
-            doc.font(fontNormal);
+            doc
+              .rect(
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  6.5,
+                y,
+                columnWidth[i],
+                rowHeight,
+              )
+              .stroke();
           }
+
+          doc.font(isHeader ? fontBold : fontNormal);
 
           const lines = Array.isArray(cell) ? cell : [cell];
           const lineHeight = doc.heightOfString(lines[0]);
@@ -367,7 +407,10 @@ export const buildPart2Content = (
                 columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
                 10 +
                 8,
-              y + 10 + (isHeader && index * lineHeight),
+              y +
+                10 +
+                (isHeader && index * lineHeight) +
+                (isHeader && i > 1 && heightSubHeader - 5),
               {
                 width: columnWidth[i] - 20,
                 align: isHeader ? 'center' : 'left',

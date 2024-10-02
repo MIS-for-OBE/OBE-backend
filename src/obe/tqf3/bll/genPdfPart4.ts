@@ -34,16 +34,12 @@ export const buildPart4Content = (
     const rows = data.data.map(({ clo, evals }) => {
       return [
         `CLO: ${clo.no} ${clo.descTH}`,
-        [
-          'หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา',
-          'หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา',
-          'หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา',
-          'หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา',
-        ],
-        [[1, 2, 6, 8, 9, 80, 88], 2, 3, 4],
-        ['5%', '50%', '90%', '90%'],
+        evals.map((e) => e.eval.topicTH),
+        evals.map((e) => e.evalWeek),
+        evals.map((e) => e.percent),
       ];
     });
+    console.log(rows[3].map((e) => e));
 
     const tableTop = doc.y + 0.6;
     const tableLeft = 50;
@@ -56,25 +52,47 @@ export const buildPart4Content = (
       return textHeight + 20;
     }
 
-    function drawSubTable(x, y, data, columnWidth, columnIndex) {
+    const subRowHeight: number[] = [];
+    const cloHeight: number[] = [];
+
+    for (let index = 1; index < rows.length; index++) {
+      console.log('index : ', index);
+
+      const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
+      cloHeight.push(maxHeightClo);
+
+      for (let i = 0; i < rows[index][1].length; i++) {
+        const col1Height = calculateRowHeight(
+          rows[index][1][i],
+          columnWidth[1],
+        );
+        const col2Height = calculateRowHeight(
+          rows[index][2][i],
+          columnWidth[2],
+        );
+        const col3Height = calculateRowHeight(
+          rows[index][3][i],
+          columnWidth[3],
+        );
+
+        const maxHeight = Math.max(col1Height, col2Height, col3Height);
+        subRowHeight.push(maxHeight);
+      }
+    }
+    console.log('Max Heights for each rows:', subRowHeight);
+
+    function drawSubTable(x, y, data, subTableWidth, col) {
       let subTableY = y;
 
-      data.forEach((row, index) => {
+      data.map((row, i) => {
         let subCellHeight = 0;
-        for (let i = 1; i < 3; i++) {
-          let temp = calculateRowHeight(rows[i][index], columnWidth[i]);
-          if (temp > subCellHeight) {
-            subCellHeight = temp;
-          }
-        }
 
-        subCellHeight += 8;
-
-        doc.rect(x, subTableY, columnWidth, subCellHeight).stroke();
+        subCellHeight = subRowHeight[i];
+        doc.rect(x, subTableY, subTableWidth, subCellHeight).stroke();
 
         doc.font(fontNormal).text(row, x + 5, subTableY + 5, {
-          width: columnWidth - 10,
-          align: columnIndex === 1 ? 'left' : 'center',
+          width: subTableWidth - 10,
+          align: col > 1 ? 'center' : 'left',
         });
 
         subTableY += subCellHeight;
@@ -89,11 +107,7 @@ export const buildPart4Content = (
       row.forEach((cell, i) => {
         let content = cell;
 
-        if (
-          (i === 1 || i === 2 || i === 3) &&
-          Array.isArray(cell) &&
-          !isHeader
-        ) {
+        if (i !== 0 && Array.isArray(cell) && !isHeader) {
           const subTableWidth = columnWidth[i];
           const subTableHeight = drawSubTable(
             tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 8,
@@ -113,7 +127,6 @@ export const buildPart4Content = (
         }
       });
 
-      // วาดเส้นขอบและข้อความของแต่ละเซลล์
       row.forEach((cell, i) => {
         doc
           .rect(
@@ -154,6 +167,7 @@ export const buildPart4Content = (
       });
 
       return rowHeight;
+      doc.addPage();
     }
 
     function drawHeaders() {

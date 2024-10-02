@@ -24,11 +24,13 @@ export class TQF3Service {
       const part4 = tqf3.part4.data.map((item) => {
         const evals = [];
         item.evals.forEach((evalItem) => {
-          evals.push(
-            tqf3.part3.eval.find(
+          evals.push({
+            eval: tqf3.part3.eval.find(
               (e: any) => e._id.toString() === evalItem.eval.toString(),
             ),
-          );
+            evalWeek: evalItem.evalWeek,
+            percent: evalItem.percent,
+          });
         });
         return {
           clo: tqf3.part2.clo.find(
@@ -201,6 +203,7 @@ export class TQF3Service {
           ...data,
           ...this.populatePart4(tqf3),
         });
+        return filename;
         files.push(filename);
       }
       if (requestDTO.part5 !== undefined) {
