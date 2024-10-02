@@ -993,11 +993,8 @@ export class TQF3Service {
               .stroke();
 
             // Set font style
-            if (isHeader) {
-              doc.font(fontBold);
-            } else {
-              doc.font(fontNormal);
-            }
+
+            doc.font(isHeader ? fontBold : fontNormal);
 
             const lines = Array.isArray(cell) ? cell : [cell];
             const lineHeight = doc.heightOfString(lines[0]);
@@ -1060,9 +1057,9 @@ export class TQF3Service {
 
     //Table
     {
-      doc.font(fontBold).text('Course Syllabus', 57, doc.y);
+      // doc.font(fontBold).text('Course Syllabus', 57, doc.y);
 
-      doc.moveDown(0.75);
+      // doc.moveDown(0.75);
 
       const headers = [
         'ผลลัพธ์การเรียนรู้ (CLO)',
@@ -1071,16 +1068,26 @@ export class TQF3Service {
         ['สัดส่วน', 'ของการ', 'ประเมิน'],
       ];
 
-      const rows = data.part2.clo.map((clo: any) => [
-        `CLO: ${clo.no} ${clo.descTH}`,
-        ['ผลลัพธ์การเรียนรู้ (CLO)', 22, 222, 2222],
-        ['ผลลัพธ์การเรียนรู้ (CLO)', 22, 222, 2222],
-        ['ผลลัพธ์การเรียนรู้ (CLO)', 22, 222, 2222],
-      ]);
+      const rows = data.part2.clo.map((clo: any) => {
+        const evalItems = data.part3.eval;
+        console.log(evalItems);
+
+        return [
+          `CLO: ${clo.no} ${clo.descTH}`,
+          [
+            'หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา',
+            'หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา',
+            'หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา',
+            'หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา',
+          ],
+          [[1, 2, 6, 8, 9, 80, 88], 2, 3, 4],
+          ['5%', '50%', '90%', '90%'],
+        ];
+      });
 
       const tableTop = doc.y + 0.6;
       const tableLeft = 50;
-      const columnWidth = [175, 175, 80, 70];
+      const columnWidth = [150, 200, 70, 70];
 
       function calculateRowHeight(text, columnWidth) {
         const textHeight = doc.heightOfString(text, {
@@ -1089,17 +1096,25 @@ export class TQF3Service {
         return textHeight + 20;
       }
 
-      function drawSubTable(x, y, data, columnWidth) {
+      function drawSubTable(x, y, data, columnWidth, columnIndex) {
         let subTableY = y;
 
-        data.forEach((row) => {
-          const subCellHeight = calculateRowHeight(row, columnWidth);
+        data.forEach((row, index) => {
+          let subCellHeight = 0;
+          for (let i = 1; i < 3; i++) {
+            let temp = calculateRowHeight(rows[i][index], columnWidth[i]);
+            if (temp > subCellHeight) {
+              subCellHeight = temp;
+            }
+          }
+
+          subCellHeight += 8;
 
           doc.rect(x, subTableY, columnWidth, subCellHeight).stroke();
 
           doc.font(fontNormal).text(row, x + 5, subTableY + 5, {
             width: columnWidth - 10,
-            align: 'left',
+            align: columnIndex === 1 ? 'left' : 'center',
           });
 
           subTableY += subCellHeight;
@@ -1119,18 +1134,15 @@ export class TQF3Service {
             Array.isArray(cell) &&
             !isHeader
           ) {
-            // ถ้าเป็นคอลัมน์ที่ 2 และเป็น Array จะให้ถือว่าเป็นตารางซ้อน (1 คอลัมน์)
-            const subTableData = [['20'], ['10'], ['10'], ['10'], ['10']];
-
-            // กำหนดความกว้างของตารางย่อย
             const subTableWidth = columnWidth[i];
             const subTableHeight = drawSubTable(
               tableLeft +
                 columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
                 8,
               y,
-              subTableData, // ส่งข้อมูลตารางย่อยเข้าไป
-              subTableWidth, // ความกว้างของตารางย่อย
+              cell,
+              subTableWidth,
+              i,
             );
 
             rowHeight = Math.max(rowHeight, subTableHeight);
