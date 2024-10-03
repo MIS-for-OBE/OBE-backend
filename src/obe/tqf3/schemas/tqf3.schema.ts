@@ -191,13 +191,13 @@ class Part7 {
     type: [
       {
         clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
-        plo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+        plos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
       },
     ],
   })
   data: {
     clo: CLO;
-    plo: PLONo[];
+    plos: PLONo[];
   }[];
 }
 export const Part7Schema = SchemaFactory.createForClass(Part7);

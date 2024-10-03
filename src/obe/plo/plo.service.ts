@@ -65,9 +65,21 @@ export class PLOService {
     }
   }
 
-  async searchOnePLO(searchDTO: any): Promise<PLO> {
+  async searchOnePLO(facultyCode: string, searchDTO: any): Promise<PLO> {
     try {
-      const plo = await this.model.findOne({ name: searchDTO.name });
+      const filter: any = {};
+      if (searchDTO.name) {
+        filter.name = searchDTO.name;
+      } else {
+        filter.isActive = true;
+        filter.year = { $gte: searchDTO.year };
+        filter.semester = { $gte: searchDTO.semester };
+        const faculty = await this.facultyModel.findOne({ facultyCode });
+        filter.departmentCode = faculty.department.find(
+          ({ courseCode }) => courseCode === parseInt(searchDTO.courseCode),
+        ).codeEN;
+      }
+      const plo = await this.model.findOne(filter);
       if (!plo) {
         throw new NotFoundException('PLO Collection not found');
       }

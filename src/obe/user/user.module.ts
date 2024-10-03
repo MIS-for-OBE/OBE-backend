@@ -10,10 +10,7 @@ import { LogEvent, LogEventSchema } from '../logEvent/schemas/logEvent.schema';
   imports: [
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
-      {
-        name: LogEvent.name,
-        schema: LogEventSchema,
-      },
+      { name: LogEvent.name, schema: LogEventSchema },
     ]),
   ],
   controllers: [UserController],

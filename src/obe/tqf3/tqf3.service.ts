@@ -11,11 +11,13 @@ import {
   CmuApiTqfCourseSearchDTO,
 } from 'src/common/cmu-api/cmu-api.dto';
 import { GeneratePdfBLL } from './bll/genPdf';
+import { PLOService } from '../plo/plo.service';
 
 @Injectable()
 export class TQF3Service {
   constructor(
     @InjectModel(TQF3.name) private readonly model: Model<TQF3>,
+    private readonly ploService: PLOService,
     private readonly generatePdfBLL: GeneratePdfBLL,
   ) {}
 
@@ -41,6 +43,22 @@ export class TQF3Service {
         };
       });
       return { data: part4 };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private populatePart7(tqf3: TQF3) {
+    try {
+      const part7 = tqf3.part7.data.map((item) => {
+        return {
+          clo: tqf3.part2.clo.find(
+            (clo: any) => clo._id.toString() === item.clo.toString(),
+          ),
+          plos: item.plos,
+        };
+      });
+      return { data: part7 };
     } catch (error) {
       throw error;
     }
@@ -158,7 +176,10 @@ export class TQF3Service {
     }
   }
 
-  async generatePDF(requestDTO: GeneratePdfDTO): Promise<any> {
+  async generatePDF(
+    facultyCode: string,
+    requestDTO: GeneratePdfDTO,
+  ): Promise<any> {
     try {
       const courseInfo = await axios.get(
         `${process.env.BASE_CMU_API}course-template`,
@@ -221,9 +242,18 @@ export class TQF3Service {
         files.push(filename);
       }
       if (requestDTO.part7 !== undefined) {
+        const ploList = await this.ploService.searchOnePLO(
+          data.FacultyID || facultyCode,
+          {
+            year: requestDTO.academicYear,
+            semester: requestDTO.academicTerm,
+            courseCode: requestDTO.courseNo.slice(0, -3),
+          },
+        );
         const filename = await this.generatePdfBLL.generatePdf(7, date, {
           ...data,
-          ...tqf3.part7?._doc,
+          ...this.populatePart7(tqf3),
+          ploList: { ...ploList.data },
         });
         files.push(filename);
       }

@@ -40,11 +40,13 @@ export class PLOController {
     @Request() req,
     @Query() searchDTO: PLOSearchDTO,
   ): Promise<ResponseDTO<PLO>> {
-    return this.service.searchOnePLO(searchDTO).then((result) => {
-      const responseDTO = new ResponseDTO<PLO>();
-      responseDTO.data = result;
-      return responseDTO;
-    });
+    return this.service
+      .searchOnePLO(req.user.facultyCode, searchDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<PLO>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
   }
 
   @Get('check')

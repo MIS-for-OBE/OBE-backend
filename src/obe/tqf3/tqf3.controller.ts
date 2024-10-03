@@ -5,6 +5,7 @@ import {
   Param,
   Put,
   Query,
+  Request,
   Res,
   UsePipes,
   ValidationPipe,
@@ -37,11 +38,15 @@ export class TQF3Controller {
 
   @Get('pdf')
   async generatePDF(
+    @Request() req,
     @Res() res: Response,
     @Query() requestDTO: GeneratePdfDTO,
   ): Promise<void> {
     try {
-      const files = await this.service.generatePDF(requestDTO);
+      const files = await this.service.generatePDF(
+        req.user.facultyCode,
+        requestDTO,
+      );
 
       // const totalSize = files.reduce((total, file) => {
       //   const filePath = join(process.cwd(), file);
