@@ -56,7 +56,7 @@ export class TQF3Controller {
 
       res.setHeader(
         'Content-disposition',
-        `attachment; filename="TQF3_Parts_${requestDTO.academicYear}_${requestDTO.academicTerm}.zip"`,
+        `attachment; filename="TQF3_Parts_${requestDTO.courseNo}_${requestDTO.academicYear}_${requestDTO.academicTerm}.zip"`,
       );
       res.setHeader('Content-type', 'application/zip');
       // res.setHeader('Content-Length', totalSize);
