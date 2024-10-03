@@ -77,7 +77,7 @@ export class PLOService {
         const faculty = await this.facultyModel.findOne({ facultyCode });
         filter.departmentCode = faculty.department.find(
           ({ courseCode }) => courseCode === parseInt(searchDTO.courseCode),
-        ).codeEN;
+        )?.codeEN;
       }
       const plo = await this.model.findOne(filter);
       if (!plo) {
