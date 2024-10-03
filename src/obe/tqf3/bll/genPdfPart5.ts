@@ -20,13 +20,13 @@ export const buildPart5Content = (
   {
     doc.font(fontBold).text('1. ตำราและเอกสารหลัก').moveDown(0.4);
     doc.x += 10.5;
-    doc.font(fontNormal).text(data.mainRef).moveDown(0.6);
+    doc.font(fontNormal).text(data.mainRef).moveDown(0.75);
   }
 
   {
     doc.x -= 10.5;
     doc.font(fontBold).text('2. เอกสารและข้อมูลแนะนำ').moveDown(0.4);
     doc.x += 10.5;
-    doc.font(fontNormal).text(data.recDoc).moveDown(0.6);
+    doc.font(fontNormal).text(data.recDoc).moveDown(0.75);
   }
 };

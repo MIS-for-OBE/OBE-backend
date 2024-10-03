@@ -14,7 +14,10 @@ export const buildPart3Content = (
   const { fontNormal, fontBold, emoji } = font;
 
   // Section: หมวดที่ 3
-  doc.font(fontBold, 14).text('หมวดที่ 3 ', { align: 'center' }).moveDown(0.75);
+  doc
+    .font(fontBold, 14)
+    .text('หมวดที่ 3 การประเมินผลคะแนนกระบวนวิชา', { align: 'center' })
+    .moveDown(0.75);
 
   // Evaluation
   {
@@ -80,13 +83,14 @@ export const buildPart3Content = (
       );
   }
 
+  doc.moveDown(0.6);
+
   // Course Syllabus Table
   {
-    doc.font(fontBold).text('Course Syllabus', 57, doc.y);
+    doc.font(fontBold).text(' แผนการสอนและการประเมินผล', 57, doc.y);
 
-    doc.moveDown(0.75);
+    doc.moveDown(0.6);
 
-    // Table
     {
       const headers = [
         ['ลำดับ', 'ที่'],
@@ -96,14 +100,13 @@ export const buildPart3Content = (
       ];
 
       const rows = data.eval.map((eva) => {
-        return [eva.no, eva.topicTH, eva.desc, eva.percent];
+        return [eva.no, eva.topicTH, eva.desc, eva.percent + '%'];
       });
 
       const tableTop = doc.y + 0.6;
       const tableLeft = 50;
       const columnWidth = [60, 130, 230, 70];
 
-      // Calculates row height
       function calculateRowHeight(text, columnWidth) {
         const textHeight = doc.heightOfString(text, {
           width: columnWidth - 20,
@@ -111,11 +114,9 @@ export const buildPart3Content = (
         return textHeight + 20;
       }
 
-      // Draws each row
       function drawRow(y, row, isHeader = false) {
         let rowHeight = 0;
 
-        // Calculate row height based on the tallest cell
         row.forEach((cell, i) => {
           const content = Array.isArray(cell) ? cell.join('\n') : cell;
           const cellHeight = calculateRowHeight(content, columnWidth[i]);
@@ -126,9 +127,7 @@ export const buildPart3Content = (
 
         doc.lineWidth(0.5);
 
-        // Draw each cell in the row
         row.forEach((cell, i) => {
-          // Draw cell border
           doc
             .rect(
               tableLeft +
@@ -139,8 +138,6 @@ export const buildPart3Content = (
               rowHeight,
             )
             .stroke();
-
-          // Set font style
 
           doc.font(isHeader ? fontBold : fontNormal);
 
@@ -157,7 +154,7 @@ export const buildPart3Content = (
               y + 10 + (isHeader && index * lineHeight),
               {
                 width: columnWidth[i] - 20,
-                align: isHeader ? 'center' : 'left',
+                align: isHeader || i === 3 ? 'center' : 'left',
               },
             );
           });
@@ -166,15 +163,17 @@ export const buildPart3Content = (
         return rowHeight;
       }
 
-      // Draw the headers
       function drawHeaders() {
         drawRow(tableTop, headers, true);
       }
 
-      // Draw the table
       function drawTable() {
         let currentY = tableTop + 63;
         rows.forEach((row) => {
+          if (doc.y > 750) {
+            doc.addPage();
+            currentY = doc.y;
+          }
           const rowHeight = drawRow(currentY, row);
           currentY += rowHeight;
         });

@@ -15,14 +15,14 @@ export const buildPart4Content = (
   // Section: หมวดที่ 4
   doc
     .font(fontBold, 14)
-    .text('หมวดที่ 4 การประเมินผลคะแนนกระบวนวิชา', { align: 'center' })
+    .text('หมวดที่ 4 แผนการสอนและการประเมินผล', { align: 'center' })
     .moveDown(0.75);
 
   //Table
   {
-    // doc.font(fontBold).text('Course Syllabus', 57, doc.y);
+    doc.font(fontBold).text('แผนการประเมินการเรียนรู้', 57, doc.y);
 
-    // doc.moveDown(0.75);
+    doc.moveDown(0.75);
 
     const headers = [
       'ผลลัพธ์การเรียนรู้ (CLO)',
@@ -36,14 +36,14 @@ export const buildPart4Content = (
         `CLO: ${clo.no} ${clo.descTH}`,
         evals.map((e) => e.eval.topicTH),
         evals.map((e) => e.evalWeek),
-        evals.map((e) => e.percent),
+        evals.map((e) => e.percent + '%'),
       ];
     });
     console.log(rows[3].map((e) => e));
 
     const tableTop = doc.y + 0.6;
     const tableLeft = 50;
-    const columnWidth = [150, 200, 70, 70];
+    const columnWidth = [160, 190, 70, 70];
 
     function calculateRowHeight(text, columnWidth) {
       const textHeight = doc.heightOfString(text, {
@@ -52,10 +52,11 @@ export const buildPart4Content = (
       return textHeight + 20;
     }
 
-    const subRowHeight: number[] = [];
-    const cloHeight: number[] = [];
+    const subRowHeight: any[] = [];
+    const cloHeight: any[] = [];
+    console.log(rows.length);
 
-    for (let index = 1; index < rows.length; index++) {
+    for (let index = 0; index < rows.length; index++) {
       console.log('index : ', index);
 
       const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
@@ -76,32 +77,48 @@ export const buildPart4Content = (
         );
 
         const maxHeight = Math.max(col1Height, col2Height, col3Height);
-        subRowHeight.push(maxHeight);
+        subRowHeight.push({ clo: index, height: maxHeight });
       }
     }
-    console.log('Max Heights for each rows:', subRowHeight);
 
-    function drawSubTable(x, y, data, subTableWidth, col) {
+    function drawSubTable(x, y, data, subTableWidth, col, cloIndex) {
+      const eachRowHeight: any[] = [];
+      subRowHeight.map((h) => {
+        if (h.clo === cloIndex) {
+          eachRowHeight.push(h);
+        }
+      });
+      console.log('clo:', cloIndex + 1, eachRowHeight);
+
       let subTableY = y;
-
       data.map((row, i) => {
         let subCellHeight = 0;
+        let sumOfCellRow = 0;
+        subRowHeight.forEach((sum) => {
+          if (sum.clo === cloIndex) {
+            sumOfCellRow += sum.height;
+          }
+        });
 
-        subCellHeight = subRowHeight[i];
+        if (cloHeight[cloIndex] > sumOfCellRow) {
+          subCellHeight = cloHeight[cloIndex] / data.length;
+        } else if (cloHeight[cloIndex] <= sumOfCellRow) {
+          subCellHeight = eachRowHeight[i].height;
+        }
+
         doc.rect(x, subTableY, subTableWidth, subCellHeight).stroke();
 
-        doc.font(fontNormal).text(row, x + 5, subTableY + 5, {
-          width: subTableWidth - 10,
+        doc.font(fontNormal).text(row, x + 12 + (col > 1 && 4), subTableY + 8, {
+          width: subTableWidth - 30,
           align: col > 1 ? 'center' : 'left',
         });
 
         subTableY += subCellHeight;
       });
-
       return subTableY - y;
     }
 
-    function drawRow(y, row, isHeader = false) {
+    function drawRow(y, row, isHeader = false, cloIndex = null) {
       let rowHeight = 0;
 
       row.forEach((cell, i) => {
@@ -115,6 +132,7 @@ export const buildPart4Content = (
             cell,
             subTableWidth,
             i,
+            cloIndex,
           );
 
           rowHeight = Math.max(rowHeight, subTableHeight);
@@ -139,13 +157,7 @@ export const buildPart4Content = (
 
         doc.font(isHeader ? fontBold : fontNormal);
 
-        if (
-          (i === 1 || i === 2 || i === 3) &&
-          Array.isArray(cell) &&
-          !isHeader
-        ) {
-          // ถ้าคอลัมน์ที่ 2 เป็นตารางย่อย จะข้ามการเขียนข้อความเพราะเขียนไปแล้วในฟังก์ชัน drawSubTable
-        } else {
+        if (i === 0 || !Array.isArray(cell) || isHeader) {
           const lines = Array.isArray(cell) ? cell : [cell];
           const lineHeight = doc.heightOfString(lines[0]);
 
@@ -154,9 +166,8 @@ export const buildPart4Content = (
               line,
               tableLeft +
                 columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                10 +
-                8,
-              y + 10 + (isHeader && index * lineHeight),
+                18,
+              y + 10 + (isHeader ? index * lineHeight : 0),
               {
                 width: columnWidth[i] - 20,
                 align: isHeader ? 'center' : 'left',
@@ -167,7 +178,6 @@ export const buildPart4Content = (
       });
 
       return rowHeight;
-      doc.addPage();
     }
 
     function drawHeaders() {
@@ -176,8 +186,12 @@ export const buildPart4Content = (
 
     function drawTable() {
       let currentY = tableTop + 63;
-      rows.forEach((row) => {
-        const rowHeight = drawRow(currentY, row);
+      rows.forEach((row, cloIndex) => {
+        if (doc.y > 750) {
+          doc.addPage();
+          currentY = doc.y;
+        }
+        const rowHeight = drawRow(currentY, row, false, cloIndex);
         currentY += rowHeight;
       });
     }

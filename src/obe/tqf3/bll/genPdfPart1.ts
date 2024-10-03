@@ -21,12 +21,11 @@ export const buildPart1Content = (
   doc
     .font(fontBold, 14)
     .text('รายละเอียดของกระบวนวิชา', { align: 'center' })
-    .moveDown(0.6);
+    .moveDown(0.7);
 
   const labelX = 58;
   const column2 = 70;
 
-  // Detail
   {
     doc
       .font(fontBold)
@@ -168,15 +167,14 @@ export const buildPart1Content = (
     doc.x += 20;
     doc.text('2.1 ชื่ออาจารย์ผู้รับผิดชอบ').moveDown(0.6);
     doc.x += 15;
-    doc.font(fontNormal).text(`ผู้ช่วยศาสตราจารย์โดม โพธิกานนท์`).moveDown(0.6);
+    doc.font(fontNormal).text(data.mainInstructor).moveDown(0.6);
     doc.x -= 15;
     doc.font(fontBold).text('2.2 อาจารย์ผู้สอน (ทุกคน)').moveDown(0.6);
     doc.x += 15;
-    doc.font(fontNormal).text(`ผู้ช่วยศาสตราจารย์โดม โพธิกานนท์`).moveDown(0.6);
-    doc
-      .font(fontNormal)
-      .text(`ผู้ช่วยศาสตราจารย์นิรันดร์ พิสุทธอานนท`)
-      .moveDown(0.6);
+    data.instructors.forEach((e) => {
+      doc.font(fontNormal).text(e).moveDown(0.6);
+    });
+
     doc.x -= 35;
   }
 
@@ -197,6 +195,7 @@ export const buildPart1Content = (
   {
     doc.font(fontBold).text('4. สถานที่เรียน').moveDown(0.6);
     doc.x += 12;
+    // in
     doc
       .font(emoji)
       .text(
@@ -209,6 +208,15 @@ export const buildPart1Content = (
       .font(fontNormal)
       .text(`ในสถานที่ตั้งของมหาวิทยาลัยเชียงใหม่ `, doc.x + 5, doc.y + 2)
       .moveDown(0.6);
+
+    if (data.teachingLocation.in !== undefined) {
+      doc
+        .font(fontNormal)
+        .text(data.teachingLocation.in, doc.x + 17, doc.y + 2)
+        .moveDown(0.6);
+      doc.x -= 17;
+    }
+
     doc
       .font(emoji)
       .text(
@@ -221,6 +229,13 @@ export const buildPart1Content = (
       .font(fontNormal)
       .text(`นอกสถานที่ตั้งของมหาวิทยาลัยเชียงใหม่ `, doc.x + 5, doc.y + 2)
       .moveDown(0.6);
+    if (data.teachingLocation.out !== undefined) {
+      doc
+        .font(fontNormal)
+        .text(data.teachingLocation.out, doc.x + 17, doc.y + 2)
+        .moveDown(0.6);
+      doc.x -= 17;
+    }
     doc.x -= 12;
   }
 

@@ -64,7 +64,7 @@ export const buildPart2Content = (
         { continued: true },
       );
     doc
-      .font(fontNormal)
+      .font(fontBold)
       .text('บรรยาย', doc.x + 5, doc.y + 2, { continued: true });
 
     // LAB
@@ -77,7 +77,7 @@ export const buildPart2Content = (
         { continued: true },
       );
     doc
-      .font(fontNormal)
+      .font(fontBold)
       .text('ปฏิบัติการ', doc.x + 5, doc.y + 2, { continued: true });
 
     //PRAC
@@ -90,7 +90,7 @@ export const buildPart2Content = (
         { continued: true },
       );
     doc
-      .font(fontNormal)
+      .font(fontBold)
       .text('ฝึกปฏิบัติ', doc.x + 5, doc.y + 2, { continued: true });
 
     //COOP
@@ -102,7 +102,7 @@ export const buildPart2Content = (
         doc.y - 2,
         { continued: true },
       );
-    doc.font(fontNormal).text('สหกิจศึกษา', doc.x + 5, doc.y + 2);
+    doc.font(fontBold).text('สหกิจศึกษา', doc.x + 5, doc.y + 2);
 
     doc.moveDown(0.75);
   }
@@ -123,7 +123,7 @@ export const buildPart2Content = (
         doc.y - 2,
         { continued: true },
       );
-    doc.font(fontNormal).text('A-F', doc.x + 5, doc.y + 2, { continued: true });
+    doc.font(fontBold).text('A-F', doc.x + 5, doc.y + 2, { continued: true });
 
     //S/U
     doc
@@ -134,7 +134,7 @@ export const buildPart2Content = (
         doc.y - 2,
         { continued: true },
       );
-    doc.font(fontNormal).text('S/U', doc.x + 5, doc.y + 2, { continued: true });
+    doc.font(fontBold).text('S/U', doc.x + 5, doc.y + 2, { continued: true });
 
     //P
     doc
@@ -145,7 +145,7 @@ export const buildPart2Content = (
         doc.y - 2,
         { continued: true },
       );
-    doc.font(fontNormal).text('P', doc.x + 5, doc.y + 2);
+    doc.font(fontBold).text('P', doc.x + 5, doc.y + 2);
 
     doc.moveDown(0.6);
   }
@@ -172,6 +172,8 @@ export const buildPart2Content = (
 
     doc.moveDown(0.75);
   }
+
+  console.log('before table :', doc.y);
 
   // Course Learning Outcomes: CLO
   {
@@ -202,9 +204,6 @@ export const buildPart2Content = (
           );
           learningMethod.push(clo.other);
         }
-
-        // return ['1', 0];
-
         return [`CLO ${clo.no}: ${clo.descTH}`, learningMethod.join('\n')];
       });
 
@@ -258,7 +257,7 @@ export const buildPart2Content = (
             y + 10,
             {
               width: columnWidth[i] - 20,
-              align: isHeader ? 'center' : 'left',
+              align: isHeader || i > 1 ? 'center' : 'left',
               wordSpacing: 1,
             },
           );
@@ -273,15 +272,18 @@ export const buildPart2Content = (
 
       function drawTable() {
         let currentY = tableTop + 34.5;
-        let totalTableHeight = 0; // to track total height of table
+        let totalTableHeight = 0;
 
         rows.forEach((row) => {
+          if (doc.y > 750) {
+            doc.addPage();
+            currentY = doc.y;
+          }
           const rowHeight = drawRow(currentY, row);
-          totalTableHeight += rowHeight; // adding row height to total table height
+          totalTableHeight += rowHeight;
           currentY += rowHeight;
         });
 
-        // Adjust doc.y by the table height
         doc.y = currentY;
         return totalTableHeight;
       }
@@ -289,12 +291,13 @@ export const buildPart2Content = (
       drawHeaders();
       const tableHeight = drawTable();
 
-      // Adding 100pt space between tables
       doc.y -= 10;
     }
   }
 
-  doc.addPage();
+  if (doc.y > 700) {
+    doc.addPage();
+  }
 
   // Course content
   {
@@ -313,13 +316,28 @@ export const buildPart2Content = (
         'ปฏิบัติ',
       ];
 
+      let totalLec = 0;
+      let totalLab = 0;
       const rows = data.schedule.map((item) => {
+        totalLec += item.lecHour;
+        totalLab += item.labHour;
         return [item.weekNo, item.topic, item.lecHour, item.labHour];
       });
 
       const tableTop = doc.y + 0.6;
       const tableLeft = 50;
       const columnWidth = [70, 300, 65, 65];
+      const lastRowColumns = [
+        { width: columnWidth[0] + columnWidth[1], offset: 0 },
+        {
+          width: columnWidth[2],
+          offset: columnWidth[0] + columnWidth[1],
+        },
+        {
+          width: columnWidth[3],
+          offset: columnWidth[0] + columnWidth[1] + columnWidth[2],
+        },
+      ];
 
       function calculateRowHeight(text, columnWidth) {
         const textHeight = doc.heightOfString(text, {
@@ -328,7 +346,7 @@ export const buildPart2Content = (
         return textHeight + 20;
       }
 
-      function drawRow(y, row, isHeader = false) {
+      function drawRow(y, row, isHeader = false, isLastRow = false) {
         let rowHeight = 0;
 
         row.forEach((cell, i) => {
@@ -344,6 +362,9 @@ export const buildPart2Content = (
         let heightSubHeader = 0;
 
         row.forEach((cell, i) => {
+          if (doc.y > 750) {
+            doc.addPage();
+          }
           if (isHeader && i > 1) {
             rowHeight = rowHeight / 2;
             if (i === 2) {
@@ -383,16 +404,24 @@ export const buildPart2Content = (
             heightSubHeader = rowHeight;
             rowHeight = rowHeight * 2;
           } else {
-            doc
-              .rect(
-                tableLeft +
-                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                  6.5,
-                y,
-                columnWidth[i],
-                rowHeight,
-              )
-              .stroke();
+            if (isLastRow) {
+              lastRowColumns.forEach(({ width, offset }) => {
+                doc
+                  .rect(tableLeft + offset + 6.5, y, width, rowHeight)
+                  .stroke();
+              });
+            } else {
+              doc
+                .rect(
+                  tableLeft +
+                    columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                    6.5,
+                  y,
+                  columnWidth[i],
+                  rowHeight,
+                )
+                .stroke();
+            }
           }
 
           doc.font(isHeader ? fontBold : fontNormal);
@@ -401,21 +430,38 @@ export const buildPart2Content = (
           const lineHeight = doc.heightOfString(lines[0]);
 
           lines.forEach((line, index) => {
-            doc.text(
-              line,
+            let textLeftPosition =
               tableLeft +
-                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                10 +
-                8,
-              y +
-                10 +
-                (isHeader && index * lineHeight) +
-                (isHeader && i > 1 && heightSubHeader - 5),
-              {
-                width: columnWidth[i] - 20,
-                align: isHeader ? 'center' : 'left',
-              },
-            );
+              columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+              10 +
+              8;
+
+            let textWidth = columnWidth[i] - 20;
+
+            if (isLastRow) {
+              lastRowColumns.forEach(({ width, offset }, i) => {
+                let textLeftPosition = tableLeft + offset + 10 + 8;
+                let textWidth = width - 20;
+
+                doc.text(row[i], textLeftPosition, y + 10, {
+                  width: textWidth,
+                  align: 'center',
+                });
+              });
+            } else {
+              doc.text(
+                line,
+                textLeftPosition,
+                y +
+                  10 +
+                  (isHeader && index * lineHeight) +
+                  (isHeader && i > 1 && heightSubHeader - 5),
+                {
+                  width: textWidth,
+                  align: isHeader || i > 1 ? 'center' : 'left',
+                },
+              );
+            }
           });
         });
 
@@ -429,9 +475,14 @@ export const buildPart2Content = (
       function drawTable() {
         let currentY = tableTop + 49;
         rows.forEach((row) => {
+          if (doc.y > 750) {
+            doc.addPage();
+            currentY = doc.y;
+          }
           const rowHeight = drawRow(currentY, row);
           currentY += rowHeight;
         });
+        drawRow(currentY, ['รวม', totalLec, totalLab], false, true);
       }
 
       drawHeaders();
