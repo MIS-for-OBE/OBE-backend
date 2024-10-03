@@ -11,19 +11,10 @@ import { Faculty, FacultySchema } from '../faculty/schemas/faculty.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      {
-        name: PLO.name,
-        schema: PLOSchema,
-      },
-      {
-        name: Faculty.name,
-        schema: FacultySchema,
-      },
+      { name: PLO.name, schema: PLOSchema },
+      { name: Faculty.name, schema: FacultySchema },
       { name: User.name, schema: UserSchema },
-      {
-        name: LogEvent.name,
-        schema: LogEventSchema,
-      },
+      { name: LogEvent.name, schema: LogEventSchema },
     ]),
   ],
   controllers: [PLOController],
