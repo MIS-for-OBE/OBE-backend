@@ -203,7 +203,6 @@ export class TQF3Service {
           ...data,
           ...this.populatePart4(tqf3),
         });
-        return filename;
         files.push(filename);
       }
       if (requestDTO.part5 !== undefined) {
