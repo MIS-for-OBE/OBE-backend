@@ -20,6 +20,7 @@ import {
   Part7TQF3,
 } from '../schemas/tqf3.schema';
 import { setupFonts } from './setUpPdf';
+import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 
 @Injectable()
 export class GeneratePdfBLL {
@@ -90,7 +91,8 @@ export class GeneratePdfBLL {
             buildPart7Content(
               doc,
               font,
-              data as CmuApiTqfCourseDTO & Part7TQF3,
+              data as CmuApiTqfCourseDTO &
+                Part7TQF3 & { ploList: (PLONo & { id: string })[] },
             );
             break;
         }

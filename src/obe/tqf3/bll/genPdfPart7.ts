@@ -1,5 +1,6 @@
 import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import { Part7TQF3 } from '../schemas/tqf3.schema';
+import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 
 export const buildPart7Content = (
   doc: PDFKit.PDFDocument,
@@ -8,7 +9,8 @@ export const buildPart7Content = (
     fontBold: string;
     emoji: string;
   },
-  data: CmuApiTqfCourseDTO & Part7TQF3,
+  data: CmuApiTqfCourseDTO &
+    Part7TQF3 & { ploList: (PLONo & { id: string })[] },
 ) => {
   const { fontNormal, fontBold, emoji } = font;
 
