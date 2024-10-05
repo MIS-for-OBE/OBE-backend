@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
-import { AcademicYear } from 'src/obe/academicYear/schemas/academicYear.schema';
 import { Section } from 'src/obe/section/schemas/section.schema';
 import { TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
 import { TQF5 } from 'src/obe/tqf5/schemas/tqf5.schema';
@@ -10,12 +9,11 @@ export type CourseDocument = HydratedDocument<Course>;
 
 @Schema()
 export class Course {
-  @Prop({
-    required: true,
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'AcademicYear',
-  })
-  academicYear: AcademicYear;
+  @Prop({ required: true })
+  year: Number;
+
+  @Prop({ required: true })
+  semester: Number;
 
   @Prop({ required: true })
   courseNo: String;
@@ -43,7 +41,7 @@ export class Course {
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course).index(
-  { academicYear: 1, courseNo: 1 },
+  { year: 1, semester: 1, courseNo: 1 },
   { unique: true },
 );
 

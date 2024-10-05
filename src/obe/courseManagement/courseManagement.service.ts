@@ -79,7 +79,8 @@ export class CourseManagementService {
       });
       const activeCourses = await this.courseModel
         .find({
-          academicYear: activeTerm.id,
+          year: activeTerm.year,
+          semester: activeTerm.semester,
           ...where,
         })
         .populate('sections');
@@ -187,7 +188,8 @@ export class CourseManagementService {
       }
       const updateCourse = await this.courseModel.findOneAndUpdate(
         {
-          academicYear: requestDTO.academicYear,
+          year: requestDTO.year,
+          semester: requestDTO.semester,
           courseNo: requestDTO.oldCourseNo,
         },
         requestDTO,
@@ -252,7 +254,8 @@ export class CourseManagementService {
       updateSection.type = updateCourse.type;
       let course: any = await this.courseModel
         .findOne({
-          academicYear: requestDTO.academicYear,
+          year: requestDTO.year,
+          semester: requestDTO.semester,
           courseNo: requestDTO.courseNo,
         })
         .populate('sections');
@@ -292,7 +295,8 @@ export class CourseManagementService {
           });
           await this.courseModel.findOneAndUpdate(
             {
-              academicYear: requestDTO.academicYear,
+              year: requestDTO.year,
+              semester: requestDTO.semester,
               courseNo: requestDTO.courseNo,
             },
             { $push: { sections: secId._id } },
@@ -309,7 +313,8 @@ export class CourseManagementService {
           ...requestDTO,
         });
         const data: any = {
-          academicYear: requestDTO.academicYear,
+          year: requestDTO.year,
+          semester: requestDTO.semester,
           courseNo: requestDTO.courseNo,
           courseName: updateCourse.courseName,
           type: updateCourse.type,
@@ -371,7 +376,8 @@ export class CourseManagementService {
       await updateCourse.save();
       let course = await this.courseModel
         .findOne({
-          academicYear: requestDTO.academicYear,
+          year: requestDTO.year,
+          semester: requestDTO.semester,
           courseNo: requestDTO.courseNo,
         })
         .populate('sections');
@@ -397,7 +403,8 @@ export class CourseManagementService {
           .sort([['sectionNo', 'asc']]),
         this.courseModel
           .findOne({
-            academicYear: requestDTO.academicYear,
+            year: requestDTO.year,
+            semester: requestDTO.semester,
             courseNo: requestDTO.courseNo,
           })
           .populate({
@@ -443,7 +450,8 @@ export class CourseManagementService {
         throw new NotFoundException('CourseManagement not found');
       }
       const deleteCourse = await this.courseModel.findOneAndDelete({
-        academicYear: requestDTO.academicYear,
+        year: requestDTO.year,
+        semester: requestDTO.semester,
         courseNo: requestDTO.courseNo,
       });
 
@@ -481,7 +489,8 @@ export class CourseManagementService {
       }
       const course: any = await this.courseModel
         .findOne({
-          academicYear: requestDTO.academicYear,
+          year: requestDTO.year,
+          semester: requestDTO.semester,
           courseNo: requestDTO.courseNo,
         })
         .populate('sections');

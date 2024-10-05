@@ -62,7 +62,8 @@ export class SectionService {
       if (oldTopic && newTopic && oldTopic !== newTopic) {
         const course = await this.courseModel
           .findOne({
-            academicYear: requestDTO.academicYear,
+            year: requestDTO.year,
+            semester: requestDTO.semester,
             courseNo: requestDTO.courseNo,
           })
           .select('sections');

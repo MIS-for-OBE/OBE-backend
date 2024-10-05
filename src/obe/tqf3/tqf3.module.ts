@@ -7,11 +7,13 @@ import { GeneratePdfBLL } from './bll/genPdf';
 import { PLO, PLOSchema } from '../plo/schemas/plo.schema';
 import { PLOService } from '../plo/plo.service';
 import { Faculty, FacultySchema } from '../faculty/schemas/faculty.schema';
+import { Course, CourseSchema } from '../course/schemas/course.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: TQF3.name, schema: TQF3Schema },
+      { name: Course.name, schema: CourseSchema },
       { name: PLO.name, schema: PLOSchema },
       { name: Faculty.name, schema: FacultySchema },
     ]),
