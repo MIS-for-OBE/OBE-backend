@@ -173,8 +173,6 @@ export const buildPart2Content = (
     doc.moveDown(0.75);
   }
 
-  console.log('before table :', doc.y);
-
   // Course Learning Outcomes: CLO
   {
     doc

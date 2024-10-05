@@ -41,7 +41,7 @@ export class CourseService {
     try {
       if (searchDTO.manage) {
         return await this.model
-          .find({ academicYear: searchDTO.academicYear })
+          .find({ year: searchDTO.year, semester: searchDTO.semester })
           .populate({
             path: 'sections',
             populate: [
@@ -63,7 +63,8 @@ export class CourseService {
           $or: [{ instructor: id }, { coInstructors: id }],
         });
         const where = {
-          academicYear: searchDTO.academicYear,
+          year: searchDTO.year,
+          semester: searchDTO.semester,
           sections: { $in: sections.map((section) => section.id) },
         };
         if (searchDTO.search.length) {
@@ -124,7 +125,8 @@ export class CourseService {
     try {
       const course = await this.model
         .findOne({
-          academicYear: searchDTO.academicYear,
+          year: searchDTO.year,
+          semester: searchDTO.semester,
           courseNo: searchDTO.courseNo,
         })
         .populate({
@@ -242,7 +244,8 @@ export class CourseService {
         }),
         this.model
           .findOne({
-            academicYear: requestDTO.academicYear,
+            year: requestDTO.year,
+            semester: requestDTO.semester,
             courseNo: requestDTO.courseNo,
           })
           .populate('sections'),
@@ -287,12 +290,14 @@ export class CourseService {
 
       if (existCourseManagement) {
         await existCourseManagement.updateOne({
-          updatedYear: requestDTO.updatedYear,
-          updatedSemester: requestDTO.updatedSemester,
+          updatedYear: requestDTO.year,
+          updatedSemester: requestDTO.semester,
           courseName: requestDTO.courseName,
           $push: { sections: requestDTO.sections },
         });
       } else {
+        requestDTO.updatedYear = requestDTO.year;
+        requestDTO.updatedSemester = requestDTO.semester;
         await this.courseManagementModel.create(requestDTO);
       }
 
@@ -320,7 +325,8 @@ export class CourseService {
           { new: true },
         );
         course = await this.model.findOne({
-          academicYear: requestDTO.academicYear,
+          year: requestDTO.year,
+          semester: requestDTO.semester,
           courseNo: requestDTO.courseNo,
         });
       } else {

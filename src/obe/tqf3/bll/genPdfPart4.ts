@@ -39,7 +39,6 @@ export const buildPart4Content = (
         evals.map((e) => e.percent + '%'),
       ];
     });
-    console.log(rows[3].map((e) => e));
 
     const tableTop = doc.y + 0.6;
     const tableLeft = 50;
@@ -54,11 +53,8 @@ export const buildPart4Content = (
 
     const subRowHeight: any[] = [];
     const cloHeight: any[] = [];
-    console.log(rows.length);
 
     for (let index = 0; index < rows.length; index++) {
-      console.log('index : ', index);
-
       const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
       cloHeight.push(maxHeightClo);
 
@@ -88,7 +84,6 @@ export const buildPart4Content = (
           eachRowHeight.push(h);
         }
       });
-      console.log('clo:', cloIndex + 1, eachRowHeight);
 
       let subTableY = y;
       data.map((row, i) => {
