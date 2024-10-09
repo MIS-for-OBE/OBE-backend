@@ -26,9 +26,9 @@ export class TQF3Controller {
 
   @Get('reuse')
   async getCourseReuseTQF3(
-    @Query() requestDTO: any,
+    @Query() searchDTO: any,
   ): Promise<ResponseDTO<any[]>> {
-    return this.service.getCourseReuseTQF3(requestDTO).then((result) => {
+    return this.service.getCourseReuseTQF3(searchDTO).then((result) => {
       const responseDTO = new ResponseDTO<any[]>();
       responseDTO.data = result;
       return responseDTO;
