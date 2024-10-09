@@ -71,7 +71,7 @@ export class CourseManagementService {
       }
       const courses = await this.model
         .find(where)
-        .sort([[searchDTO.orderBy, searchDTO.orderType]])
+        .sort({ [searchDTO.orderBy]: searchDTO.orderType })
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
       const activeTerm = await this.academicYearModel.findOne({
@@ -241,7 +241,7 @@ export class CourseManagementService {
           { arrayFilters: [{ 'sec._id': params.section }], new: true },
         )
         .select('-sections.isActive')
-        .sort([['sectionNo', 'asc']]);
+        .sort({ sectionNo: 'asc' });
       if (!updateCourse) {
         throw new NotFoundException('SectionManagement not found');
       }
@@ -397,7 +397,7 @@ export class CourseManagementService {
         this.model
           .findOne({ courseNo: requestDTO.courseNo })
           .select('-sections.isActive')
-          .sort([['sectionNo', 'asc']]),
+          .sort({ sectionNo: 'asc' }),
         this.courseModel
           .findOne({
             year: requestDTO.year,

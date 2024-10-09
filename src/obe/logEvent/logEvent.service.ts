@@ -20,7 +20,7 @@ export class LogEventService {
           'user',
           'firstNameTH lastNameTH firstNameEN lastNameEN email role',
         )
-        .sort([[searchDTO.orderBy, searchDTO.orderType]])
+        .sort({ [searchDTO.orderBy]: searchDTO.orderType })
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
       return res;

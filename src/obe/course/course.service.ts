@@ -55,7 +55,7 @@ export class CourseService {
           })
           .populate('TQF3', 'status')
           .populate('TQF5', 'status')
-          .sort([[searchDTO.orderBy, searchDTO.orderType]])
+          .sort({ [searchDTO.orderBy]: searchDTO.orderType })
           .skip((searchDTO.page - 1) * searchDTO.limit)
           .limit(searchDTO.limit);
       } else {
@@ -89,7 +89,7 @@ export class CourseService {
           })
           .populate('TQF3', 'status')
           .populate('TQF5', 'status')
-          .sort([[searchDTO.orderBy, searchDTO.orderType]])
+          .sort({ [searchDTO.orderBy]: searchDTO.orderType })
           .skip((searchDTO.page - 1) * searchDTO.limit)
           .limit(searchDTO.limit);
         const filterCourses = courses.map((course) => {

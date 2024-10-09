@@ -26,7 +26,7 @@ export class UserService {
     try {
       return await this.model
         .find({ role: { $ne: ROLE.STUDENT } })
-        .sort([['firstNameEN', 'asc']]);
+        .sort({ firstNameEN: 'asc' });
     } catch (error) {
       throw error;
     }

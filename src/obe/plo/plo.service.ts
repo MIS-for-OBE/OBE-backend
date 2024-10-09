@@ -32,10 +32,9 @@ export class PLOService {
       }
       const faculty = await this.facultyModel.findOne({ facultyCode });
       const totalCount = await this.model.countDocuments(where);
-      const data = await this.model.find(where).sort([
-        ['year', 'desc'],
-        ['semester', 'desc'],
-      ]);
+      const data = await this.model
+        .find(where)
+        .sort({ year: 'desc', semester: 'desc' });
       if (searchDTO.manage || searchDTO.all) {
         return { totalCount, plos: data };
       }
