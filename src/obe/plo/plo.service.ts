@@ -64,7 +64,7 @@ export class PLOService {
     }
   }
 
-  async searchOnePLO(facultyCode: string, searchDTO: any): Promise<PLO> {
+  async searchOnePLO(facultyCode: string, searchDTO: any): Promise<any> {
     try {
       const filter: any = {};
       if (searchDTO.name) {
@@ -79,10 +79,7 @@ export class PLOService {
         )?.codeEN;
       }
       const plo = await this.model.findOne(filter);
-      if (!plo) {
-        throw new NotFoundException('PLO Collection not found');
-      }
-      return plo;
+      return plo || {};
     } catch (error) {
       throw error;
     }

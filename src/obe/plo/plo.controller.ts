@@ -39,11 +39,11 @@ export class PLOController {
   async seachOnePLO(
     @Request() req,
     @Query() searchDTO: PLOSearchDTO,
-  ): Promise<ResponseDTO<PLO>> {
+  ): Promise<ResponseDTO<any>> {
     return this.service
       .searchOnePLO(req.user.facultyCode, searchDTO)
       .then((result) => {
-        const responseDTO = new ResponseDTO<PLO>();
+        const responseDTO = new ResponseDTO<any>();
         responseDTO.data = result;
         return responseDTO;
       });
