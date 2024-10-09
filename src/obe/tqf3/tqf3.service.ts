@@ -98,14 +98,22 @@ export class TQF3Service {
 
   async reuseTQF3(requestDTO: any): Promise<TQF3> {
     try {
-      const newTqf3 = (
-        await this.model.findById(requestDTO.reuseId)
-      ).toObject();
-      delete newTqf3._id;
-      const tqf3 = await this.model.findByIdAndUpdate(requestDTO.id, newTqf3, {
-        new: true,
-      });
-      return tqf3;
+      const [newTqf3] = await Promise.all([
+        await this.model.findById(requestDTO.reuseId),
+        this.model.findByIdAndUpdate(requestDTO.id, {
+          $unset: {
+            part1: 1,
+            part2: 1,
+            part3: 1,
+            part4: 1,
+            part5: 1,
+            part6: 1,
+            part7: 1,
+          },
+        }),
+      ]);
+      delete newTqf3.id;
+      return newTqf3;
     } catch (error) {
       throw error;
     }
@@ -122,6 +130,7 @@ export class TQF3Service {
       }
 
       if (params.part === 'part2') {
+        if (!tqf3Document.part2) tqf3Document.part2 = {} as any;
         tqf3Document.part2.teachingMethod = requestDTO.teachingMethod;
         tqf3Document.part2.evaluate = requestDTO.evaluate;
         tqf3Document.part2.schedule = requestDTO.schedule;
@@ -129,7 +138,6 @@ export class TQF3Service {
           const existingCloItem = tqf3Document.part2.clo.find(
             (clo: any) => clo.id == newCloItem.id,
           );
-
           if (existingCloItem) {
             existingCloItem.no = newCloItem.no;
             existingCloItem.descTH = newCloItem.descTH;
@@ -137,7 +145,9 @@ export class TQF3Service {
             existingCloItem.learningMethod = newCloItem.learningMethod;
             existingCloItem.other = newCloItem.other;
           } else {
-            tqf3Document.part2.clo.push(newCloItem);
+            const newItem = { ...newCloItem };
+            if (newCloItem.id) newItem._id = newCloItem.id;
+            tqf3Document.part2.clo.push(newItem);
             newCloItem.id = (
               tqf3Document.part2.clo[tqf3Document.part2.clo.length - 1] as any
             ).id;
@@ -185,6 +195,7 @@ export class TQF3Service {
           });
         }
       } else if (params.part === 'part3') {
+        if (!tqf3Document.part3) tqf3Document.part3 = {} as any;
         tqf3Document.part3.gradingPolicy = requestDTO.gradingPolicy;
         requestDTO.eval.forEach((newEvalItem) => {
           const existingEvalItem = tqf3Document.part3.eval.find(
@@ -197,7 +208,9 @@ export class TQF3Service {
             existingEvalItem.desc = newEvalItem.desc;
             existingEvalItem.percent = newEvalItem.percent;
           } else {
-            tqf3Document.part3.eval.push(newEvalItem);
+            const newItem = { ...newEvalItem };
+            if (newEvalItem.id) newItem._id = newEvalItem.id;
+            tqf3Document.part3.eval.push(newItem);
             newEvalItem.id = (
               tqf3Document.part3.eval[tqf3Document.part3.eval.length - 1] as any
             ).id;
