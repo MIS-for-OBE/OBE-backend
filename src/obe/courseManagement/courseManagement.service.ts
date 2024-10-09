@@ -71,6 +71,19 @@ export class CourseManagementService {
       }
       const courses = await this.model
         .find(where)
+        .populate({
+          path: 'sections',
+          populate: [
+            {
+              path: 'instructor',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+            {
+              path: 'coInstructors',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+          ],
+        })
         .sort({ [searchDTO.orderBy]: searchDTO.orderType })
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
