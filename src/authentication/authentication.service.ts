@@ -50,6 +50,7 @@ export class AuthenticationService {
       );
       return response.data.access_token;
     } catch (err) {
+      console.error('Error getting OAuth access token:', err);
       return null;
     }
   }
@@ -63,6 +64,7 @@ export class AuthenticationService {
       });
       return response.data;
     } catch (err) {
+      console.error('Error getting CMU basic info:', err);
       return null;
     }
   }
@@ -76,6 +78,7 @@ export class AuthenticationService {
       });
       return response.data;
     } catch (err) {
+      console.error('Error getting CMU student info:', err);
       return null;
     }
   }
@@ -89,6 +92,7 @@ export class AuthenticationService {
       });
       return response.data;
     } catch (err) {
+      console.error('Error getting CMU employee info:', err);
       return null;
     }
   }
@@ -96,25 +100,24 @@ export class AuthenticationService {
   private async generateJWTToken(user: UserDocument): Promise<TokenDTO> {
     const data = new TokenDTO();
     // build access token
-    let payload = {
+    let payload: Partial<UserDocument> = {
       id: user.id,
       email: user.email,
       firstNameEN: user.firstNameEN,
       lastNameEN: user.lastNameEN,
       role: user.role,
       facultyCode: user.facultyCode,
-    } as UserDocument;
-    if (user.studentId) {
-      payload.studentId = user.studentId;
-    }
+      ...(user.studentId && { studentId: user.studentId }),
+    };
 
     data.token = this.jwtService.sign(payload);
     return data;
   }
 
   async login(body: LoginDTO): Promise<TokenDTO> {
-    if (!body.code) throw new BadRequestException('Invalid authorization code');
-    else if (!body.redirectUri)
+    const { code, redirectUri } = body;
+    if (!code) throw new BadRequestException('Invalid authorization code');
+    else if (!redirectUri)
       throw new BadRequestException('Invalid redirect uri');
 
     //get access token
@@ -128,84 +131,82 @@ export class AuthenticationService {
     //get basic info
     const basicInfo = await this.getCMUBasicInfoAsync(accessToken);
     if (!basicInfo) throw new BadRequestException('Cannot get CMU basic info');
-    else if (
-      // for MISEmp engineering
-      basicInfo.itaccounttype_id == CMU_OAUTH_ROLE.MIS &&
-      basicInfo.organization_code != '06'
+    if (
+      ![CMU_OAUTH_ROLE.STUDENT, CMU_OAUTH_ROLE.MIS].includes(
+        basicInfo.itaccounttype_id,
+      ) ||
+      (basicInfo.itaccounttype_id == CMU_OAUTH_ROLE.MIS &&
+        basicInfo.organization_code != '06')
     )
       throw new ForbiddenException(
-        'Your CMU account was not permission for this website',
+        'Your CMU account does not have permission for this website',
       );
 
     basicInfo.firstname_EN = capitalize(basicInfo.firstname_EN);
     basicInfo.lastname_EN = capitalize(basicInfo.lastname_EN);
 
-    let user = await this.userModel.findOne({
-      email: basicInfo.cmuitaccount,
-    });
-    const data = {
+    let user = await this.userModel.findOne({ email: basicInfo.cmuitaccount });
+    const userData: Partial<User> = {
       firstNameTH: basicInfo.firstname_TH,
       lastNameTH: basicInfo.lastname_TH,
       firstNameEN: basicInfo.firstname_EN,
       lastNameEN: basicInfo.lastname_EN,
       email: basicInfo.cmuitaccount,
       facultyCode: basicInfo.organization_code,
-    } as User;
+    };
     if (!user) {
-      switch (basicInfo.itaccounttype_id) {
-        case CMU_OAUTH_ROLE.STUDENT:
-          const stdInfo = await this.getCMUStdInfoAsync(accessToken);
-          data.studentId = basicInfo.student_id;
-          data.role = ROLE.STUDENT;
-          data.departmentCode = await this.getDepartmentCode(
-            data.facultyCode,
-            stdInfo.department_name_TH,
-          );
-          break;
-        case CMU_OAUTH_ROLE.MIS:
-          data.role = ROLE.INSTRUCTOR;
-          break;
+      userData.role = this.assignRole(basicInfo);
+      if (basicInfo.itaccounttype_id == CMU_OAUTH_ROLE.STUDENT) {
+        this.updateUserDepartment(userData, basicInfo, accessToken);
       }
-      if (
-        [
-          'thanaporn_chan',
-          'sawit_cha',
-          'worapitcha_muangyot',
-          'dome.potikanond',
-        ].includes(basicInfo.cmuitaccount_name)
-      ) {
-        data.role = ROLE.SUPREME_ADMIN;
-      }
-      user = await this.userModel.create(data);
+      user = await this.userModel.create(userData);
     } else if (!user.departmentCode?.length) {
       if (user.studentId) {
-        const stdInfo = await this.getCMUStdInfoAsync(accessToken);
-        const role = [
-          'thanaporn_chan',
-          'sawit_cha',
-          'worapitcha_muangyot',
-        ].includes(basicInfo.cmuitaccount_name)
-          ? ROLE.SUPREME_ADMIN
-          : ROLE.STUDENT;
-        const departmentCode = await this.getDepartmentCode(
-          data.facultyCode,
-          stdInfo.department_name_TH,
-        );
-        await user.updateOne({
-          ...data,
-          departmentCode,
-          role,
-        });
-      } else {
-        await user.updateOne({ ...data });
+        this.updateUserDepartment(userData, basicInfo, accessToken);
       }
-      user = await this.userModel.findById(user.id);
+      user = await user.updateOne({ ...userData }, { new: true });
     }
 
     //create session
     const dataRs = await this.generateJWTToken(user);
     dataRs.user = user;
     return dataRs;
+  }
+
+  private assignRole(basicInfo: CmuOAuthBasicInfoDTO): ROLE {
+    if (this.isSupremeAdmin(basicInfo.cmuitaccount_name))
+      return ROLE.SUPREME_ADMIN;
+    switch (basicInfo.itaccounttype_id) {
+      case CMU_OAUTH_ROLE.STUDENT:
+        return ROLE.STUDENT;
+      case CMU_OAUTH_ROLE.MIS:
+        return ROLE.INSTRUCTOR;
+    }
+  }
+
+  private isSupremeAdmin(username: string): boolean {
+    return [
+      'thanaporn_chan',
+      'sawit_cha',
+      'worapitcha_muangyot',
+      'dome.potikanond',
+    ].includes(username);
+  }
+
+  private async updateUserDepartment(
+    user: Partial<User>,
+    basicInfo: CmuOAuthBasicInfoDTO,
+    accessToken: string,
+  ) {
+    const stdInfo = await this.getCMUStdInfoAsync(accessToken);
+    user.studentId = basicInfo.student_id;
+    user.role = this.isSupremeAdmin(basicInfo.cmuitaccount_name)
+      ? ROLE.SUPREME_ADMIN
+      : ROLE.STUDENT;
+    user.departmentCode = await this.getDepartmentCode(
+      user.facultyCode,
+      stdInfo.department_name_TH,
+    );
   }
 
   private async getDepartmentCode(facultyCode: string, departmentTH: string) {

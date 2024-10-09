@@ -23,10 +23,62 @@ export class TQF3Service {
     private readonly generatePdfBLL: GeneratePdfBLL,
   ) {}
 
-  async getCourseReuseTQF3(requestDTO: any): Promise<any[]> {
+  async getCourseReuseTQF3(searchDTO: any): Promise<any[]> {
     try {
-      const courseList = await this.courseModel.find({});
-      return courseList;
+      const year = parseInt(searchDTO.year);
+      const semester = parseInt(searchDTO.semester);
+      if (![1, 2, 3].includes(semester)) {
+        throw new Error('Invalid semester provided');
+      }
+      const termsToInclude: { year: number; semester: number }[] = [];
+      switch (semester) {
+        case 1:
+          termsToInclude.push(
+            { year: year - 1, semester: 3 },
+            { year: year - 1, semester: 2 },
+            { year: year - 1, semester: 1 },
+          );
+          break;
+        case 2:
+          termsToInclude.push(
+            { year: year, semester: 1 },
+            { year: year - 1, semester: 3 },
+            { year: year - 1, semester: 2 },
+          );
+          break;
+        case 3:
+          termsToInclude.push(
+            { year: year, semester: 2 },
+            { year: year, semester: 1 },
+            { year: year - 1, semester: 3 },
+          );
+          break;
+      }
+      let courseList = await this.courseModel
+        .find({ $or: termsToInclude })
+        .select(['year', 'semester', 'courseNo', 'type', 'TQF3', 'sections'])
+        .sort({ year: 'desc', semester: 'desc' })
+        .populate({
+          path: 'sections',
+          select: 'topic TQF3',
+          populate: [{ path: 'TQF3', select: 'status' }],
+        })
+        .populate('TQF3', 'status');
+      courseList = courseList.filter(({ TQF3, sections }) => {
+        sections = sections.filter((sec) => sec.TQF3?.status == TQF_STATUS.DONE);
+        return (
+          TQF3?.status == TQF_STATUS.DONE ||
+          sections.find((sec) => sec.TQF3?.status == TQF_STATUS.DONE)
+        );
+      });
+      const uniqueCoursesMap = new Map<String, any>();
+      for (const course of courseList) {
+        if (!uniqueCoursesMap.has(course.courseNo)) {
+          uniqueCoursesMap.set(course.courseNo, course);
+        }
+      }
+      const uniqueCourseList = Array.from(uniqueCoursesMap.values());
+      return uniqueCourseList;
     } catch (error) {
       throw error;
     }

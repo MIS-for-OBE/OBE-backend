@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { BaseDTO } from 'src/common/dto/base.dto';
+import { CMU_OAUTH_ROLE } from 'src/common/enum/role.enum';
 import { User } from 'src/obe/user/schemas/user.schema';
 
 export class LoginDTO extends BaseDTO {
@@ -64,7 +65,7 @@ export class CmuOAuthBasicInfoDTO extends BaseDTO {
   organization_name_EN: string;
 
   @IsString()
-  itaccounttype_id: string;
+  itaccounttype_id: CMU_OAUTH_ROLE;
 
   @IsString()
   itaccounttype_TH: string;
