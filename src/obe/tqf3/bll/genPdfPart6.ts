@@ -170,6 +170,8 @@ export const buildPart6Content = (
           data.data[index].detail.includes(e.label),
         );
 
+        doc.x += 10.5;
+
         doc.font(emoji).text(checkboxSymbol, doc.x, doc.y);
 
         doc.font(fontNormal).text(e.labelTH, doc.x + 15, doc.y - 15.3, {
@@ -177,6 +179,8 @@ export const buildPart6Content = (
           lineGap: index === 3 && eIndex === 1 ? 6 : 0,
           continued: false,
         });
+
+        doc.x -= 10.5;
 
         doc.x -= 15;
 
