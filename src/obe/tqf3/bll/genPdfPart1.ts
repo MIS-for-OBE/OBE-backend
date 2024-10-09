@@ -74,9 +74,13 @@ export const buildPart1Content = (
       .moveDown(0.6);
 
     // 4.
-    doc.font(fontBold).text('4. หน่วยกิต', labelX, doc.y, { continued: true });
-    doc.x = column2 + 29 + 22;
-    doc.font(fontNormal).text(`${data.Credit}`).moveDown(0.6);
+    if (data.Credit) {
+      doc
+        .font(fontBold)
+        .text('4. หน่วยกิต', labelX, doc.y, { continued: true });
+      doc.x = column2 + 29 + 22;
+      doc.font(fontNormal).text(`${data.Credit}`).moveDown(0.6);
+    }
   }
 
   // Section: หมวดที่ 1 ข้อมูลทั่วไป

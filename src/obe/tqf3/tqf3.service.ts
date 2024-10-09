@@ -13,12 +13,14 @@ import {
 import { GeneratePdfBLL } from './bll/genPdf';
 import { PLOService } from '../plo/plo.service';
 import { Course } from '../course/schemas/course.schema';
+import { Faculty } from '../faculty/schemas/faculty.schema';
 
 @Injectable()
 export class TQF3Service {
   constructor(
     @InjectModel(TQF3.name) private readonly model: Model<TQF3>,
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
+    @InjectModel(Faculty.name) private readonly facultyModel: Model<Faculty>,
     private readonly ploService: PLOService,
     private readonly generatePdfBLL: GeneratePdfBLL,
   ) {}
@@ -65,7 +67,9 @@ export class TQF3Service {
         })
         .populate('TQF3', 'status');
       courseList = courseList.filter(({ TQF3, sections }) => {
-        sections = sections.filter((sec) => sec.TQF3?.status == TQF_STATUS.DONE);
+        sections = sections.filter(
+          (sec) => sec.TQF3?.status == TQF_STATUS.DONE,
+        );
         return (
           TQF3?.status == TQF_STATUS.DONE ||
           sections.find((sec) => sec.TQF3?.status == TQF_STATUS.DONE)
@@ -225,6 +229,30 @@ export class TQF3Service {
       );
       let data: CmuApiTqfCourseDTO = courseInfo.data[0];
       data = { ...data, ...requestDTO };
+      if (!data.CourseID) {
+        const [course, faculty] = await Promise.all([
+          this.courseModel.findOne({
+            year: requestDTO.academicYear,
+            semester: requestDTO.academicTerm,
+            courseNo: requestDTO.courseNo,
+          }),
+          this.facultyModel.findOne({ facultyCode: facultyCode }),
+        ]);
+        const department = faculty.department.find(
+          ({ courseCode }) =>
+            courseCode == parseInt(course.courseNo.slice(0, 3)),
+        );
+        data.AcademicYear = course.year.toString();
+        data.AcademicTerm = course.semester;
+        data.CourseID = course.courseNo;
+        data.CourseTitleTha = course.courseName;
+        data.CourseTitleEng = course.courseName;
+        data.FacultyID = facultyCode;
+        data.FacultyNameTha = faculty.facultyTH;
+        data.CourseCodeTha = department.codeTH;
+        data.CourseCodeEng = department.codeEN;
+      }
+
       const tqf3: any = await this.model.findById(requestDTO.tqf3);
 
       const date = moment().format('DD-MM-YYYY');

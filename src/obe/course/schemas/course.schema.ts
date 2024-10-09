@@ -10,16 +10,16 @@ export type CourseDocument = HydratedDocument<Course>;
 @Schema()
 export class Course {
   @Prop({ required: true })
-  year: Number;
+  year: number;
 
   @Prop({ required: true })
-  semester: Number;
+  semester: number;
 
   @Prop({ required: true })
-  courseNo: String;
+  courseNo: string;
 
   @Prop({ required: true })
-  courseName: String;
+  courseName: string;
 
   @Prop({ required: true, enum: COURSE_TYPE })
   type: COURSE_TYPE;
