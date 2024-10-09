@@ -143,7 +143,10 @@ export class TQF3Service {
       }
 
       tqf3Document.status =
-        params.part === 'part7' ? TQF_STATUS.DONE : TQF_STATUS.IN_PROGRESS;
+        (tqf3Document.part7 || params.part === 'part7') &&
+        !requestDTO.inProgress
+          ? TQF_STATUS.DONE
+          : TQF_STATUS.IN_PROGRESS;
 
       await tqf3Document.save({ validateModifiedOnly: true });
 
