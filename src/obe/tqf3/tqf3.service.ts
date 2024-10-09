@@ -58,7 +58,15 @@ export class TQF3Service {
       }
       let courseList = await this.courseModel
         .find({ $or: termsToInclude })
-        .select(['year', 'semester', 'courseNo', 'type', 'TQF3', 'sections'])
+        .select([
+          'year',
+          'semester',
+          'courseNo',
+          'courseName',
+          'type',
+          'TQF3',
+          'sections',
+        ])
         .sort({ year: 'desc', semester: 'desc' })
         .populate({
           path: 'sections',
@@ -90,8 +98,14 @@ export class TQF3Service {
 
   async reuseTQF3(requestDTO: any): Promise<TQF3> {
     try {
-      // const courseList = await this.courseModel.find();
-      return;
+      const newTqf3 = (
+        await this.model.findById(requestDTO.reuseId)
+      ).toObject();
+      delete newTqf3._id;
+      const tqf3 = await this.model.findByIdAndUpdate(requestDTO.id, newTqf3, {
+        new: true,
+      });
+      return tqf3;
     } catch (error) {
       throw error;
     }
@@ -303,7 +317,7 @@ export class TQF3Service {
         files.push(filename);
       }
 
-      if (files.length > 0) {
+      if (files.length > 1) {
         const fileAllParts = await this.generatePdfBLL.mergePdfs(
           files,
           `TQF3_All_Parts_${date}.pdf`,
