@@ -109,16 +109,13 @@ export class CourseManagementService {
     }
   }
 
-  async searchOneCourseManagement(searchDTO: any): Promise<CourseManagement> {
+  async searchOneCourseManagement(searchDTO: any): Promise<any> {
     try {
       const course = await this.model.findOne({
         courseNo: searchDTO.courseNo,
       });
-      if (!course) {
-        throw new NotFoundException('Course not found');
-      }
-      course.sections.sort((a, b) => a.sectionNo - b.sectionNo);
-      return course;
+      course?.sections.sort((a, b) => a.sectionNo - b.sectionNo);
+      return course || {};
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

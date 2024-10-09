@@ -13,7 +13,10 @@ import {
 } from '@nestjs/common';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { CourseManagementService } from './courseManagement.service';
-import { CourseManagement, CourseManagementDocument } from './schemas/courseManagement.schema';
+import {
+  CourseManagement,
+  CourseManagementDocument,
+} from './schemas/courseManagement.schema';
 
 @Controller('/courseManagement')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -38,9 +41,9 @@ export class CourseManagementController {
   async searchOneCourseManagement(
     @Request() req,
     @Query() searchDTO: any,
-  ): Promise<ResponseDTO<CourseManagement>> {
+  ): Promise<ResponseDTO<any>> {
     return this.service.searchOneCourseManagement(searchDTO).then((result) => {
-      const responseDTO = new ResponseDTO<CourseManagement>();
+      const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
     });
