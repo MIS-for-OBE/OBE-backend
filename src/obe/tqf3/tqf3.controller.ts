@@ -24,6 +24,26 @@ import { join } from 'path';
 export class TQF3Controller {
   constructor(private service: TQF3Service) {}
 
+  @Get('reuse')
+  async getCourseReuseTQF3(
+    @Query() requestDTO: any,
+  ): Promise<ResponseDTO<any[]>> {
+    return this.service.getCourseReuseTQF3(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<any[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Put('reuse')
+  async reuseTQF3(@Body() requestDTO: any): Promise<ResponseDTO<TQF3>> {
+    return this.service.reuseTQF3(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<TQF3>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Put('/:id/:part')
   async updateCourse(
     @Param() params: { id: string; part: string },

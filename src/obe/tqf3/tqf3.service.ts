@@ -12,53 +12,30 @@ import {
 } from 'src/common/cmu-api/cmu-api.dto';
 import { GeneratePdfBLL } from './bll/genPdf';
 import { PLOService } from '../plo/plo.service';
+import { Course } from '../course/schemas/course.schema';
 
 @Injectable()
 export class TQF3Service {
   constructor(
     @InjectModel(TQF3.name) private readonly model: Model<TQF3>,
+    @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     private readonly ploService: PLOService,
     private readonly generatePdfBLL: GeneratePdfBLL,
   ) {}
 
-  private populatePart4(tqf3: TQF3) {
+  async getCourseReuseTQF3(requestDTO: any): Promise<any[]> {
     try {
-      const part4 = tqf3.part4.data.map((item) => {
-        const evals = [];
-        item.evals.forEach((evalItem) => {
-          evals.push({
-            eval: tqf3.part3.eval.find(
-              (e: any) => e._id.toString() === evalItem.eval.toString(),
-            ),
-            evalWeek: evalItem.evalWeek,
-            percent: evalItem.percent,
-          });
-        });
-        return {
-          clo: tqf3.part2.clo.find(
-            (clo: any) => clo._id.toString() === item.clo.toString(),
-          ),
-          evals,
-          percent: item.percent,
-        };
-      });
-      return { data: part4 };
+      const courseList = await this.courseModel.find({});
+      return courseList;
     } catch (error) {
       throw error;
     }
   }
 
-  private populatePart7(tqf3: TQF3) {
+  async reuseTQF3(requestDTO: any): Promise<TQF3> {
     try {
-      const part7 = tqf3.part7.data.map((item) => {
-        return {
-          clo: tqf3.part2.clo.find(
-            (clo: any) => clo._id.toString() === item.clo.toString(),
-          ),
-          plos: item.plos,
-        };
-      });
-      return { data: part7 };
+      // const courseList = await this.courseModel.find();
+      return;
     } catch (error) {
       throw error;
     }
@@ -240,24 +217,59 @@ export class TQF3Service {
         });
         files.push(filename);
       }
-      if (requestDTO.part7 !== undefined) {
-        const ploList = await this.ploService.searchOnePLO(
-          data.FacultyID || facultyCode,
-          {
-            year: requestDTO.academicYear,
-            semester: requestDTO.academicTerm,
-            courseCode: requestDTO.courseNo.slice(0, -3),
-          },
+
+      if (files.length > 0) {
+        const fileAllParts = await this.generatePdfBLL.mergePdfs(
+          files,
+          `TQF3_All_Parts_${date}.pdf`,
         );
-        const filename = await this.generatePdfBLL.generatePdf(7, date, {
-          ...data,
-          ...this.populatePart7(tqf3),
-          ploList: { ...ploList.data },
-        });
-        files.push(filename);
+        files.push(fileAllParts);
       }
 
       return files;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private populatePart4(tqf3: TQF3) {
+    try {
+      const part4 = tqf3.part4.data.map((item) => {
+        const evals = [];
+        item.evals.forEach((evalItem) => {
+          evals.push({
+            eval: tqf3.part3.eval.find(
+              (e: any) => e._id.toString() === evalItem.eval.toString(),
+            ),
+            evalWeek: evalItem.evalWeek,
+            percent: evalItem.percent,
+          });
+        });
+        return {
+          clo: tqf3.part2.clo.find(
+            (clo: any) => clo._id.toString() === item.clo.toString(),
+          ),
+          evals,
+          percent: item.percent,
+        };
+      });
+      return { data: part4 };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private populatePart7(tqf3: TQF3) {
+    try {
+      const part7 = tqf3.part7.data.map((item) => {
+        return {
+          clo: tqf3.part2.clo.find(
+            (clo: any) => clo._id.toString() === item.clo.toString(),
+          ),
+          plos: item.plos,
+        };
+      });
+      return { data: part7 };
     } catch (error) {
       throw error;
     }
