@@ -35,6 +35,9 @@ export class CmuApiTqfCourseDTO extends BaseDTO {
   CourseTemplateID: string;
   FacultyID: string;
   FacultyNameTha: string;
+  FacultyNameEng: string;
+  DepartmentNameTha: string;
+  DepartmentNameEng: string;
   AcademicYear: string;
   AcademicTerm: number;
   CourseID: string;

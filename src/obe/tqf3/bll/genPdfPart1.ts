@@ -43,12 +43,12 @@ export const buildPart1Content = (
     doc.x = column2 + 29; // Move to second column for the value
     doc
       .font(fontNormal)
-      .text(`${data.FacultyNameTha}/ภาควิชาวิศวกรรมคอมพิวเตอร์`)
+      .text(`${data.FacultyNameTha}/ภาควิชา${data.DepartmentNameTha}`)
       .moveDown(0.6);
     doc.x = labelX + column2 + 29 + 12;
     doc
       .font(fontNormal)
-      .text('Faculty of Engineering / Department Computer Engineering')
+      .text(`${data.FacultyNameEng} / Department ${data.DepartmentNameEng}`)
       .moveDown(0.6);
 
     // 3.

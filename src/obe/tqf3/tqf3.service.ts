@@ -229,19 +229,21 @@ export class TQF3Service {
       );
       let data: CmuApiTqfCourseDTO = courseInfo.data[0];
       data = { ...data, ...requestDTO };
+      const [course, faculty] = await Promise.all([
+        this.courseModel.findOne({
+          year: requestDTO.academicYear,
+          semester: requestDTO.academicTerm,
+          courseNo: requestDTO.courseNo,
+        }),
+        this.facultyModel.findOne({ facultyCode: facultyCode }),
+      ]);
+      const department = faculty.department.find(
+        ({ courseCode }) => courseCode == parseInt(course.courseNo.slice(0, 3)),
+      );
+      data.FacultyNameEng = faculty.facultyEN;
+      data.DepartmentNameTha = department?.departmentTH;
+      data.DepartmentNameEng = department?.departmentEN;
       if (!data.CourseID) {
-        const [course, faculty] = await Promise.all([
-          this.courseModel.findOne({
-            year: requestDTO.academicYear,
-            semester: requestDTO.academicTerm,
-            courseNo: requestDTO.courseNo,
-          }),
-          this.facultyModel.findOne({ facultyCode: facultyCode }),
-        ]);
-        const department = faculty.department.find(
-          ({ courseCode }) =>
-            courseCode == parseInt(course.courseNo.slice(0, 3)),
-        );
         data.AcademicYear = course.year.toString();
         data.AcademicTerm = course.semester;
         data.CourseID = course.courseNo;
