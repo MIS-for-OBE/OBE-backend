@@ -91,7 +91,10 @@ export class TQF3Controller {
       archive.pipe(res);
       files.forEach((file) => {
         const filePath = join(process.cwd(), file);
-        archive.file(filePath, { name: file });
+        const stats = fs.statSync(filePath);
+        const bangkokOffset = 7 * 60 * 60 * 1000;
+        const modifiedDate = new Date(stats.mtime.getTime() + bangkokOffset);
+        archive.file(filePath, { name: file, date: modifiedDate });
       });
       await archive.finalize();
     } catch (error) {
