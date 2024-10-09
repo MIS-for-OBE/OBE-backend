@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as PDFDocument from 'pdfkit';
+import { PDFDocument as PDFLibDocument } from 'pdf-lib';
 import { join } from 'path';
 import { buildPart1Content } from './genPdfPart1';
 import { buildPart2Content } from './genPdfPart2';
@@ -25,6 +26,7 @@ import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 @Injectable()
 export class GeneratePdfBLL {
   constructor() {}
+
   async generatePdf(
     part: number,
     date: string,
@@ -104,5 +106,26 @@ export class GeneratePdfBLL {
         reject(error);
       }
     });
+  }
+
+  async mergePdfs(files: string[], outputFilename: string): Promise<string> {
+    const pdfDoc = await PDFLibDocument.create();
+
+    for (const file of files) {
+      const filePath = join(process.cwd(), file);
+      const existingPdfBytes = fs.readFileSync(filePath);
+      const existingPdf = await PDFLibDocument.load(existingPdfBytes);
+      const copiedPages = await pdfDoc.copyPages(
+        existingPdf,
+        existingPdf.getPageIndices(),
+      );
+      copiedPages.forEach((page) => pdfDoc.addPage(page));
+    }
+
+    const pdfBytes = await pdfDoc.save();
+    const outputPath = join(process.cwd(), outputFilename);
+    fs.writeFileSync(outputPath, pdfBytes);
+
+    return outputFilename;
   }
 }
