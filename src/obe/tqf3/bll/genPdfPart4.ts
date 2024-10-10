@@ -42,7 +42,7 @@ export const buildPart4Content = (
 
     const tableTop = doc.y + 0.6;
     const tableLeft = 50;
-    const columnWidth = [160, 190, 70, 70];
+    const columnWidth = [170, 190, 70, 70];
 
     function calculateRowHeight(text, columnWidth) {
       const textHeight = doc.heightOfString(text, {
@@ -71,11 +71,18 @@ export const buildPart4Content = (
           rows[index][3][i],
           columnWidth[3],
         );
+        let lastRow = 0;
+        lastRow += rows[index][1].length;
 
         const maxHeight = Math.max(col1Height, col2Height, col3Height);
-        subRowHeight.push({ clo: index, height: maxHeight });
+        subRowHeight.push({
+          clo: index,
+          height: maxHeight + (index === lastRow && 20),
+        });
       }
     }
+
+    const rowCLO: number[] = [];
 
     function drawSubTable(x, y, data, subTableWidth, col, cloIndex) {
       const eachRowHeight: any[] = [];
@@ -100,6 +107,8 @@ export const buildPart4Content = (
         } else if (cloHeight[cloIndex] <= sumOfCellRow) {
           subCellHeight = eachRowHeight[i].height;
         }
+
+        rowCLO.push(subCellHeight);
 
         doc.rect(x, subTableY, subTableWidth, subCellHeight).stroke();
 
@@ -138,6 +147,7 @@ export const buildPart4Content = (
             rowHeight = cellHeight;
           }
         }
+        rowCLO.push(rowHeight);
       });
 
       row.forEach((cell, i) => {
@@ -181,10 +191,14 @@ export const buildPart4Content = (
 
     function drawTable() {
       let currentY = tableTop + 63;
+      let temp = 0;
       rows.forEach((row, cloIndex) => {
-        if (doc.y > 750) {
+        temp += rowCLO[cloIndex];
+
+        if (temp > 200) {
           doc.addPage();
           currentY = doc.y;
+          temp = doc.y;
         }
         const rowHeight = drawRow(currentY, row, false, cloIndex);
         currentY += rowHeight;

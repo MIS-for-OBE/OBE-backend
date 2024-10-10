@@ -273,7 +273,7 @@ export const buildPart2Content = (
         let totalTableHeight = 0;
 
         rows.forEach((row) => {
-          if (doc.y > 700) {
+          if (doc.y > 730) {
             doc.addPage();
             currentY = doc.y;
           }
@@ -292,8 +292,6 @@ export const buildPart2Content = (
       doc.y -= 10;
     }
   }
-
-  doc.addPage();
 
   // Course content
   {
@@ -471,7 +469,7 @@ export const buildPart2Content = (
       function drawTable() {
         let currentY = tableTop + 49;
         rows.forEach((row) => {
-          if (doc.y > 700) {
+          if (doc.y > 730) {
             doc.addPage();
             currentY = doc.y;
           }

@@ -170,7 +170,7 @@ export const buildPart3Content = (
       function drawTable() {
         let currentY = tableTop + 63;
         rows.forEach((row) => {
-          if (doc.y > 750) {
+          if (doc.y > 730) {
             doc.addPage();
             currentY = doc.y;
           }
