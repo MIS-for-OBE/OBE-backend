@@ -45,7 +45,7 @@ export class Assignment {
   desc: string;
 
   @Prop({ default: false })
-  isPublish: string;
+  isPublish: boolean;
 
   @Prop({ required: true })
   weight: number;
@@ -73,7 +73,7 @@ export class Section {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   coInstructors: User[];
 
-  @Prop({ type: [AssignmentSchema], _id: false })
+  @Prop({ type: [AssignmentSchema], _id: false, required: false })
   assignments: Assignment[];
 
   @Prop()
