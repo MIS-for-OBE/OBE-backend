@@ -1,5 +1,7 @@
 import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import { Part4TQF3 } from '../schemas/tqf3.schema';
+import { height } from 'pdfkit/js/page';
+import { log } from 'console';
 
 export const buildPart4Content = (
   doc: PDFKit.PDFDocument,
@@ -52,37 +54,191 @@ export const buildPart4Content = (
     }
 
     const subRowHeight: any[] = [];
+
+    const addPageIndex: any[] = [];
+
+    const evalRow: any[] = [];
     const cloHeight: any[] = [];
 
-    for (let index = 0; index < rows.length; index++) {
-      const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
-      cloHeight.push(maxHeightClo);
+    let temp = 600;
+    let newTable = 0;
 
-      for (let i = 0; i < rows[index][1].length; i++) {
-        const col1Height = calculateRowHeight(
-          rows[index][1][i],
-          columnWidth[1],
-        );
-        const col2Height = calculateRowHeight(
-          rows[index][2][i],
-          columnWidth[2],
-        );
-        const col3Height = calculateRowHeight(
-          rows[index][3][i],
-          columnWidth[3],
-        );
-        let lastRow = 0;
-        lastRow += rows[index][1].length;
+    //calculate eachEvalRowHeight
+    {
+      for (let index = 0; index < rows.length; index++) {
+        const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
+        cloHeight.push(maxHeightClo);
 
-        const maxHeight = Math.max(col1Height, col2Height, col3Height);
-        subRowHeight.push({
-          clo: index,
-          height: maxHeight + (index === lastRow && 20),
-        });
+        for (let i = 0; i < rows[index][1].length; i++) {
+          const col1Height = calculateRowHeight(
+            rows[index][1][i],
+            columnWidth[1],
+          );
+          const col2Height = calculateRowHeight(
+            rows[index][2][i],
+            columnWidth[2],
+          );
+          const col3Height = calculateRowHeight(
+            rows[index][3][i],
+            columnWidth[3],
+          );
+          let lastRow = 0;
+          lastRow += rows[index][1].length;
+
+          const maxHeight = Math.max(col1Height, col2Height, col3Height);
+          subRowHeight.push({
+            clo: index,
+            height: maxHeight,
+          });
+        }
       }
+
+      rows.forEach((row, cloIndex) => {
+        row.forEach((cell, index) => {
+          const eachRowHeight: any[] = [];
+          subRowHeight.forEach((h) => {
+            if (h.clo === cloIndex) {
+              eachRowHeight.push(h);
+            }
+          });
+
+          if (index === 1 && Array.isArray(cell)) {
+            cell.forEach((_, i) => {
+              let subCellHeight = 0;
+              let sumOfCellRow = 0;
+              subRowHeight.forEach((sum) => {
+                if (sum.clo === cloIndex) {
+                  sumOfCellRow += sum.height;
+                }
+              });
+
+              if (cloHeight[cloIndex] > sumOfCellRow) {
+                subCellHeight = cloHeight[cloIndex] / cell.length;
+              } else if (cloHeight[cloIndex] <= sumOfCellRow) {
+                subCellHeight = eachRowHeight[i].height;
+              }
+
+              evalRow.push({
+                clo: row[0],
+                cloIndex: `${cloIndex}`,
+                order: i,
+                height: subCellHeight,
+              });
+            });
+          }
+        });
+      });
     }
 
-    const rowCLO: number[] = [];
+    evalRow.forEach((e) => {
+      if (e && typeof e.height === 'number') {
+        newTable += e.height;
+
+        if (newTable > temp) {
+          const indexToPop = rows.findIndex((row) => row[0] === e.clo);
+          let pageIndex = Number(e.cloIndex) + (e.order !== 0 && 1);
+          addPageIndex.push(pageIndex);
+          console.log('pageIndex', pageIndex);
+
+          if (indexToPop !== -1) {
+            const poppedItem = rows.splice(indexToPop, 1)[0];
+            console.log('Popped Item:', poppedItem);
+
+            if (e.order !== 0) {
+              const newInstances = [
+                [
+                  poppedItem[0],
+                  poppedItem[1].slice(0, e.order),
+                  poppedItem[2].slice(0, e.order),
+                  poppedItem[3].slice(0, e.order),
+                ],
+                [
+                  ' ',
+                  poppedItem[1].slice(e.order),
+                  poppedItem[2].slice(e.order),
+                  poppedItem[3].slice(e.order),
+                ],
+              ];
+
+              rows.splice(indexToPop, 0, ...newInstances);
+            }
+          } else {
+            console.log('No item to pop');
+          }
+
+          newTable = 0;
+          temp = 750;
+        }
+      }
+    });
+    console.log(rows);
+
+    //calculate eachEvalRowHeight
+    {
+      for (let index = 0; index < rows.length; index++) {
+        const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
+        cloHeight.push(maxHeightClo);
+
+        for (let i = 0; i < rows[index][1].length; i++) {
+          const col1Height = calculateRowHeight(
+            rows[index][1][i],
+            columnWidth[1],
+          );
+          const col2Height = calculateRowHeight(
+            rows[index][2][i],
+            columnWidth[2],
+          );
+          const col3Height = calculateRowHeight(
+            rows[index][3][i],
+            columnWidth[3],
+          );
+          let lastRow = 0;
+          lastRow += rows[index][1].length;
+
+          const maxHeight = Math.max(col1Height, col2Height, col3Height);
+          subRowHeight.push({
+            clo: index,
+            height: maxHeight,
+          });
+        }
+      }
+
+      rows.forEach((row, cloIndex) => {
+        row.forEach((cell, index) => {
+          const eachRowHeight: any[] = [];
+          subRowHeight.forEach((h) => {
+            if (h.clo === cloIndex) {
+              eachRowHeight.push(h);
+            }
+          });
+
+          if (index === 1 && Array.isArray(cell)) {
+            cell.forEach((_, i) => {
+              let subCellHeight = 0;
+              let sumOfCellRow = 0;
+              subRowHeight.forEach((sum) => {
+                if (sum.clo === cloIndex) {
+                  sumOfCellRow += sum.height;
+                }
+              });
+
+              if (cloHeight[cloIndex] > sumOfCellRow) {
+                subCellHeight = cloHeight[cloIndex] / cell.length;
+              } else if (cloHeight[cloIndex] <= sumOfCellRow) {
+                subCellHeight = eachRowHeight[i].height;
+              }
+
+              evalRow.push({
+                clo: row[0],
+                cloIndex: `${cloIndex}`,
+                order: i,
+                height: subCellHeight,
+              });
+            });
+          }
+        });
+      });
+    }
 
     function drawSubTable(x, y, data, subTableWidth, col, cloIndex) {
       const eachRowHeight: any[] = [];
@@ -107,8 +263,6 @@ export const buildPart4Content = (
         } else if (cloHeight[cloIndex] <= sumOfCellRow) {
           subCellHeight = eachRowHeight[i].height;
         }
-
-        rowCLO.push(subCellHeight);
 
         doc.rect(x, subTableY, subTableWidth, subCellHeight).stroke();
 
@@ -147,7 +301,6 @@ export const buildPart4Content = (
             rowHeight = cellHeight;
           }
         }
-        rowCLO.push(rowHeight);
       });
 
       row.forEach((cell, i) => {
@@ -191,14 +344,13 @@ export const buildPart4Content = (
 
     function drawTable() {
       let currentY = tableTop + 63;
-      let temp = 0;
-      rows.forEach((row, cloIndex) => {
-        temp += rowCLO[cloIndex];
+      console.log('addPageIndex', addPageIndex);
 
-        if (temp > 200) {
+      rows.forEach((row, cloIndex) => {
+        if (addPageIndex.includes(cloIndex)) {
+          console.log(addPageIndex.includes(cloIndex));
           doc.addPage();
           currentY = doc.y;
-          temp = doc.y;
         }
         const rowHeight = drawRow(currentY, row, false, cloIndex);
         currentY += rowHeight;
