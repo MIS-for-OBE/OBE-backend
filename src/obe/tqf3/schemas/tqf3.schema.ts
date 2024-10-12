@@ -6,7 +6,7 @@ import {
   TEACHING_METHOD,
   TQF_STATUS,
 } from 'src/common/enum/type.enum';
-import { PLONo, PLONoSchema } from 'src/obe/plo/schemas/plo.schema';
+import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 
 @Schema()
 export class CLO {
@@ -23,7 +23,7 @@ export class CLO {
   learningMethod: string[];
 
   @Prop()
-  other?: string;
+  other: string;
 }
 export const CLOSchema = SchemaFactory.createForClass(CLO);
 
@@ -39,7 +39,7 @@ export class Eval {
   topicEN: string;
 
   @Prop()
-  desc?: string;
+  desc: string;
 
   @Prop({ required: true })
   percent: number;
