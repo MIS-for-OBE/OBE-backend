@@ -10,14 +10,8 @@ import {
   CourseManagement,
   CourseManagementDocument,
 } from './schemas/courseManagement.schema';
-import { ConfigService } from '@nestjs/config';
 import { User } from '../user/schemas/user.schema';
-import { LogEventDTO } from '../logEvent/dto/dto';
-import {
-  COURSE_TYPE,
-  LOG_EVENT_TYPE,
-  TQF_STATUS,
-} from 'src/common/enum/type.enum';
+import { COURSE_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
 import { FacultyService } from '../faculty/faculty.service';
 import {
   setWhereWithSearchCourse,
@@ -584,14 +578,5 @@ export class CourseManagementService {
       data.TQF5 = tqf5.id;
     }
     return await this.sectionModel.create({ ...data });
-  }
-
-  private setLogEvent(
-    logEventDTO: LogEventDTO,
-    action: string,
-    courseNo: string,
-  ) {
-    logEventDTO.type = LOG_EVENT_TYPE.COURSE_MANAGEMENT;
-    logEventDTO.event = `${action} Course ${courseNo}`;
   }
 }

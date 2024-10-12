@@ -9,7 +9,6 @@ import { UserModule } from './obe/user/user.module';
 import { FacultyModule } from './obe/faculty/faculty.module';
 import { AcademicYearModule } from './obe/academicYear/academicYear.module';
 import { CourseManagementModule } from './obe/courseManagement/courseManagement.module';
-import { LogEventModule } from './obe/logEvent/logEvent.module';
 import { CourseModule } from './obe/course/course.module';
 import { SectionModule } from './obe/section/section.module';
 import { PLOModule } from './obe/plo/plo.module';
@@ -27,7 +26,6 @@ import { globalTransformPlugin } from './common/plugins/globalTransform.plugin';
     DatabaseModule,
     UserModule,
     FacultyModule,
-    LogEventModule,
     AcademicYearModule,
     PLOModule,
     CourseManagementModule,
