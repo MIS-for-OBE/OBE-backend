@@ -9,10 +9,6 @@ import {
   CourseManagementSchema,
 } from 'src/obe/courseManagement/schemas/courseManagement.schema';
 import { Faculty, FacultySchema } from 'src/obe/faculty/schemas/faculty.schema';
-import {
-  LogEvent,
-  LogEventSchema,
-} from 'src/obe/logEvent/schemas/logEvent.schema';
 import { PLO, PLOSchema } from 'src/obe/plo/schemas/plo.schema';
 import { Section, SectionSchema } from 'src/obe/section/schemas/section.schema';
 import { TQF3, TQF3Schema } from 'src/obe/tqf3/schemas/tqf3.schema';
@@ -22,7 +18,6 @@ import { User, UserSchema } from 'src/obe/user/schemas/user.schema';
 export const registerModels = () => {
   mongoose.model(User.name, UserSchema);
   mongoose.model(Faculty.name, FacultySchema);
-  mongoose.model(LogEvent.name, LogEventSchema);
   mongoose.model(AcademicYear.name, AcademicYearSchema);
   mongoose.model(PLO.name, PLOSchema);
   mongoose.model(CourseManagement.name, CourseManagementSchema);

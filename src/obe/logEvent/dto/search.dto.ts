@@ -1,9 +1,9 @@
-import { IsNumber, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
-import { SearchDTO } from 'src/common/dto/search.dto';
+// import { IsNumber, IsString } from 'class-validator';
+// import { Type } from 'class-transformer';
+// import { SearchDTO } from 'src/common/dto/search.dto';
 
-export class LogEventSearchDTO extends SearchDTO {
-  @IsString()
-  @Type(() => String)
-  type = '';
-}
+// export class LogEventSearchDTO extends SearchDTO {
+//   @IsString()
+//   @Type(() => String)
+//   type = '';
+// }

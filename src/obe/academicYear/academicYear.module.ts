@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { AcademicYearService } from './academicYear.service';
 import { AcademicYearController } from './academicYear.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AcademicYear, AcademicYearSchema } from './schemas/academicYear.schema';
-import { LogEventService } from '../logEvent/logEvent.service';
-import { LogEvent, LogEventSchema } from '../logEvent/schemas/logEvent.schema';
+import {
+  AcademicYear,
+  AcademicYearSchema,
+} from './schemas/academicYear.schema';
 
 @Module({
   imports: [
@@ -13,13 +14,9 @@ import { LogEvent, LogEventSchema } from '../logEvent/schemas/logEvent.schema';
         name: AcademicYear.name,
         schema: AcademicYearSchema,
       },
-      {
-        name: LogEvent.name,
-        schema: LogEventSchema,
-      },
     ]),
   ],
   controllers: [AcademicYearController],
-  providers: [AcademicYearService, LogEventService],
+  providers: [AcademicYearService],
 })
 export class AcademicYearModule {}

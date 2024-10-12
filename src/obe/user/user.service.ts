@@ -3,16 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
-import { LogEventService } from '../logEvent/logEvent.service';
-import { LogEventDTO } from '../logEvent/dto/dto';
-import { LOG_EVENT_TYPE } from 'src/common/enum/type.enum';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel(User.name) private readonly model: Model<User>,
-    private readonly logEventService: LogEventService,
-  ) {}
+  constructor(@InjectModel(User.name) private readonly model: Model<User>) {}
 
   async getUserInfo(id: string): Promise<User> {
     try {
@@ -48,15 +42,7 @@ export class UserService {
       } else {
         res = await this.updateOrCreateUserByEmail(data.email, data.role);
       }
-      const logEventDTO = new LogEventDTO();
-      this.setLogEvent(
-        logEventDTO,
-        res.role == ROLE.ADMIN ? 'Add' : 'Delete',
-        res.firstNameEN
-          ? `${res.firstNameEN} ${res.lastNameEN}`
-          : `${res.email}`,
-      );
-      // await this.logEventService.createLogEvent(id, logEventDTO);
+
       return res;
     } catch (error) {
       throw error;
@@ -70,14 +56,7 @@ export class UserService {
         data.id,
         ROLE.SUPREME_ADMIN,
       );
-      const logEventDTO = new LogEventDTO();
-      this.setLogEvent(
-        logEventDTO,
-        'Change',
-        `${newSAdmin.firstNameEN} ${newSAdmin.lastNameEN}`,
-        'to S. Admin',
-      );
-      // await this.logEventService.createLogEvent(id, logEventDTO);
+
       return { user, newSAdmin };
     } catch (error) {
       throw error;
@@ -127,16 +106,5 @@ export class UserService {
     } catch (error) {
       throw error;
     }
-  }
-
-  private setLogEvent(
-    logEventDTO: LogEventDTO,
-    action: string,
-    user: string,
-    explain?: string,
-  ) {
-    logEventDTO.type = LOG_EVENT_TYPE.ADMIN;
-    logEventDTO.event = `${action} ${user}`;
-    if (explain) logEventDTO.event += ` ${explain}`;
   }
 }
