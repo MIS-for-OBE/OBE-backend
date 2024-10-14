@@ -1,7 +1,6 @@
 import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import { Part4TQF3 } from '../schemas/tqf3.schema';
 import { height } from 'pdfkit/js/page';
-import { log } from 'console';
 
 export const buildPart4Content = (
   doc: PDFKit.PDFDocument,
@@ -44,27 +43,21 @@ export const buildPart4Content = (
 
     const tableTop = doc.y + 0.6;
     const tableLeft = 50;
-    const columnWidth = [170, 190, 70, 70];
+    const columnWidth = [190, 170, 70, 70];
+
+    let subRowHeight: any[] = [];
+    const addPageIndex: any[] = [];
+    const evalRow: any[] = [];
+    let cloHeight: any[] = [];
 
     function calculateRowHeight(text, columnWidth) {
       const textHeight = doc.heightOfString(text, {
-        width: columnWidth - 20,
+        width: columnWidth - 28,
       });
       return textHeight + 20;
     }
 
-    const subRowHeight: any[] = [];
-
-    const addPageIndex: any[] = [];
-
-    const evalRow: any[] = [];
-    const cloHeight: any[] = [];
-
-    let temp = 600;
-    let newTable = 0;
-
-    //calculate eachEvalRowHeight
-    {
+    function findEachEvalRowHeight(rows, subRowHeight, cloHeight) {
       for (let index = 0; index < rows.length; index++) {
         const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
         cloHeight.push(maxHeightClo);
@@ -82,163 +75,111 @@ export const buildPart4Content = (
             rows[index][3][i],
             columnWidth[3],
           );
-          let lastRow = 0;
-          lastRow += rows[index][1].length;
 
           const maxHeight = Math.max(col1Height, col2Height, col3Height);
+
           subRowHeight.push({
             clo: index,
             height: maxHeight,
           });
         }
       }
-
-      rows.forEach((row, cloIndex) => {
-        row.forEach((cell, index) => {
-          const eachRowHeight: any[] = [];
-          subRowHeight.forEach((h) => {
-            if (h.clo === cloIndex) {
-              eachRowHeight.push(h);
-            }
-          });
-
-          if (index === 1 && Array.isArray(cell)) {
-            cell.forEach((_, i) => {
-              let subCellHeight = 0;
-              let sumOfCellRow = 0;
-              subRowHeight.forEach((sum) => {
-                if (sum.clo === cloIndex) {
-                  sumOfCellRow += sum.height;
-                }
-              });
-
-              if (cloHeight[cloIndex] > sumOfCellRow) {
-                subCellHeight = cloHeight[cloIndex] / cell.length;
-              } else if (cloHeight[cloIndex] <= sumOfCellRow) {
-                subCellHeight = eachRowHeight[i].height;
-              }
-
-              evalRow.push({
-                clo: row[0],
-                cloIndex: `${cloIndex}`,
-                order: i,
-                height: subCellHeight,
-              });
-            });
-          }
-        });
-      });
     }
 
-    evalRow.forEach((e) => {
+    findEachEvalRowHeight(rows, subRowHeight, cloHeight);
+
+    rows.forEach((row, cloIndex) => {
+      row.forEach((cell, index) => {
+        const eachRowHeight: any[] = [];
+        subRowHeight.forEach((h) => {
+          if (h.clo === cloIndex) {
+            eachRowHeight.push(h);
+          }
+        });
+
+        if (index === 1 && Array.isArray(cell)) {
+          cell.forEach((_, i) => {
+            let subCellHeight = 0;
+            let sumOfCellRow = 0;
+            subRowHeight.forEach((sum) => {
+              if (sum.clo === cloIndex) {
+                sumOfCellRow += sum.height;
+              }
+            });
+
+            if (cloHeight[cloIndex] > sumOfCellRow) {
+              subCellHeight = cloHeight[cloIndex] / cell.length;
+            } else if (cloHeight[cloIndex] <= sumOfCellRow) {
+              subCellHeight = eachRowHeight[i].height;
+            }
+
+            evalRow.push({
+              clo: row[0],
+              cloIndex: `${cloIndex}`,
+              order: i,
+              height: subCellHeight,
+            });
+          });
+        }
+      });
+    });
+
+    let temp = 680;
+    let addIndexNewInstance = 0;
+    console.log(temp);
+
+    let newTable = 0;
+    evalRow.forEach((e, i) => {
       if (e && typeof e.height === 'number') {
         newTable += e.height;
 
+        console.log(`CLO ${e.cloIndex}`, `order ${e.order}`, e.height);
+        console.log(`newTable ${newTable}`);
+
         if (newTable > temp) {
           const indexToPop = rows.findIndex((row) => row[0] === e.clo);
-          let pageIndex = Number(e.cloIndex) + (e.order !== 0 && 1);
+          let pageIndex =
+            Number(e.cloIndex) + (e.order !== 0 ? 1 : addIndexNewInstance);
           addPageIndex.push(pageIndex);
           console.log('pageIndex', pageIndex);
 
           if (indexToPop !== -1) {
-            const poppedItem = rows.splice(indexToPop, 1)[0];
-            console.log('Popped Item:', poppedItem);
-
             if (e.order !== 0) {
+              const poppedItem = rows.splice(indexToPop, 1)[0];
+
               const newInstances = [
                 [
                   poppedItem[0],
-                  poppedItem[1].slice(0, e.order),
-                  poppedItem[2].slice(0, e.order),
-                  poppedItem[3].slice(0, e.order),
+                  poppedItem[1].slice(0, e.order - 1),
+                  poppedItem[2].slice(0, e.order - 1),
+                  poppedItem[3].slice(0, e.order - 1),
                 ],
                 [
                   ' ',
-                  poppedItem[1].slice(e.order),
-                  poppedItem[2].slice(e.order),
-                  poppedItem[3].slice(e.order),
+                  poppedItem[1].slice(e.order - 1),
+                  poppedItem[2].slice(e.order - 1),
+                  poppedItem[3].slice(e.order - 1),
                 ],
               ];
+
+              temp = 720;
+              addIndexNewInstance++;
 
               rows.splice(indexToPop, 0, ...newInstances);
             }
           } else {
             console.log('No item to pop');
           }
-
-          newTable = 0;
-          temp = 750;
+          newTable = e.height;
         }
       }
     });
-    console.log(rows);
+    console.log(rows.length);
+    console.log('addPage', addPageIndex);
 
-    //calculate eachEvalRowHeight
-    {
-      for (let index = 0; index < rows.length; index++) {
-        const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
-        cloHeight.push(maxHeightClo);
-
-        for (let i = 0; i < rows[index][1].length; i++) {
-          const col1Height = calculateRowHeight(
-            rows[index][1][i],
-            columnWidth[1],
-          );
-          const col2Height = calculateRowHeight(
-            rows[index][2][i],
-            columnWidth[2],
-          );
-          const col3Height = calculateRowHeight(
-            rows[index][3][i],
-            columnWidth[3],
-          );
-          let lastRow = 0;
-          lastRow += rows[index][1].length;
-
-          const maxHeight = Math.max(col1Height, col2Height, col3Height);
-          subRowHeight.push({
-            clo: index,
-            height: maxHeight,
-          });
-        }
-      }
-
-      rows.forEach((row, cloIndex) => {
-        row.forEach((cell, index) => {
-          const eachRowHeight: any[] = [];
-          subRowHeight.forEach((h) => {
-            if (h.clo === cloIndex) {
-              eachRowHeight.push(h);
-            }
-          });
-
-          if (index === 1 && Array.isArray(cell)) {
-            cell.forEach((_, i) => {
-              let subCellHeight = 0;
-              let sumOfCellRow = 0;
-              subRowHeight.forEach((sum) => {
-                if (sum.clo === cloIndex) {
-                  sumOfCellRow += sum.height;
-                }
-              });
-
-              if (cloHeight[cloIndex] > sumOfCellRow) {
-                subCellHeight = cloHeight[cloIndex] / cell.length;
-              } else if (cloHeight[cloIndex] <= sumOfCellRow) {
-                subCellHeight = eachRowHeight[i].height;
-              }
-
-              evalRow.push({
-                clo: row[0],
-                cloIndex: `${cloIndex}`,
-                order: i,
-                height: subCellHeight,
-              });
-            });
-          }
-        });
-      });
-    }
+    subRowHeight = [];
+    cloHeight = [];
+    findEachEvalRowHeight(rows, subRowHeight, cloHeight);
 
     function drawSubTable(x, y, data, subTableWidth, col, cloIndex) {
       const eachRowHeight: any[] = [];
@@ -344,11 +285,9 @@ export const buildPart4Content = (
 
     function drawTable() {
       let currentY = tableTop + 63;
-      console.log('addPageIndex', addPageIndex);
 
       rows.forEach((row, cloIndex) => {
         if (addPageIndex.includes(cloIndex)) {
-          console.log(addPageIndex.includes(cloIndex));
           doc.addPage();
           currentY = doc.y;
         }
