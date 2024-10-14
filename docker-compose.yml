@@ -1,0 +1,32 @@
+name: project_obe
+
+services:
+  backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongodb
+    # env_file:
+    #   - .env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  mongodb:
+    image: mongo
+    restart: always
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
+    #   - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
+    driver: local
