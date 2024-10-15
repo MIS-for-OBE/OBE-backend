@@ -63,20 +63,16 @@ export class DocumentInterceptor implements NestInterceptor {
         return;
       }
       const userToken = this.getUserToken(req);
-      this.reqLogger.log(
-        'Request',
-
-        {
-          userToken,
-          path: this.getFullPath(req),
-          ...(_.includes(['GET', 'DELETE'], req.method)
-            ? { query: req.query }
-            : {
-                body: buildBodyPayload(req.body),
-                query: _.isEmpty(req.query) ? undefined : req.query,
-              }),
-        },
-      );
+      this.reqLogger.log('Request', {
+        userToken,
+        path: this.getFullPath(req),
+        ...(_.includes(['GET', 'DELETE'], req.method)
+          ? { query: req.query }
+          : {
+              body: buildBodyPayload(req.body),
+              query: _.isEmpty(req.query) ? undefined : req.query,
+            }),
+      });
     } catch (error) {
       // continue
     }
@@ -85,16 +81,12 @@ export class DocumentInterceptor implements NestInterceptor {
   logSuccessRes(req, res, resBody, now) {
     try {
       const ms = now ? Date.now() - now : '-';
-      this.resLogger.log(
-        'Response',
-
-        {
-          status: res?.statusCode || 200,
-          path: this.getFullPath(req),
-          durationMs: ms,
-          data: resBody,
-        },
-      );
+      this.resLogger.log('Response', {
+        status: res?.statusCode || 200,
+        path: this.getFullPath(req),
+        durationMs: ms,
+        data: resBody,
+      });
     } catch (error) {
       // continue
     }
