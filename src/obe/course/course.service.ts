@@ -276,7 +276,7 @@ export class CourseService {
         tqf5 = course.sections.find(
           (sec) => sec.topic == requestDTO.sections[0].topic,
         ).TQF5;
-      } else {
+      } else if (!course || !tqf3 || !tqf5) {
         tqf3 = (await this.tqf3Model.create({ status: TQF_STATUS.NO_DATA })).id;
         tqf5 = (await this.tqf5Model.create({ status: TQF_STATUS.NO_DATA })).id;
       }
@@ -311,9 +311,9 @@ export class CourseService {
         addFirstTime: true,
       };
 
-      if (courseData.type != COURSE_TYPE.SEL_TOPIC) {
-        courseData.TQF3 = tqf3.id;
-        courseData.TQF5 = tqf5.id;
+      if (!course && courseData.type != COURSE_TYPE.SEL_TOPIC) {
+        courseData.TQF3 = tqf3;
+        courseData.TQF5 = tqf5;
       }
 
       if (course) {
@@ -331,7 +331,7 @@ export class CourseService {
         });
       } else {
         if (courseData.sections.length) {
-          course = await this.model.create(courseData);
+          course = await this.model.create({ ...courseData });
         }
       }
       if (course) {
