@@ -124,9 +124,8 @@ export const buildPart4Content = (
       });
     });
 
-    let temp = 680;
+    let temp = 645; //limit height pdf
     let addIndexNewInstance = 0;
-    console.log(temp);
 
     let newTable = 0;
     evalRow.forEach((e, i) => {
@@ -139,7 +138,8 @@ export const buildPart4Content = (
         if (newTable > temp) {
           const indexToPop = rows.findIndex((row) => row[0] === e.clo);
           let pageIndex =
-            Number(e.cloIndex) + (e.order !== 0 ? 1 : addIndexNewInstance);
+            Number(e.cloIndex) +
+            (e.order !== 0 ? 1 + addIndexNewInstance : addIndexNewInstance);
           addPageIndex.push(pageIndex);
           console.log('pageIndex', pageIndex);
 
@@ -150,19 +150,19 @@ export const buildPart4Content = (
               const newInstances = [
                 [
                   poppedItem[0],
-                  poppedItem[1].slice(0, e.order - 1),
-                  poppedItem[2].slice(0, e.order - 1),
-                  poppedItem[3].slice(0, e.order - 1),
+                  poppedItem[1].slice(0, e.order),
+                  poppedItem[2].slice(0, e.order),
+                  poppedItem[3].slice(0, e.order),
                 ],
                 [
                   ' ',
-                  poppedItem[1].slice(e.order - 1),
-                  poppedItem[2].slice(e.order - 1),
-                  poppedItem[3].slice(e.order - 1),
+                  poppedItem[1].slice(e.order),
+                  poppedItem[2].slice(e.order),
+                  poppedItem[3].slice(e.order),
                 ],
               ];
 
-              temp = 720;
+              temp = 755; //limit height pdf
               addIndexNewInstance++;
 
               rows.splice(indexToPop, 0, ...newInstances);
@@ -174,8 +174,9 @@ export const buildPart4Content = (
         }
       }
     });
-    console.log(rows.length);
+
     console.log('addPage', addPageIndex);
+    console.log(rows);
 
     subRowHeight = [];
     cloHeight = [];
@@ -281,6 +282,7 @@ export const buildPart4Content = (
 
     function drawHeaders() {
       drawRow(tableTop, headers, true);
+      console.log(doc.y);
     }
 
     function drawTable() {
@@ -288,9 +290,11 @@ export const buildPart4Content = (
 
       rows.forEach((row, cloIndex) => {
         if (addPageIndex.includes(cloIndex)) {
+          console.log(doc.y);
           doc.addPage();
           currentY = doc.y;
         }
+
         const rowHeight = drawRow(currentY, row, false, cloIndex);
         currentY += rowHeight;
       });
