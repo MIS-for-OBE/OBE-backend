@@ -565,8 +565,8 @@ export class CourseManagementService {
         course &&
         course.sections.find((sec) => requestDTO.data.topic == sec.topic)
       ) {
-        tqf3 = sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF3;
-        tqf5 = sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF5;
+        tqf3 =  course.sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF3;
+        tqf5 =  course.sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF5;
       } else {
         tqf3 = (await this.tqf3Model.create({ status: TQF_STATUS.NO_DATA })).id;
         tqf5 = (await this.tqf5Model.create({ status: TQF_STATUS.NO_DATA })).id;
@@ -574,6 +574,6 @@ export class CourseManagementService {
       data.TQF3 = tqf3;
       data.TQF5 = tqf5;
     }
-    return await this.sectionModel.create({ ...data });
+    return await this.sectionModel.create(data);
   }
 }
