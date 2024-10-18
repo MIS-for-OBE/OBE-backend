@@ -568,13 +568,11 @@ export class CourseManagementService {
         tqf3 = sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF3;
         tqf5 = sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF5;
       } else {
-        [tqf3, tqf5] = await Promise.all([
-          this.tqf3Model.create({ status: TQF_STATUS.NO_DATA }),
-          this.tqf5Model.create({ status: TQF_STATUS.NO_DATA }),
-        ]);
+        tqf3 = (await this.tqf3Model.create({ status: TQF_STATUS.NO_DATA })).id;
+        tqf5 = (await this.tqf5Model.create({ status: TQF_STATUS.NO_DATA })).id;
       }
-      data.TQF3 = tqf3.id;
-      data.TQF5 = tqf5.id;
+      data.TQF3 = tqf3;
+      data.TQF5 = tqf5;
     }
     return await this.sectionModel.create({ ...data });
   }
