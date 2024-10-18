@@ -13,19 +13,20 @@ export class TQF5Service {
     requestDTO: any,
   ): Promise<TQF5> {
     try {
-      const updateTQF5 = await this.model.findByIdAndUpdate(
-        params.id,
-        {
-          status:
-            params.part == 'part3' ? TQF_STATUS.DONE : TQF_STATUS.IN_PROGRESS,
-          [params.part]: requestDTO,
-        },
-        { new: true, fields: `status ${params.part} updatedAt` },
-      );
-      if (!updateTQF5) {
-        throw new NotFoundException('TQF5 not found.');
-      }
-      return updateTQF5;
+      // const updateTQF5 = await this.model.findByIdAndUpdate(
+      //   params.id,
+      //   {
+      //     status:
+      //       params.part == 'part3' ? TQF_STATUS.DONE : TQF_STATUS.IN_PROGRESS,
+      //     [params.part]: requestDTO,
+      //   },
+      //   { new: true, fields: `status ${params.part} updatedAt` },
+      // );
+      // if (!updateTQF5) {
+      //   throw new NotFoundException('TQF5 not found.');
+      // }
+      // return updateTQF5;
+      return;
     } catch (error) {
       throw error;
     }

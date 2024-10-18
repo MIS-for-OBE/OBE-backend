@@ -27,7 +27,7 @@ export class UserController {
   }
 
   @Get('instructor')
-  async getInstructor(@Request() req): Promise<ResponseDTO<User[]>> {
+  async getInstructor(): Promise<ResponseDTO<User[]>> {
     return this.service.getInstructor().then((result) => {
       const responseDTO = new ResponseDTO<User[]>();
       responseDTO.data = result;
@@ -48,18 +48,15 @@ export class UserController {
   }
 
   @Put('admin')
-  async updateAdmin(
-    @Request() req,
-    @Body() body: any,
-  ): Promise<ResponseDTO<User>> {
-    return this.service.updateAdmin(req.user.id, body).then((result) => {
+  async updateAdmin(@Body() body: any): Promise<ResponseDTO<User>> {
+    return this.service.updateAdmin(body).then((result) => {
       const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
     });
   }
 
-  @Put('s.admin')
+  @Put('s-admin')
   async updateSAdmin(
     @Request() req,
     @Body() body: any,

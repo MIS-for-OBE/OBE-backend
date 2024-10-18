@@ -34,7 +34,7 @@ export class UserService {
     }
   }
 
-  async updateAdmin(id: string, data: any): Promise<User> {
+  async updateAdmin(data: any): Promise<User> {
     try {
       let res;
       if (data.id) {

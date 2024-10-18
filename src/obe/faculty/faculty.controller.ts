@@ -27,7 +27,7 @@ export class FacultyController {
     });
   }
 
-  @Get('courseCode')
+  @Get('course-code')
   async getCourseCode(
     @Request() req,
     @Query('departmentCode') departmentCode: string[],

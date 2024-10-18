@@ -32,7 +32,7 @@ export class AcademicYearService {
     }
   }
 
-  async createAcademicYear(id: string, requestDTO: AcademicYear): Promise<any> {
+  async createAcademicYear(requestDTO: AcademicYear): Promise<any> {
     try {
       const res = await this.model.create({
         year: requestDTO.year,
@@ -44,10 +44,7 @@ export class AcademicYearService {
     }
   }
 
-  async activeAcademicYear(
-    id: string,
-    academicYearId: string,
-  ): Promise<AcademicYear> {
+  async activeAcademicYear(academicYearId: string): Promise<AcademicYear> {
     try {
       await this.model.findOneAndUpdate(
         { isActive: true },
@@ -65,7 +62,6 @@ export class AcademicYearService {
   }
 
   async updateProcessTqf3(
-    id: string,
     academicYearId: string,
     requestDTO: any,
   ): Promise<AcademicYear> {

@@ -129,7 +129,6 @@ export class CourseManagementService {
   }
 
   async createCourseManagement(
-    id: string,
     requestDTO: CourseManagementDocument,
   ): Promise<CourseManagement> {
     try {
@@ -529,7 +528,7 @@ export class CourseManagementService {
     }
   }
 
-  async ploMapping(authUser: any, requestDTO: any): Promise<any> {
+  async ploMapping(requestDTO: any): Promise<any> {
     try {
       const updateCourses = await Promise.all(
         requestDTO.data.map(async (course) => {
@@ -555,7 +554,7 @@ export class CourseManagementService {
     }
   }
 
-  private async createSection(course, sections: any, requestDTO: any) {
+  private async createSection(course: any, sections: any, requestDTO: any) {
     const data = sections.find(
       (sec) => sec.sectionNo == requestDTO.data.sectionNo,
     )._doc;

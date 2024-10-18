@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Param,
+  Post,
   Put,
   Query,
   UsePipes,
@@ -52,4 +53,7 @@ export class SectionController {
       return responseDTO;
     });
   }
+
+  @Post('student-list')
+  async uploadStudentList(@Body() requestDTO: any) {}
 }

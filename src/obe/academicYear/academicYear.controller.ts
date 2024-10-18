@@ -16,7 +16,7 @@ import { AcademicYearService } from './academicYear.service';
 import { AcademicYearSearchDTO } from './dto/search.dto';
 import { AcademicYear } from './schemas/academicYear.schema';
 
-@Controller('/academicYear')
+@Controller('/academic-year')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class AcademicYearController {
   constructor(private service: AcademicYearService) {}
@@ -34,24 +34,20 @@ export class AcademicYearController {
 
   @Post()
   async createAcademicYear(
-    @Request() req,
     @Body() requestDTO: AcademicYear,
   ): Promise<ResponseDTO<AcademicYear>> {
-    return this.service
-      .createAcademicYear(req.user.id, requestDTO)
-      .then((result) => {
-        const responseDTO = new ResponseDTO<AcademicYear>();
-        responseDTO.data = result;
-        return responseDTO;
-      });
+    return this.service.createAcademicYear(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<AcademicYear>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
   }
 
   @Put('/:id')
   async activeAcademicYear(
-    @Request() req,
     @Param('id') id: string,
   ): Promise<ResponseDTO<AcademicYear>> {
-    return this.service.activeAcademicYear(req.user.id, id).then((result) => {
+    return this.service.activeAcademicYear(id).then((result) => {
       const responseDTO = new ResponseDTO<AcademicYear>();
       responseDTO.data = result;
       return responseDTO;
@@ -60,17 +56,14 @@ export class AcademicYearController {
 
   @Put('/:id/tqf')
   async updateProcessTqf3(
-    @Request() req,
     @Param('id') id: string,
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<AcademicYear>> {
-    return this.service
-      .updateProcessTqf3(req.user.id, id, requestDTO)
-      .then((result) => {
-        const responseDTO = new ResponseDTO<AcademicYear>();
-        responseDTO.data = result;
-        return responseDTO;
-      });
+    return this.service.updateProcessTqf3(id, requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<AcademicYear>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
   }
 
   @Delete('/:id')

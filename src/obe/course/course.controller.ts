@@ -47,7 +47,7 @@ export class CourseController {
       });
   }
 
-  @Get('courseName/:courseNo')
+  @Get('name/:courseNo')
   async getExistCourseName(
     @Param('courseNo') courseNo: string,
     @Query() requestDTO: any,

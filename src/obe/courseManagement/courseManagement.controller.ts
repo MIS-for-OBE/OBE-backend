@@ -18,7 +18,7 @@ import {
   CourseManagementDocument,
 } from './schemas/courseManagement.schema';
 
-@Controller('/courseManagement')
+@Controller('/course-management')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class CourseManagementController {
   constructor(private service: CourseManagementService) {}
@@ -39,7 +39,6 @@ export class CourseManagementController {
 
   @Get('one')
   async searchOneCourseManagement(
-    @Request() req,
     @Query() searchDTO: any,
   ): Promise<ResponseDTO<any>> {
     return this.service.searchOneCourseManagement(searchDTO).then((result) => {
@@ -51,16 +50,13 @@ export class CourseManagementController {
 
   @Post()
   async createCourseManagement(
-    @Request() req,
     @Body() requestDTO: CourseManagementDocument,
   ): Promise<ResponseDTO<CourseManagement>> {
-    return this.service
-      .createCourseManagement(req.user.id, requestDTO)
-      .then((result) => {
-        const responseDTO = new ResponseDTO<CourseManagement>();
-        responseDTO.data = result;
-        return responseDTO;
-      });
+    return this.service.createCourseManagement(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<CourseManagement>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
   }
 
   @Get('check')
@@ -88,19 +84,16 @@ export class CourseManagementController {
   //     });
   // }
 
-  @Put('ploMapping')
-  async ploMapping(
-    @Request() req,
-    @Body() requestDTO: any,
-  ): Promise<ResponseDTO<any>> {
-    return this.service.ploMapping(req.user, requestDTO).then((result) => {
+  @Put('plo-mapping')
+  async ploMapping(@Body() requestDTO: any): Promise<ResponseDTO<any>> {
+    return this.service.ploMapping(requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
     });
   }
 
-  @Put('coIns')
+  @Put('co-instructor')
   async updateCoInsSections(
     @Request() req,
     @Body() requestDTO: any,
