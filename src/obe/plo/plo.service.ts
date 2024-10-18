@@ -100,7 +100,7 @@ export class PLOService {
     }
   }
 
-  async createPLO(id: string, requestDTO: any): Promise<PLO> {
+  async createPLO(requestDTO: any): Promise<PLO> {
     try {
       const existPloWithDep = await this.model.find({
         semester: requestDTO.semester,

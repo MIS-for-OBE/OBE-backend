@@ -67,19 +67,11 @@ export class TQF3Controller {
         req.user.facultyCode,
         requestDTO,
       );
-
-      // const totalSize = files.reduce((total, file) => {
-      //   const filePath = join(process.cwd(), file);
-      //   const stats = fs.statSync(filePath);
-      //   return total + stats.size;
-      // }, 0);
-
       res.setHeader(
         'Content-disposition',
         `attachment; filename="TQF3_Parts_${requestDTO.courseNo}_${requestDTO.academicYear}_${requestDTO.academicTerm}.zip"`,
       );
       res.setHeader('Content-type', 'application/zip');
-      // res.setHeader('Content-Length', totalSize);
       res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
       const archive = archiver('zip', { zlib: { level: 9 } });
       archive.on('error', (err) => {

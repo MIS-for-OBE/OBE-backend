@@ -11,7 +11,6 @@ import {
   CmuApiTqfCourseSearchDTO,
 } from 'src/common/cmu-api/cmu-api.dto';
 import { GeneratePdfBLL } from './bll/genPdf';
-import { PLOService } from '../plo/plo.service';
 import { Course } from '../course/schemas/course.schema';
 import { Faculty } from '../faculty/schemas/faculty.schema';
 
@@ -21,7 +20,6 @@ export class TQF3Service {
     @InjectModel(TQF3.name) private readonly model: Model<TQF3>,
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(Faculty.name) private readonly facultyModel: Model<Faculty>,
-    private readonly ploService: PLOService,
     private readonly generatePdfBLL: GeneratePdfBLL,
   ) {}
 
