@@ -73,6 +73,9 @@ export class Section {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   coInstructors: User[];
 
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
+  students: User[];
+
   @Prop({ type: [AssignmentSchema], _id: false, required: false })
   assignments: Assignment[];
 
