@@ -81,12 +81,12 @@ export class DocumentInterceptor implements NestInterceptor {
   logSuccessRes(req, res, resBody, now) {
     try {
       const ms = now ? Date.now() - now : '-';
-      this.resLogger.log('Response', {
-        status: res?.statusCode || 200,
-        path: this.getFullPath(req),
-        durationMs: ms,
-        data: resBody,
-      });
+      // this.resLogger.log('Response', {
+      //   status: res?.statusCode || 200,
+      //   path: this.getFullPath(req),
+      //   durationMs: ms,
+      //   data: resBody,
+      // });
     } catch (error) {
       // continue
     }

@@ -3,14 +3,42 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private readonly model: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly model: Model<User>,
+    private readonly authService: AuthService,
+  ) {}
 
   async getUserInfo(id: string): Promise<User> {
     try {
       return await this.model.findById(id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async termsOfService(id: string, body: { agree: boolean }): Promise<any> {
+    try {
+      if (!body.agree) {
+        const user = await this.model.findById(id);
+        if (
+          !user.departmentCode.includes('CPE') &&
+          (user.role !== ROLE.STUDENT || !user.studentId)
+        ) {
+          await this.model.findByIdAndDelete(id);
+        }
+      } else {
+        const user = await this.model.findByIdAndUpdate(id, {
+          termsOfService: true,
+        });
+        const dataRs = await this.authService.generateJWTToken(user);
+        dataRs.user = user;
+        return dataRs;
+      }
+      return { message: 'ok' };
     } catch (error) {
       throw error;
     }

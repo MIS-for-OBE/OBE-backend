@@ -14,17 +14,18 @@ import {
 } from './dto/dto';
 import { capitalize } from 'lodash';
 import { Model } from 'mongoose';
-import { User, UserDocument } from 'src/obe/user/schemas/user.schema';
+import { User } from 'src/obe/user/schemas/user.schema';
 import { CMU_OAUTH_ROLE, ROLE } from 'src/common/enum/role.enum';
 import { InjectModel } from '@nestjs/mongoose';
 import { Faculty } from 'src/obe/faculty/schemas/faculty.schema';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
-    private jwtService: JwtService,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Faculty.name) private readonly facultyModel: Model<Faculty>,
+    private readonly authService: AuthService,
   ) {}
 
   private async getOAuthAccessTokenAsync(
@@ -97,23 +98,6 @@ export class AuthenticationService {
     }
   }
 
-  private async generateJWTToken(user: UserDocument): Promise<TokenDTO> {
-    const data = new TokenDTO();
-    // build access token
-    let payload: Partial<UserDocument> = {
-      id: user.id,
-      email: user.email,
-      firstNameEN: user.firstNameEN,
-      lastNameEN: user.lastNameEN,
-      role: user.role,
-      facultyCode: user.facultyCode,
-      ...(user.studentId && { studentId: user.studentId }),
-    };
-
-    data.token = this.jwtService.sign(payload);
-    return data;
-  }
-
   async login(body: LoginDTO): Promise<TokenDTO> {
     const { code, redirectUri } = body;
     if (!code) throw new BadRequestException('Invalid authorization code');
@@ -168,7 +152,7 @@ export class AuthenticationService {
     }
 
     //create session
-    const dataRs = await this.generateJWTToken(user);
+    const dataRs = await this.authService.generateJWTToken(user);
     dataRs.user = user;
     return dataRs;
   }

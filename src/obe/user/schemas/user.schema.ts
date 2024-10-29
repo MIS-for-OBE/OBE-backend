@@ -48,6 +48,9 @@ export class User {
   @Prop({ required: true, enum: ROLE })
   role: string;
 
+  @Prop()
+  termsOfService?: boolean;
+
   @Prop({ type: [EnrollCourseSchema], _id: false })
   enrollCourses?: EnrollCourse[];
 

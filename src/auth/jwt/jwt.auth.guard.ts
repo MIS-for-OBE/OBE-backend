@@ -36,7 +36,8 @@ export class JWTAuthGuard extends AuthGuard('jwt_strategy') {
       !user.lastNameEN ||
       !user.email ||
       !user.role ||
-      !user.facultyCode
+      !user.facultyCode ||
+      !user.termsOfService
     ) {
       throw err || new UnauthorizedException();
     }

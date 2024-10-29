@@ -26,6 +26,18 @@ export class UserController {
     });
   }
 
+  @Post('terms-of-service')
+  async termsOfService(
+    @Request() req,
+    @Body() body,
+  ): Promise<ResponseDTO<any>> {
+    return this.service.termsOfService(req.user.id, body).then((result) => {
+      const responseDTO = new ResponseDTO<any>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Get('instructor')
   async getInstructor(): Promise<ResponseDTO<User[]>> {
     return this.service.getInstructor().then((result) => {

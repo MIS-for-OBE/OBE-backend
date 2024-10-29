@@ -203,6 +203,7 @@ export class TokenDTO extends BaseDTO {
       studentId: '690610696',
       role: 'Student',
       facultyCode: '06',
+      termsOfService: true,
     },
   })
   user: User;

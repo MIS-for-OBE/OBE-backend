@@ -22,6 +22,7 @@ export class JWTStrategy extends PassportStrategy(Strategy, 'jwt_strategy') {
       lastNameEN: payload.lastNameEN,
       role: payload.role,
       facultyCode: payload.facultyCode,
+      termsOfService: payload.termsOfService,
       session: new Date(),
     };
   }
