@@ -31,9 +31,11 @@ export class UserService {
           await this.model.findByIdAndDelete(id);
         }
       } else {
-        const user = await this.model.findByIdAndUpdate(id, {
-          termsOfService: true,
-        });
+        const user = await this.model.findByIdAndUpdate(
+          id,
+          { termsOfService: true },
+          { new: true },
+        );
         const dataRs = await this.authService.generateJWTToken(user);
         dataRs.user = user;
         return dataRs;
