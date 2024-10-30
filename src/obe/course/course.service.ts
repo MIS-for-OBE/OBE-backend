@@ -44,7 +44,7 @@ export class CourseService {
         if (searchDTO.search.length) {
           setWhereWithSearchCourse(where, searchDTO.search);
         }
-        return await this.model
+        const courses = await this.model
           .find(where)
           .populate({
             path: 'sections',
@@ -53,15 +53,16 @@ export class CourseService {
                 path: 'instructor',
                 select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
               },
-              { path: 'TQF3', select: 'status' },
-              { path: 'TQF5', select: 'status' },
+              { path: 'TQF3' },
+              { path: 'TQF5' },
             ],
           })
-          .populate('TQF3', 'status')
-          .populate('TQF5', 'status')
+          .populate('TQF3')
+          .populate('TQF5')
           .sort({ [searchDTO.orderBy]: searchDTO.orderType })
           .skip((searchDTO.page - 1) * searchDTO.limit)
           .limit(searchDTO.limit);
+        return courses;
       } else {
         const sections = await this.sectionModel.find({
           $or: [{ instructor: id }, { coInstructors: id }],
