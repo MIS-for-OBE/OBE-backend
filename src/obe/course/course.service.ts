@@ -40,8 +40,12 @@ export class CourseService {
   async searchCourse(id: string, searchDTO: CourseSearchDTO): Promise<any> {
     try {
       if (searchDTO.manage) {
+        const where = { year: searchDTO.year, semester: searchDTO.semester };
+        if (searchDTO.search.length) {
+          setWhereWithSearchCourse(where, searchDTO.search);
+        }
         return await this.model
-          .find({ year: searchDTO.year, semester: searchDTO.semester })
+          .find(where)
           .populate({
             path: 'sections',
             populate: [
