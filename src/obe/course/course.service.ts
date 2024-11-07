@@ -145,6 +145,10 @@ export class CourseService {
               path: 'coInstructors',
               select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
             },
+            {
+              path: 'students',
+              select: 'studentId firstNameEN lastNameEN firstNameTH lastNameTH',
+            },
             { path: 'TQF3' },
             { path: 'TQF5' },
           ],
