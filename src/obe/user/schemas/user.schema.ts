@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
+import { Course } from 'src/obe/course/schemas/course.schema';
 import { Section } from 'src/obe/section/schemas/section.schema';
 
 @Schema()
@@ -11,8 +12,18 @@ export class EnrollCourse {
   @Prop({ required: true })
   semester: number;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Section' }] })
-  courses: Section[];
+  @Prop({
+    type: [
+      {
+        course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+        section: { type: mongoose.Schema.Types.ObjectId, ref: 'Section' },
+      },
+    ],
+  })
+  courses: {
+    course: Course;
+    section: Section;
+  }[];
 }
 export const EnrollCourseSchema = SchemaFactory.createForClass(
   EnrollCourse,

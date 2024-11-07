@@ -45,9 +45,9 @@ export class SectionController {
   @Delete('/:id')
   async deleteSection(
     @Param('id') id: string,
-    @Query() reqestDTO: any,
+    @Query() requestDTO: any,
   ): Promise<ResponseDTO<Section>> {
-    return this.service.deleteSection(id, reqestDTO).then((result) => {
+    return this.service.deleteSection(id, requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<Section>();
       responseDTO.data = result;
       return responseDTO;
@@ -55,5 +55,13 @@ export class SectionController {
   }
 
   @Post('student-list')
-  async uploadStudentList(@Body() requestDTO: any) {}
+  async uploadStudentList(
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<Section[]>> {
+    return this.service.uploadStudentList(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
 }

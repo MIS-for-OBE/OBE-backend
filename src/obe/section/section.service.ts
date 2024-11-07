@@ -8,6 +8,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CourseManagement } from '../courseManagement/schemas/courseManagement.schema';
 import { Course } from '../course/schemas/course.schema';
+import { User } from '../user/schemas/user.schema';
+import { ROLE } from 'src/common/enum/role.enum';
 
 @Injectable()
 export class SectionService {
@@ -16,6 +18,7 @@ export class SectionService {
     @InjectModel(CourseManagement.name)
     private readonly courseManagementModel: Model<CourseManagement>,
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
   async updateSection(id: string, requestDTO: any): Promise<Section> {
@@ -122,6 +125,69 @@ export class SectionService {
         throw new NotFoundException('Section not found');
       }
       return deleteSection;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async uploadStudentList(requestDTO: any): Promise<Section[]> {
+    try {
+      const { year, semester, course, sections } = requestDTO;
+      const updatePromises = sections.map(async (section: any) => {
+        const { sectionId, studentList } = section;
+        const studentPromises = studentList.map(async (student: any) => {
+          let existsUser = await this.userModel.findOne({
+            studentId: student.studentId,
+          });
+          if (!existsUser) {
+            existsUser = await this.userModel.create({
+              studentId: student.studentId,
+              firstNameTH: student.firstName,
+              lastNameTH: student.lastName,
+              role: ROLE.STUDENT,
+              enrollCourses: [
+                {
+                  year,
+                  semester,
+                  courses: [{ course, section: sectionId }],
+                },
+              ],
+            });
+          } else {
+            const existsTerm = existsUser.enrollCourses.find(
+              (item) => item.year == year && item.semester == semester,
+            );
+            if (existsTerm) {
+              existsTerm.courses.push({ course, section: sectionId });
+            } else {
+              existsUser.enrollCourses.push({
+                year,
+                semester,
+                courses: [{ course, section: sectionId }],
+              });
+            }
+            await existsUser.save();
+          }
+          return existsUser._id;
+        });
+        const studentIds = await Promise.all(studentPromises);
+        return this.model.updateOne(
+          { _id: sectionId },
+          { $set: { students: studentIds } },
+        );
+      });
+
+      await Promise.all(updatePromises);
+
+      const updatedSections = await this.model
+        .find({
+          _id: { $in: sections.map((section: any) => section.sectionId) },
+        })
+        .populate(
+          'students',
+          'studentId firstNameTH lastNameTH firstNameEN lastNameEN',
+        );
+      return updatedSections;
     } catch (error) {
       throw error;
     }
