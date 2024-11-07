@@ -10,18 +10,18 @@ services:
       - 8000:8000
     depends_on:
       - mongodb
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - .:/app
+      - /app/node_modules
 
   mongodb:
     image: mongo
     restart: always
-    # environment:
-    #   - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
-    #   - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
     ports:
       - 27017:27017
     volumes:
