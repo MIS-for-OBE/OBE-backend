@@ -35,6 +35,11 @@ export class PLOService {
       const data = await this.model
         .find(where)
         .sort({ year: 'desc', semester: 'desc' });
+      if (data && data.length) {
+        data.forEach((plo) => {
+          plo.data.sort((a, b) => a.no - b.no);
+        });
+      }
       if (searchDTO.manage || searchDTO.all) {
         return { totalCount, plos: data };
       }
@@ -79,6 +84,9 @@ export class PLOService {
         )?.codeEN;
       }
       const plo = await this.model.findOne(filter);
+      if (plo && plo.data) {
+        plo.data.sort((a, b) => a.no - b.no);
+      }
       return plo || {};
     } catch (error) {
       throw error;
@@ -147,6 +155,7 @@ export class PLOService {
       const arrayFilters: any[] = [];
 
       requestDTO.data.forEach((item: any, index: number) => {
+        updateFields[`data.$[elem${index}].no`] = item.no;
         updateFields[`data.$[elem${index}].descTH`] = item.descTH;
         updateFields[`data.$[elem${index}].descEN`] = item.descEN;
         arrayFilters.push({ [`elem${index}._id`]: item.id });
@@ -157,6 +166,9 @@ export class PLOService {
         { $set: updateFields },
         { arrayFilters, new: true },
       );
+      if (updatePLO && updatePLO.data) {
+        updatePLO.data.sort((a, b) => a.no - b.no);
+      }
 
       return updatePLO;
     } catch (error) {
