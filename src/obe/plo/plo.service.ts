@@ -143,9 +143,21 @@ export class PLOService {
 
   async updatePLO(id: string, requestDTO: any): Promise<PLO> {
     try {
-      const updatePLO = await this.model.findByIdAndUpdate(id, {
-        data: requestDTO.data,
+      const updateFields: any = {};
+      const arrayFilters: any[] = [];
+
+      requestDTO.data.forEach((item: any, index: number) => {
+        updateFields[`data.$[elem${index}].descTH`] = item.descTH;
+        updateFields[`data.$[elem${index}].descEN`] = item.descEN;
+        arrayFilters.push({ [`elem${index}._id`]: item.id });
       });
+
+      const updatePLO = await this.model.findOneAndUpdate(
+        { _id: id },
+        { $set: updateFields },
+        { arrayFilters, new: true },
+      );
+
       return updatePLO;
     } catch (error) {
       throw error;
