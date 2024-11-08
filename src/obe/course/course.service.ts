@@ -76,6 +76,10 @@ export class CourseService {
           .sort({ [searchDTO.orderBy]: searchDTO.orderType })
           .skip((searchDTO.page - 1) * searchDTO.limit)
           .limit(searchDTO.limit);
+        if (searchDTO.page == 1) {
+          const totalCount = await this.model.countDocuments(where);
+          return { totalCount, courses, courseCode };
+        }
         return courses;
       } else {
         const sections = await this.sectionModel.find({
