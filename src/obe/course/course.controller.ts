@@ -26,7 +26,7 @@ export class CourseController {
     @Request() req,
     @Query() searchDTO: CourseSearchDTO,
   ): Promise<ResponseDTO<any>> {
-    return this.service.searchCourse(req.user.id, searchDTO).then((result) => {
+    return this.service.searchCourse(req.user, searchDTO).then((result) => {
       const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;

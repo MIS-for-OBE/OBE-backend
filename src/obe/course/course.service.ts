@@ -24,6 +24,7 @@ import {
   CmuApiTqfCourseSearchDTO,
   CmuApiTqfCourseDTO,
 } from 'src/common/cmu-api/cmu-api.dto';
+import { FacultyService } from '../faculty/faculty.service';
 
 @Injectable()
 export class CourseService {
@@ -35,13 +36,26 @@ export class CourseService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(TQF3.name) private readonly tqf3Model: Model<TQF3>,
     @InjectModel(TQF5.name) private readonly tqf5Model: Model<TQF5>,
+    private readonly facultyService: FacultyService,
   ) {}
 
-  async searchCourse(id: string, searchDTO: CourseSearchDTO): Promise<any> {
+  async searchCourse(authUser: any, searchDTO: CourseSearchDTO): Promise<any> {
     try {
       if (searchDTO.manage) {
-        const where = { year: searchDTO.year, semester: searchDTO.semester };
-        if (searchDTO.search.length) {
+        const courseCode = await this.facultyService.getCourseCode(
+          authUser.facultyCode,
+          searchDTO.departmentCode,
+        );
+        const where = {
+          year: searchDTO.year,
+          semester: searchDTO.semester,
+          courseNo: {
+            $in: Object.values(courseCode).map(
+              (code) => new RegExp('^' + ('000' + code).slice(-3)),
+            ),
+          },
+        };
+        if (searchDTO.search?.length) {
           setWhereWithSearchCourse(where, searchDTO.search);
         }
         const courses = await this.model
@@ -65,7 +79,7 @@ export class CourseService {
         return courses;
       } else {
         const sections = await this.sectionModel.find({
-          $or: [{ instructor: id }, { coInstructors: id }],
+          $or: [{ instructor: authUser.id }, { coInstructors: authUser.id }],
         });
         const where = {
           year: searchDTO.year,
@@ -101,8 +115,8 @@ export class CourseService {
           const topics = course.sections
             .map((sec: any) => {
               if (
-                sec.instructor.id == id ||
-                sec.coInstructors.some((coIns: any) => coIns.id == id)
+                sec.instructor.id == authUser.id ||
+                sec.coInstructors.some((coIns: any) => coIns.id == authUser.id)
               )
                 return sec.topic;
             })
