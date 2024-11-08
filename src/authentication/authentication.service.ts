@@ -146,9 +146,13 @@ export class AuthenticationService {
       user = await this.userModel.create(userData);
     } else if (!user.departmentCode?.length) {
       if (user.studentId) {
-        this.updateUserDepartment(userData, basicInfo, accessToken);
+        await this.updateUserDepartment(userData, basicInfo, accessToken);
       }
-      user = await user.updateOne({ ...userData }, { new: true });
+      user = await this.userModel.findByIdAndUpdate(
+        user.id,
+        { ...userData },
+        { new: true },
+      );
     }
 
     //create session
