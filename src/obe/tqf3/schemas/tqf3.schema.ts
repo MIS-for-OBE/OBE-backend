@@ -194,6 +194,7 @@ class Part7 {
         plos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
       },
     ],
+    _id: false,
   })
   data: {
     clo: CLO;
