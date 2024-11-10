@@ -110,8 +110,13 @@ export class CourseService {
               },
               {
                 path: 'students',
-                select:
-                  'studentId firstNameEN lastNameEN firstNameTH lastNameTH',
+                populate: [
+                  {
+                    path: 'student',
+                    select:
+                      'studentId firstNameEN lastNameEN firstNameTH lastNameTH',
+                  },
+                ],
               },
               { path: 'TQF3', select: 'status' },
               { path: 'TQF5', select: 'status' },
@@ -172,7 +177,13 @@ export class CourseService {
             },
             {
               path: 'students',
-              select: 'studentId firstNameEN lastNameEN firstNameTH lastNameTH',
+              populate: [
+                {
+                  path: 'student',
+                  select:
+                    'studentId firstNameEN lastNameEN firstNameTH lastNameTH',
+                },
+              ],
             },
             { path: 'TQF3' },
             { path: 'TQF5' },

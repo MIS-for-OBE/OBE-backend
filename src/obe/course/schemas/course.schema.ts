@@ -8,33 +8,27 @@ import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 
 @Schema()
 export class Score {
-  @Prop({
-    unique: true,
-    required: true,
-    sparse: true,
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  })
-  student: User;
+  @Prop()
+  assignmentName: string;
 
-  @Prop({ required: true })
-  point: number;
+  @Prop({ type: [{ name: String, score: Number }], _id: false })
+  questions: {
+    name: string;
+    score: number;
+  }[];
 }
 export const ScoreSchema = SchemaFactory.createForClass(Score);
 
 @Schema()
 export class Question {
   @Prop({ unique: true, required: true, sparse: true })
-  no: number;
+  name: string;
 
   @Prop()
   desc: string;
 
   @Prop({ required: true })
   fullScore: number;
-
-  @Prop({ type: [{ type: ScoreSchema }], _id: false, required: true })
-  scores: Score[];
 }
 export const QuestionSchema = SchemaFactory.createForClass(Question);
 
@@ -71,8 +65,16 @@ export class Section {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   coInstructors: User[];
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
-  students: User[];
+  @Prop({
+    type: [
+      {
+        student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        scores: [{ type: ScoreSchema }],
+      },
+    ],
+    _id: false,
+  })
+  students: { student: User; scores: Score[] }[];
 
   @Prop({ type: [{ type: AssignmentSchema }], _id: false })
   assignments: Assignment[];

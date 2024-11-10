@@ -160,9 +160,7 @@ export class SectionService {
           });
           if (!existsUser) {
             existsUser = await this.userModel.create({
-              studentId: student.studentId,
-              firstNameTH: student.firstName,
-              lastNameTH: student.lastName,
+              ...student,
               role: ROLE.STUDENT,
               enrollCourses: [
                 {
@@ -201,7 +199,12 @@ export class SectionService {
           (sec) => sec.sectionNo == sectionNo,
         );
         if (courseSection) {
-          courseSection.students = studentIds;
+          courseSection.students = studentIds.map((std) => {
+            const existStd = courseSection.students.find(
+              (std) => std.student == std.student,
+            );
+            return { student: std, scores: existStd.scores || [] };
+          });
         }
       });
       await Promise.all(updatePromises);
