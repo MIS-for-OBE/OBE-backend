@@ -331,7 +331,7 @@ export class TQF3Service {
       if (files.length > 1) {
         const fileAllParts = await this.generatePdfBLL.mergePdfs(
           files,
-          `TQF3_All_Parts_${date}.pdf`,
+          `TQF3_${course.courseNo}_All_Parts_${date}.pdf`,
         );
         files.push(fileAllParts);
       }
