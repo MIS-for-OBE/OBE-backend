@@ -153,7 +153,7 @@ export class SectionService {
       const { year, semester, course, sections } = requestDTO;
       let updateCourse = await this.courseModel.findById(course);
       const updatePromises = sections.map(async (section: any) => {
-        const { sectionId, studentList } = section;
+        const { sectionNo, studentList } = section;
         const studentPromises = studentList.map(async (student: any) => {
           let existsUser = await this.userModel.findOne({
             studentId: student.studentId,
@@ -168,7 +168,7 @@ export class SectionService {
                 {
                   year,
                   semester,
-                  courses: [{ course, section: sectionId }],
+                  courses: [{ course, section: sectionNo }],
                 },
               ],
             });
@@ -177,12 +177,19 @@ export class SectionService {
               (item) => item.year == year && item.semester == semester,
             );
             if (existsTerm) {
-              existsTerm.courses.push({ course, section: sectionId });
+              const existsCourse = existsTerm.courses.find(
+                (item) => item.course == course,
+              );
+              if (existsCourse) {
+                existsCourse.section = sectionNo;
+              } else {
+                existsTerm.courses.push({ course, section: sectionNo });
+              }
             } else {
               existsUser.enrollCourses.push({
                 year,
                 semester,
-                courses: [{ course, section: sectionId }],
+                courses: [{ course, section: sectionNo }],
               });
             }
             await existsUser.save();
@@ -190,24 +197,15 @@ export class SectionService {
           return existsUser._id;
         });
         const studentIds = await Promise.all(studentPromises);
-        updateCourse.sections.find((sec: any) => sec.id == sectionId).students =
-          studentIds;
-        // return this.model.updateOne(
-        //   { _id: sectionId },
-        //   { $set: { students: studentIds } },
-        // );
+        const courseSection = updateCourse.sections.find(
+          (sec) => sec.sectionNo == sectionNo,
+        );
+        if (courseSection) {
+          courseSection.students = studentIds;
+        }
       });
-
-      await Promise.all([updatePromises, updateCourse.save()]);
-
-      // const updatedSections = await this.model
-      //   .find({
-      //     _id: { $in: sections.map((section: any) => section.sectionId) },
-      //   })
-      //   .populate(
-      //     'students',
-      //     'studentId firstNameTH lastNameTH firstNameEN lastNameEN',
-      //   );
+      await Promise.all(updatePromises);
+      await updateCourse.save();
       return updateCourse.sections;
     } catch (error) {
       throw error;

@@ -15,9 +15,10 @@ export class EnrollCourse {
     type: [
       {
         course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
-        section: { type: mongoose.Schema.Types.ObjectId, ref: 'Section' },
+        section: Number,
       },
     ],
+    _id: false,
   })
   courses: {
     course: Course;
@@ -63,12 +64,6 @@ export class User {
 
   @Prop({ type: [EnrollCourseSchema], _id: false })
   enrollCourses?: EnrollCourse[];
-
-  // @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }] })
-  // ownCourses: Course[];
-
-  // @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }] })
-  // coCourses: Course[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
