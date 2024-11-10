@@ -141,7 +141,7 @@ export class AuthenticationService {
     if (!user) {
       userData.role = this.assignRole(basicInfo);
       if (basicInfo.itaccounttype_id == CMU_OAUTH_ROLE.STUDENT) {
-        this.updateUserDepartment(userData, basicInfo, accessToken);
+        await this.updateUserDepartment(userData, basicInfo, accessToken);
       }
       user = await this.userModel.create(userData);
     } else if (!user.departmentCode?.length) {
