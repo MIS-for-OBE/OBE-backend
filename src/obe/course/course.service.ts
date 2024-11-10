@@ -7,7 +7,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Course } from './schemas/course.schema';
 import { User } from '../user/schemas/user.schema';
-import { Section } from '../section/schemas/section.schema';
 import { CourseManagement } from '../courseManagement/schemas/courseManagement.schema';
 import { CourseSearchDTO } from './dto/search.dto';
 import {
@@ -30,7 +29,6 @@ import { FacultyService } from '../faculty/faculty.service';
 export class CourseService {
   constructor(
     @InjectModel(Course.name) private readonly model: Model<Course>,
-    @InjectModel(Section.name) private readonly sectionModel: Model<Section>,
     @InjectModel(CourseManagement.name)
     private readonly courseManagementModel: Model<CourseManagement>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
@@ -82,13 +80,17 @@ export class CourseService {
         }
         return courses;
       } else {
-        const sections = await this.sectionModel.find({
-          $or: [{ instructor: authUser.id }, { coInstructors: authUser.id }],
-        });
         const where = {
           year: searchDTO.year,
           semester: searchDTO.semester,
-          sections: { $in: sections.map((section) => section.id) },
+          sections: {
+            $elemMatch: {
+              $or: [
+                { instructor: authUser.id },
+                { coInstructors: authUser.id },
+              ],
+            },
+          },
         };
         if (searchDTO.search.length) {
           setWhereWithSearchCourse(where, searchDTO.search);
@@ -274,13 +276,11 @@ export class CourseService {
         this.courseManagementModel.findOne({
           courseNo: requestDTO.courseNo,
         }),
-        this.model
-          .findOne({
-            year: requestDTO.year,
-            semester: requestDTO.semester,
-            courseNo: requestDTO.courseNo,
-          })
-          .populate('sections'),
+        this.model.findOne({
+          year: requestDTO.year,
+          semester: requestDTO.semester,
+          courseNo: requestDTO.courseNo,
+        }),
       ]);
       for (const instructor of coInstructors) {
         let user = await this.userModel.findOne({
@@ -308,11 +308,11 @@ export class CourseService {
         tqf5 = course.sections.find(
           (sec) => sec.topic == requestDTO.sections[0].topic,
         ).TQF5;
-      } else if (!course || !tqf3 || !tqf5) {
+      } else if (!course || requestDTO.type == COURSE_TYPE.SEL_TOPIC) {
         tqf3 = (await this.tqf3Model.create({ status: TQF_STATUS.NO_DATA })).id;
         tqf5 = (await this.tqf5Model.create({ status: TQF_STATUS.NO_DATA })).id;
       }
-      requestDTO.sections.forEach((sec, index) => {
+      requestDTO.sections.forEach((sec) => {
         if (!course?.addFirstTime) sec.addFirstTime = true;
         if (requestDTO.type == COURSE_TYPE.SEL_TOPIC) {
           sec.TQF3 = tqf3;
@@ -321,25 +321,27 @@ export class CourseService {
       });
 
       if (existCourseManagement) {
-        await existCourseManagement.updateOne({
-          updatedYear: requestDTO.year,
-          updatedSemester: requestDTO.semester,
-          courseName: requestDTO.courseName,
-          $push: { sections: requestDTO.sections },
-        });
+        if (requestDTO.sections.find((sec) => sec.semester.length)) {
+          await existCourseManagement.updateOne({
+            updatedYear: requestDTO.year,
+            updatedSemester: requestDTO.semester,
+            courseName: requestDTO.courseName,
+            $push: {
+              sections: requestDTO.sections.filter(
+                (sec) => sec.semester.length,
+              ),
+            },
+          });
+        }
       } else {
         requestDTO.updatedYear = requestDTO.year;
         requestDTO.updatedSemester = requestDTO.semester;
         await this.courseManagementModel.create(requestDTO);
       }
 
-      const newSecion = await this.sectionModel.insertMany(
-        requestDTO.sections.filter((sec) => sec.openThisTerm),
-      );
-
       const courseData: Course = {
         ...requestDTO,
-        sections: newSecion.map((section) => section.id),
+        sections: requestDTO.sections.filter((sec) => sec.openThisTerm),
         addFirstTime: true,
       };
 
@@ -418,7 +420,6 @@ export class CourseService {
         );
       }
       await this.model.findByIdAndUpdate(id, requestDTO);
-
       return { id, ...requestDTO };
     } catch (error) {
       if (error.code == 11000) {
@@ -430,9 +431,7 @@ export class CourseService {
 
   async deleteCourse(id: string): Promise<Course> {
     try {
-      const deleteCourse = await this.model
-        .findByIdAndDelete(id)
-        .populate('sections');
+      const deleteCourse = await this.model.findByIdAndDelete(id);
       if (!deleteCourse) {
         throw new NotFoundException('Course not found');
       }
@@ -444,7 +443,6 @@ export class CourseService {
           if (section.TQF5) {
             await this.tqf5Model.findByIdAndDelete(section.TQF5);
           }
-          await this.sectionModel.findByIdAndDelete(section._id);
         }),
         this.tqf3Model.findByIdAndDelete(deleteCourse.TQF3),
         this.tqf5Model.findByIdAndDelete(deleteCourse.TQF5),
@@ -463,14 +461,12 @@ export class CourseService {
 
   async leaveCourse(userId: string, id: string): Promise<Course> {
     try {
-      const leaveCourse = await this.model.findById(id);
+      const leaveCourse = await this.model.findByIdAndUpdate(id, {
+        sections: { $pull: { coInstructors: userId } },
+      });
       if (!leaveCourse) {
         throw new NotFoundException('Course not found');
       }
-      await this.sectionModel.updateMany(
-        { _id: { $in: leaveCourse.sections } },
-        { $pull: { coInstructors: userId } },
-      );
       await this.courseManagementModel.findOneAndUpdate(
         { courseNo: leaveCourse.courseNo },
         { $pull: { 'sections.$[].coInstructors': userId } },

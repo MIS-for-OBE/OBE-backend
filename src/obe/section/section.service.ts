@@ -3,25 +3,28 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Section } from './schemas/section.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CourseManagement } from '../courseManagement/schemas/courseManagement.schema';
-import { Course } from '../course/schemas/course.schema';
+import { Course, Section } from '../course/schemas/course.schema';
 import { User } from '../user/schemas/user.schema';
 import { ROLE } from 'src/common/enum/role.enum';
+import { COURSE_TYPE } from 'src/common/enum/type.enum';
+import { TQF3 } from '../tqf3/schemas/tqf3.schema';
+import { TQF5 } from '../tqf5/schemas/tqf5.schema';
 
 @Injectable()
 export class SectionService {
   constructor(
-    @InjectModel(Section.name) private readonly model: Model<Section>,
+    @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(CourseManagement.name)
     private readonly courseManagementModel: Model<CourseManagement>,
-    @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(TQF3.name) private readonly tqf3Model: Model<TQF3>,
+    @InjectModel(TQF5.name) private readonly tqf5Model: Model<TQF5>,
   ) {}
 
-  async updateSection(id: string, requestDTO: any): Promise<Section> {
+  async updateSection(id: string, requestDTO: any): Promise<any> {
     try {
       const check = await this.courseManagementModel.findOne({
         courseNo: requestDTO.courseNo,
@@ -36,7 +39,6 @@ export class SectionService {
           `Section No ${('000' + requestDTO.data.sectionNo).slice(-3)} already exists`,
         );
       }
-
       const oldSection = check.sections.find(
         (sec: any) => sec.sectionNo === requestDTO.oldSectionNo,
       );
@@ -47,7 +49,7 @@ export class SectionService {
       for (const key in requestDTO.data) {
         updateFields[`sections.$[sec].${key}`] = requestDTO.data[key];
       }
-      const updateCourse = await this.courseManagementModel.findOneAndUpdate(
+      await this.courseManagementModel.findOneAndUpdate(
         {
           courseNo: requestDTO.courseNo,
           'sections.sectionNo': requestDTO.oldSectionNo,
@@ -58,56 +60,60 @@ export class SectionService {
           new: true,
         },
       );
-      if (!updateCourse) {
-        throw new NotFoundException('Course not found');
-      }
 
       if (oldTopic && newTopic && oldTopic !== newTopic) {
-        const course = await this.courseModel
-          .findOne({
-            year: requestDTO.year,
-            semester: requestDTO.semester,
-            courseNo: requestDTO.courseNo,
-          })
-          .select('sections');
         await Promise.all([
           this.courseManagementModel.findOneAndUpdate(
             { courseNo: requestDTO.courseNo },
             { $set: { 'sections.$[sec].topic': newTopic } },
             { arrayFilters: [{ 'sec.topic': oldTopic }] },
           ),
-          this.model.updateMany(
+          this.courseModel.findOneAndUpdate(
             {
-              _id: { $in: [...course.sections] },
-              topic: oldTopic,
+              year: requestDTO.year,
+              semester: requestDTO.semester,
+              courseNo: requestDTO.courseNo,
             },
-            { $set: { topic: newTopic } },
+            { $set: { 'sections.$[sec].topic': newTopic } },
+            { arrayFilters: [{ 'sec.topic': oldTopic }] },
           ),
         ]);
       }
-      const updateSection = await this.model.findByIdAndUpdate(
-        id,
-        requestDTO.data,
+      const course = await this.courseModel.findOneAndUpdate(
+        {
+          year: requestDTO.year,
+          semester: requestDTO.semester,
+          courseNo: requestDTO.courseNo,
+        },
+        { $set: updateFields },
+        {
+          arrayFilters: [{ 'sec._id': id }],
+          new: true,
+        },
+      );
+      return course;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateSectionActive(requestDTO: any): Promise<any> {
+    try {
+      await this.courseModel.updateOne(
+        {
+          _id: requestDTO.courseId,
+          'sections.sectionNo': requestDTO.sectionNo,
+        },
+        { $set: { 'sections.$.isActive': requestDTO.isActive } },
         { new: true },
       );
-      return updateSection;
+      return { message: 'ok' };
     } catch (error) {
       throw error;
     }
   }
 
-  async updateSectionActive(id: string, requestDTO: any): Promise<Section> {
-    try {
-      const updateSection = await this.model.findByIdAndUpdate(id, requestDTO, {
-        new: true,
-      });
-      return updateSection;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async deleteSection(id: string, requestDTO: any): Promise<Section> {
+  async deleteSection(id: string, requestDTO: any): Promise<any> {
     try {
       const updateCourse = await this.courseManagementModel.findOneAndUpdate(
         { courseNo: requestDTO.courseNo },
@@ -117,14 +123,26 @@ export class SectionService {
       if (!updateCourse) {
         throw new NotFoundException('Course not found');
       }
-      await this.courseModel.findByIdAndUpdate(requestDTO.courseId, {
-        $pull: { sections: id },
-      });
-      const deleteSection = await this.model.findByIdAndDelete(id);
-      if (!deleteSection) {
-        throw new NotFoundException('Section not found');
+      const update = await this.courseModel.findByIdAndUpdate(
+        requestDTO.courseId,
+        {
+          $pull: { sections: { _id: id } },
+        },
+      );
+
+      if (update.type == COURSE_TYPE.SEL_TOPIC) {
+        const delSec = update.sections.find((sec: any) => sec.id == id);
+        const existTopic = update.sections.find(
+          (sec: any) => sec.topic == delSec.topic && sec.id != id,
+        );
+        if (!existTopic) {
+          await Promise.all([
+            this.tqf3Model.findByIdAndDelete(delSec.TQF3),
+            this.tqf5Model.findByIdAndDelete(delSec.TQF5),
+          ]);
+        }
       }
-      return deleteSection;
+      return { message: 'ok' };
     } catch (error) {
       throw error;
     }
@@ -133,6 +151,7 @@ export class SectionService {
   async uploadStudentList(requestDTO: any): Promise<Section[]> {
     try {
       const { year, semester, course, sections } = requestDTO;
+      let updateCourse = await this.courseModel.findById(course);
       const updatePromises = sections.map(async (section: any) => {
         const { sectionId, studentList } = section;
         const studentPromises = studentList.map(async (student: any) => {
@@ -171,23 +190,25 @@ export class SectionService {
           return existsUser._id;
         });
         const studentIds = await Promise.all(studentPromises);
-        return this.model.updateOne(
-          { _id: sectionId },
-          { $set: { students: studentIds } },
-        );
+        updateCourse.sections.find((sec: any) => sec.id == sectionId).students =
+          studentIds;
+        // return this.model.updateOne(
+        //   { _id: sectionId },
+        //   { $set: { students: studentIds } },
+        // );
       });
 
-      await Promise.all(updatePromises);
+      await Promise.all([updatePromises, updateCourse.save()]);
 
-      const updatedSections = await this.model
-        .find({
-          _id: { $in: sections.map((section: any) => section.sectionId) },
-        })
-        .populate(
-          'students',
-          'studentId firstNameTH lastNameTH firstNameEN lastNameEN',
-        );
-      return updatedSections;
+      // const updatedSections = await this.model
+      //   .find({
+      //     _id: { $in: sections.map((section: any) => section.sectionId) },
+      //   })
+      //   .populate(
+      //     'students',
+      //     'studentId firstNameTH lastNameTH firstNameEN lastNameEN',
+      //   );
+      return updateCourse.sections;
     } catch (error) {
       throw error;
     }

@@ -10,10 +10,7 @@ import {
 @Module({
   imports: [
     MongooseModule.forFeature([
-      {
-        name: AcademicYear.name,
-        schema: AcademicYearSchema,
-      },
+      { name: AcademicYear.name, schema: AcademicYearSchema },
     ]),
   ],
   controllers: [AcademicYearController],

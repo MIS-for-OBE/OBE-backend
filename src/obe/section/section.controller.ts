@@ -11,12 +11,34 @@ import {
 } from '@nestjs/common';
 import { SectionService } from './section.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
-import { Section } from './schemas/section.schema';
+import { Section } from '../course/schemas/course.schema';
 
 @Controller('/section')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class SectionController {
   constructor(private service: SectionService) {}
+
+  @Post('student-list')
+  async uploadStudentList(
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<Section[]>> {
+    return this.service.uploadStudentList(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Put('/active')
+  async updateSectionActive(
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<Section>> {
+    return this.service.updateSectionActive(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
 
   @Put('/:id')
   async updateSection(
@@ -30,18 +52,6 @@ export class SectionController {
     });
   }
 
-  @Put('/:id/active')
-  async updateSectionActive(
-    @Param('id') id: string,
-    @Body() requestDTO: any,
-  ): Promise<ResponseDTO<Section>> {
-    return this.service.updateSectionActive(id, requestDTO).then((result) => {
-      const responseDTO = new ResponseDTO<Section>();
-      responseDTO.data = result;
-      return responseDTO;
-    });
-  }
-
   @Delete('/:id')
   async deleteSection(
     @Param('id') id: string,
@@ -49,17 +59,6 @@ export class SectionController {
   ): Promise<ResponseDTO<Section>> {
     return this.service.deleteSection(id, requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<Section>();
-      responseDTO.data = result;
-      return responseDTO;
-    });
-  }
-
-  @Post('student-list')
-  async uploadStudentList(
-    @Body() requestDTO: any,
-  ): Promise<ResponseDTO<Section[]>> {
-    return this.service.uploadStudentList(requestDTO).then((result) => {
-      const responseDTO = new ResponseDTO<Section[]>();
       responseDTO.data = result;
       return responseDTO;
     });

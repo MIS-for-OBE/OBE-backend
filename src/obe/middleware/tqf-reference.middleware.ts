@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { COURSE_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
 import { Course } from '../course/schemas/course.schema';
-import { Section } from '../section/schemas/section.schema';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
 import { TQF5 } from '../tqf5/schemas/tqf5.schema';
 
@@ -14,7 +13,6 @@ export class TQFReferenceMiddleware implements NestMiddleware {
     @InjectModel(TQF3.name) private tqf3Model: Model<TQF3>,
     @InjectModel(TQF5.name) private tqf5Model: Model<TQF5>,
     @InjectModel(Course.name) private courseModel: Model<Course>,
-    @InjectModel(Section.name) private sectionModel: Model<Section>,
   ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
@@ -43,25 +41,9 @@ export class TQFReferenceMiddleware implements NestMiddleware {
           section.TQF5 = tqf5List[index].id;
         });
       }
-
       next();
     } catch (error) {
       next(error);
-      // res
-      //   .status(500)
-      //   .json({ message: 'Failed to process TQF references', error });
     }
   }
-
-  // async removeReferences(sectionId: string) {
-  //   try {
-  //     const section = await this.sectionModel.findById(sectionId);
-  //     if (section) {
-  //       await this.tqf3Model.findByIdAndDelete(section.TQF3);
-  //       await this.tqf5Model.findByIdAndDelete(section.TQF5);
-  //     }
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
 }

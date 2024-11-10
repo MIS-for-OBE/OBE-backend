@@ -1,13 +1,3 @@
-// export enum LOG_EVENT_TYPE {
-//   FILE = 'File',
-//   COURSE_MANAGEMENT = 'Course Management',
-//   ASSIGNMENT = 'Assignment',
-//   SCORE = 'Score',
-//   CO_INS = 'Co-Instructor',
-//   TQF = 'TQF',
-//   ADMIN = 'Admin',
-// }
-
 export enum COURSE_TYPE {
   GENERAL = 'General Education',
   SPECIAL = 'Field of Specialization',
@@ -37,9 +27,4 @@ export enum TQF_STATUS {
   NO_DATA = 'No Data',
   IN_PROGRESS = 'In Progress',
   DONE = 'Done',
-}
-
-export enum OWNER_REF {
-  COURSE = 'Course',
-  SECTION = 'Section',
 }

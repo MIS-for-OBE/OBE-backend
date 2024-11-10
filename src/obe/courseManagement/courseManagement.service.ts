@@ -20,7 +20,6 @@ import {
 import { CourseManagementSearchDTO } from './dto/search.dto';
 import { AcademicYear } from '../academicYear/schemas/academicYear.schema';
 import { Course } from '../course/schemas/course.schema';
-import { Section } from '../section/schemas/section.schema';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
 import { ROLE } from 'src/common/enum/role.enum';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
@@ -32,7 +31,6 @@ export class CourseManagementService {
     @InjectModel(CourseManagement.name)
     private readonly model: Model<CourseManagement>,
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
-    @InjectModel(Section.name) private readonly sectionModel: Model<Section>,
     @InjectModel(AcademicYear.name)
     private readonly academicYearModel: Model<AcademicYear>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
@@ -81,31 +79,7 @@ export class CourseManagementService {
         .sort({ [searchDTO.orderBy]: searchDTO.orderType })
         .skip((searchDTO.page - 1) * searchDTO.limit)
         .limit(searchDTO.limit);
-      const activeTerm = await this.academicYearModel.findOne({
-        isActive: true,
-      });
-      const activeCourses = await this.courseModel
-        .find({
-          year: activeTerm.year,
-          semester: activeTerm.semester,
-          ...where,
-        })
-        .populate('sections');
-      courses.forEach((course) => {
-        course.sections.sort((a, b) => a.sectionNo - b.sectionNo);
-        const curCourse = activeCourses.find(
-          (e) => e.courseNo == course.courseNo,
-        );
-        if (curCourse) {
-          course.sections.forEach((sec) => {
-            sec.isActive =
-              curCourse.sections.find((e) => e.sectionNo == sec.sectionNo)
-                ?.isActive || false;
-          });
-        } else {
-          course.sections.forEach((sec) => (sec.isActive = false));
-        }
-      });
+      await this.setIsActiveSections(where, courses);
       if (searchDTO.page == 1) {
         const totalCount = await this.model.countDocuments(where);
         return { totalCount, courses, courseCode };
@@ -118,14 +92,42 @@ export class CourseManagementService {
 
   async searchOneCourseManagement(searchDTO: any): Promise<any> {
     try {
-      const course = await this.model.findOne({
+      const where = {
         courseNo: searchDTO.courseNo,
-      });
+      };
+      const course = await this.model.findOne(where);
       course?.sections.sort((a, b) => a.sectionNo - b.sectionNo);
+      await this.setIsActiveSections(where, [course]);
       return course || {};
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private async setIsActiveSections(where: any, courses: CourseManagement[]) {
+    const activeTerm = await this.academicYearModel.findOne({
+      isActive: true,
+    });
+    const activeCourses = await this.courseModel.find({
+      year: activeTerm.year,
+      semester: activeTerm.semester,
+      ...where,
+    });
+    courses.forEach((course) => {
+      course.sections.sort((a, b) => a.sectionNo - b.sectionNo);
+      const curCourse = activeCourses.find(
+        (e) => e.courseNo == course.courseNo,
+      );
+      if (curCourse) {
+        course.sections.forEach((sec) => {
+          sec.isActive =
+            curCourse.sections.find((e) => e.sectionNo == sec.sectionNo)
+              ?.isActive || false;
+        });
+      } else {
+        course.sections.forEach((sec) => (sec.isActive = false));
+      }
+    });
   }
 
   async createCourseManagement(
@@ -255,14 +257,11 @@ export class CourseManagementService {
         (a, b) => a.sectionNo - b.sectionNo,
       );
       updateSection.type = updateCourse.type;
-      let course: any = await this.courseModel
-        .findOne({
-          year: requestDTO.year,
-          semester: requestDTO.semester,
-          courseNo: requestDTO.courseNo,
-        })
-        .populate('sections');
-
+      let course = await this.courseModel.findOne({
+        year: requestDTO.year,
+        semester: requestDTO.semester,
+        courseNo: requestDTO.courseNo,
+      });
       if (oldTopic && newTopic && oldTopic !== newTopic) {
         await Promise.all([
           this.model.findOneAndUpdate(
@@ -270,58 +269,61 @@ export class CourseManagementService {
             { $set: { 'sections.$[sec].topic': newTopic } },
             { arrayFilters: [{ 'sec.topic': oldTopic }] },
           ),
-          this.sectionModel.updateMany(
-            {
-              id: { $in: course.sections.map((sec) => sec.id) },
-              topic: oldTopic,
-            },
-            { $set: { topic: newTopic } },
-          ),
         ]);
       }
-
       if (course) {
         if (!requestDTO.oldSectionNo) {
           requestDTO.oldSectionNo = requestDTO.data.sectionNo;
         }
-        let secId = course.sections.find(
+        let existSec = course.sections.find(
           (sec) => sec.sectionNo == requestDTO.oldSectionNo,
-        )?.id;
-        if (secId) {
-          await this.sectionModel.findByIdAndUpdate(secId, {
-            ...requestDTO.data,
-            isActive: requestDTO.openThisTerm,
+        );
+        if (existSec) {
+          course.sections.forEach((sec) => {
+            if (sec.topic && sec.topic == oldTopic) {
+              sec.topic = newTopic;
+            }
+            if (sec.sectionNo == requestDTO.oldSectionNo) {
+              sec.isActive = requestDTO.openThisTerm;
+              sec = { ...sec, ...requestDTO.data };
+            }
           });
+          await course.save();
         } else if (requestDTO.openThisTerm) {
-          secId = await this.createSection(course, updateSection, {
-            ...requestDTO,
-          });
+          const newSectionData = await this.createSection(
+            updateSection.find((sec) => sec.id == params.section)._doc,
+            requestDTO,
+          );
           await this.courseModel.findOneAndUpdate(
             {
               year: requestDTO.year,
               semester: requestDTO.semester,
               courseNo: requestDTO.courseNo,
             },
-            { $push: { sections: secId._id } },
+            {
+              $push: {
+                sections: newSectionData,
+              },
+            },
             { new: true },
           );
         }
         return {
           updateSection: updateSection.find((sec) => sec.id == params.section),
           courseId: course.id,
-          secId,
         };
       } else if (requestDTO.openThisTerm) {
-        let secId = await this.createSection(course, updateSection, {
-          ...requestDTO,
-        });
+        const newSectionData = await this.createSection(
+          updateSection.find((sec) => sec.id == params.section)._doc,
+          requestDTO,
+        );
         const data: any = {
           year: requestDTO.year,
           semester: requestDTO.semester,
           courseNo: requestDTO.courseNo,
           courseName: updateCourse.courseName,
           type: updateCourse.type,
-          sections: [secId],
+          sections: [newSectionData],
         };
         if (updateCourse.type != COURSE_TYPE.SEL_TOPIC) {
           const [tqf3, tqf5] = await Promise.all([
@@ -343,12 +345,6 @@ export class CourseManagementService {
 
   async updateCoInsSections(authUser: any, requestDTO: any): Promise<any> {
     try {
-      let updateCourse = await this.model.findOne({
-        courseNo: requestDTO.courseNo,
-      });
-      if (!updateCourse) {
-        throw new NotFoundException('CourseManagement not found');
-      }
       const emails = requestDTO.data
         .flatMap((sec) => sec.coInstructors)
         .filter((email) => email.endsWith('@cmu.ac.th'));
@@ -371,33 +367,33 @@ export class CourseManagementService {
           (email) => emailToId.get(email) || email,
         );
       });
-      updateCourse.sections.forEach((sec) => {
-        sec.coInstructors =
-          requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
-            ?.coInstructors ?? sec.coInstructors;
+      let updateCourse = await this.model.findOne({
+        courseNo: requestDTO.courseNo,
       });
-      await updateCourse.save();
-      let course = await this.courseModel
-        .findOne({
-          year: requestDTO.year,
-          semester: requestDTO.semester,
-          courseNo: requestDTO.courseNo,
-        })
-        .populate('sections');
+      if (requestDTO.actionType == 'courseManagement') {
+        if (!updateCourse) {
+          throw new NotFoundException('CourseManagement not found');
+        }
+        updateCourse.sections.forEach((sec) => {
+          sec.coInstructors =
+            requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
+              ?.coInstructors ?? sec.coInstructors;
+        });
+        await updateCourse.save();
+      }
+      let course = await this.courseModel.findOne({
+        year: requestDTO.year,
+        semester: requestDTO.semester,
+        courseNo: requestDTO.courseNo,
+      });
 
       if (course) {
-        const updateSectionPromises = course.sections.map((sec: any) => {
-          const coInstructors = requestDTO.data.find(
-            (item) => item.sectionNo == sec.sectionNo,
-          )?.coInstructors;
-          if (coInstructors) {
-            return this.sectionModel.findByIdAndUpdate(sec.id, {
-              coInstructors,
-            });
-          }
-          return;
+        course.sections.forEach((sec: any) => {
+          sec.coInstructors =
+            requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
+              ?.coInstructors ?? sec.coInstructors;
         });
-        await Promise.all(updateSectionPromises);
+        await course.save();
       }
       [updateCourse, course] = await Promise.all([
         this.model
@@ -457,7 +453,6 @@ export class CourseManagementService {
         semester: requestDTO.semester,
         courseNo: requestDTO.courseNo,
       });
-
       if (deleteCourse) {
         await Promise.all([
           deleteCourse.sections.map(async (section: any) => {
@@ -467,13 +462,11 @@ export class CourseManagementService {
             if (section.TQF5) {
               await this.tqf5Model.findByIdAndDelete(section.TQF5);
             }
-            await this.sectionModel.findByIdAndDelete(section._id);
           }),
           this.tqf3Model.findByIdAndDelete(deleteCourse.TQF3),
           this.tqf5Model.findByIdAndDelete(deleteCourse.TQF5),
         ]);
       }
-
       return { id, courseId: deleteCourse.id };
     } catch (error) {
       throw error;
@@ -488,28 +481,23 @@ export class CourseManagementService {
         { new: true },
       );
       if (!updateCourse) {
-        throw new NotFoundException('SectionManagement not found');
+        throw new NotFoundException('CourseManagement not found');
       }
-      const course: any = await this.courseModel
-        .findOne({
-          year: requestDTO.year,
-          semester: requestDTO.semester,
-          courseNo: requestDTO.courseNo,
-        })
-        .populate('sections');
+      const course: any = await this.courseModel.findOne({
+        year: requestDTO.year,
+        semester: requestDTO.semester,
+        courseNo: requestDTO.courseNo,
+      });
       if (course) {
-        const secId = course.sections.find(
+        const delSec = course.sections.find(
           (sec) => sec.sectionNo == requestDTO.sectionNo,
-        )?.id;
-        if (secId) {
-          const [updatedCourse, delSec] = await Promise.all([
-            this.courseModel.findByIdAndUpdate(
-              course.id,
-              { $pull: { sections: secId } },
-              { new: true },
-            ),
-            this.sectionModel.findByIdAndDelete(secId),
-          ]);
+        );
+        if (delSec) {
+          const updatedCourse = await this.courseModel.findByIdAndUpdate(
+            course.id,
+            { $pull: { sections: { _id: delSec.id } } },
+            { new: true },
+          );
           if (
             course.type == COURSE_TYPE.SEL_TOPIC &&
             !updatedCourse.sections.some((sec) => sec.topic == delSec.topic)
@@ -520,7 +508,7 @@ export class CourseManagementService {
             ]);
           }
         }
-        return { updateCourse, courseId: course.id, secId };
+        return { updateCourse, courseId: course?.id, secId: delSec?.id };
       }
       return updateCourse;
     } catch (error) {
@@ -554,26 +542,26 @@ export class CourseManagementService {
     }
   }
 
-  private async createSection(course: any, sections: any, requestDTO: any) {
-    const data = sections.find(
-      (sec) => sec.sectionNo == requestDTO.data.sectionNo,
-    )._doc;
-    delete data._id;
-    if (sections.type == COURSE_TYPE.SEL_TOPIC) {
+  private async createSection(update, requestDTO: any) {
+    if (requestDTO.type == COURSE_TYPE.SEL_TOPIC) {
+      const existTopic = await this.courseModel
+        .findOne({ 'sections.topic': requestDTO.data.topic })
+        .select('sections.$');
       let tqf3, tqf5;
-      if (
-        course &&
-        course.sections.find((sec) => requestDTO.data.topic == sec.topic)
-      ) {
-        tqf3 =  course.sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF3;
-        tqf5 =  course.sections.find((sec) => sec.topic == requestDTO.data.topic)?.TQF5;
+      if (existTopic) {
+        tqf3 = existTopic.sections[0].TQF3;
+        tqf5 = existTopic.sections[0].TQF5;
       } else {
         tqf3 = (await this.tqf3Model.create({ status: TQF_STATUS.NO_DATA })).id;
         tqf5 = (await this.tqf5Model.create({ status: TQF_STATUS.NO_DATA })).id;
       }
-      data.TQF3 = tqf3;
-      data.TQF5 = tqf5;
+      return {
+        ...update,
+        ...requestDTO.data,
+        TQF3: tqf3,
+        TQF5: tqf5,
+      };
     }
-    return await this.sectionModel.create(data);
+    return { ...update, ...requestDTO.data };
   }
 }
