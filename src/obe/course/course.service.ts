@@ -65,6 +65,10 @@ export class CourseService {
                 path: 'instructor',
                 select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
               },
+              {
+                path: 'coInstructors',
+                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+              },
               { path: 'TQF3' },
               { path: 'TQF5' },
             ],
@@ -156,7 +160,7 @@ export class CourseService {
     }
   }
 
-  async searchOneCourse(authUser: any, searchDTO: any): Promise<Course> {
+  async searchOneCourse(id: string, searchDTO: any): Promise<Course> {
     try {
       const course = await this.model
         .findOne({
@@ -197,9 +201,8 @@ export class CourseService {
       const topics = course.sections
         .map((sec: any) => {
           if (
-            [ROLE.SUPREME_ADMIN, ROLE.ADMIN].includes(authUser.role) ||
-            sec.instructor.id == authUser.id ||
-            sec.coInstructors.some((coIns: any) => coIns.id == authUser.id)
+            sec.instructor.id == id ||
+            sec.coInstructors.some((coIns: any) => coIns.id == id)
           )
             return sec.topic;
         })
