@@ -38,13 +38,11 @@ export class CourseController {
     @Request() req,
     @Query() searchDTO: CourseSearchDTO,
   ): Promise<ResponseDTO<Course>> {
-    return this.service
-      .searchOneCourse(req.user.id, searchDTO)
-      .then((result) => {
-        const responseDTO = new ResponseDTO<Course>();
-        responseDTO.data = result;
-        return responseDTO;
-      });
+    return this.service.searchOneCourse(req.user, searchDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Course>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
   }
 
   @Get('name/:courseNo')

@@ -10,6 +10,7 @@ import { Course, CourseSchema } from '../course/schemas/course.schema';
 import { CourseManagement, CourseManagementSchema } from '../courseManagement/schemas/courseManagement.schema';
 import { TQF3, TQF3Schema } from '../tqf3/schemas/tqf3.schema';
 import { TQF5, TQF5Schema } from '../tqf5/schemas/tqf5.schema';
+import { PLO, PLOSchema } from '../plo/schemas/plo.schema';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { TQF5, TQF5Schema } from '../tqf5/schemas/tqf5.schema';
       { name: AcademicYear.name, schema: AcademicYearSchema },
       { name: Course.name, schema: CourseSchema },
       { name: CourseManagement.name, schema: CourseManagementSchema },
+      { name: PLO.name, schema: PLOSchema },
       { name: TQF3.name, schema: TQF3Schema },
       { name: TQF5.name, schema: TQF5Schema },
     ]),

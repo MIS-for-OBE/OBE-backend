@@ -156,7 +156,7 @@ export class CourseService {
     }
   }
 
-  async searchOneCourse(id: string, searchDTO: any): Promise<Course> {
+  async searchOneCourse(authUser: any, searchDTO: any): Promise<Course> {
     try {
       const course = await this.model
         .findOne({
@@ -197,8 +197,9 @@ export class CourseService {
       const topics = course.sections
         .map((sec: any) => {
           if (
-            sec.instructor.id == id ||
-            sec.coInstructors.some((coIns: any) => coIns.id == id)
+            [ROLE.SUPREME_ADMIN, ROLE.ADMIN].includes(authUser.role) ||
+            sec.instructor.id == authUser.id ||
+            sec.coInstructors.some((coIns: any) => coIns.id == authUser.id)
           )
             return sec.topic;
         })

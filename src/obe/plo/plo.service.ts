@@ -76,8 +76,8 @@ export class PLOService {
         filter.name = searchDTO.name;
       } else {
         filter.isActive = true;
-        filter.year = { $gte: searchDTO.year };
-        filter.semester = { $gte: searchDTO.semester };
+        filter.year = { $lte: searchDTO.year };
+        filter.semester = { $lte: searchDTO.semester };
         const faculty = await this.facultyModel.findOne({ facultyCode });
         filter.departmentCode = faculty.department.find(
           ({ courseCode }) => courseCode === parseInt(searchDTO.courseCode),
