@@ -16,9 +16,6 @@ export class PLOService {
   constructor(
     @InjectModel(PLO.name) private readonly model: Model<PLO>,
     @InjectModel(Faculty.name) private readonly facultyModel: Model<Faculty>,
-    // @InjectModel(Course.name) private readonly courseModel: Model<Course>,
-    // @InjectModel(CourseManagement.name)
-    // private readonly courseManagementModel: Model<CourseManagement>,
   ) {}
   async searchPLO(facultyCode: string, searchDTO: any): Promise<any> {
     try {

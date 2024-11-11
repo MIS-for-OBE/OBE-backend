@@ -11,7 +11,6 @@ import { Faculty, FacultySchema } from '../faculty/schemas/faculty.schema';
     MongooseModule.forFeature([
       { name: PLO.name, schema: PLOSchema },
       { name: Faculty.name, schema: FacultySchema },
-      { name: User.name, schema: UserSchema },
     ]),
   ],
   controllers: [PLOController],

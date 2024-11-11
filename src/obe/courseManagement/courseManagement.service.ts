@@ -95,7 +95,19 @@ export class CourseManagementService {
       const where = {
         courseNo: searchDTO.courseNo,
       };
-      const course = await this.model.findOne(where);
+      const course = await this.model.findOne(where).populate({
+        path: 'sections',
+        populate: [
+          {
+            path: 'instructor',
+            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+          },
+          {
+            path: 'coInstructors',
+            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+          },
+        ],
+      });
       course?.sections.sort((a, b) => a.sectionNo - b.sectionNo);
       await this.setIsActiveSections(where, [course]);
       return course || {};
@@ -191,16 +203,18 @@ export class CourseManagementService {
       if (!course) {
         throw new NotFoundException('CourseManagement not found');
       }
-      const updateCourse = await this.courseModel.findOneAndUpdate(
-        {
-          year: requestDTO.year,
-          semester: requestDTO.semester,
-          courseNo: requestDTO.oldCourseNo,
-        },
-        requestDTO,
-        { new: true },
-      );
-      return { id, ...requestDTO, courseId: updateCourse.id };
+      const updateCourse = await this.courseModel
+        .findOneAndUpdate(
+          {
+            year: requestDTO.year,
+            semester: requestDTO.semester,
+            courseNo: requestDTO.oldCourseNo,
+          },
+          requestDTO,
+          { new: true },
+        )
+        .select('-sections');
+      return { id, ...requestDTO, courseId: updateCourse?.id };
     } catch (error) {
       throw error;
     }
@@ -524,15 +538,17 @@ export class CourseManagementService {
             const updatedSections = course.sections.map((section) => {
               return this.model.findByIdAndUpdate(
                 course.id,
-                { $set: { 'sections.$[elem].plos': section.plos } },
-                { arrayFilters: [{ 'elem.topic': section.topic }] },
+                { $set: { 'sections.$[elem].ploRequire': section.ploRequire } },
+                { arrayFilters: [{ 'elem.topic': section.topic }], new: true },
               );
             });
             return await Promise.all(updatedSections);
           } else {
-            return await this.model.findByIdAndUpdate(course.id, {
-              plos: course.plos,
-            });
+            return await this.model.findByIdAndUpdate(
+              course.id,
+              { ploRequire: course.ploRequire },
+              { new: true },
+            );
           }
         }),
       );

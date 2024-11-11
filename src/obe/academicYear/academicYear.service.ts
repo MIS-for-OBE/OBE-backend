@@ -3,11 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AcademicYear } from './schemas/academicYear.schema';
 import { AcademicYearSearchDTO } from './dto/search.dto';
-import { Course, Section } from '../course/schemas/course.schema';
+import { Course } from '../course/schemas/course.schema';
 import { CourseManagement } from '../courseManagement/schemas/courseManagement.schema';
 import { COURSE_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
 import { TQF5 } from '../tqf5/schemas/tqf5.schema';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
+import { PLO } from '../plo/schemas/plo.schema';
 
 @Injectable()
 export class AcademicYearService {
@@ -18,6 +19,7 @@ export class AcademicYearService {
     private readonly courseManagementModel: Model<CourseManagement>,
     @InjectModel(TQF3.name) private readonly tqf3Model: Model<TQF3>,
     @InjectModel(TQF5.name) private readonly tqf5Model: Model<TQF5>,
+    @InjectModel(PLO.name) private readonly ploModel: Model<PLO>,
   ) {}
 
   async searchAcademicYear(
@@ -65,6 +67,8 @@ export class AcademicYearService {
         { isActive: true },
         { new: true },
       );
+      // await this.ploModel.updateMany({}, {});
+
       const courseManagements = await this.courseManagementModel.find({
         sections: {
           $elemMatch: { semester: academic.semester },

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
-import { PLONo } from 'src/obe/plo/schemas/plo.schema';
+import { PLO, PLONo } from 'src/obe/plo/schemas/plo.schema';
 import { User } from 'src/obe/user/schemas/user.schema';
 
 export type CourseManagementDocument = HydratedDocument<CourseManagement>;
@@ -15,9 +15,20 @@ export class SectionManagement {
   topic: string;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+    type: [
+      {
+        plo: { type: mongoose.Schema.Types.ObjectId, ref: 'PLO' },
+        list: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'PLONo',
+          },
+        ],
+      },
+    ],
+    _id: false,
   })
-  plos: PLONo[];
+  ploRequire: { plo: PLO; list: PLONo[] }[];
 
   @Prop()
   semester: number[];
@@ -62,9 +73,20 @@ export class CourseManagement {
   sections?: SectionManagement[];
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+    type: [
+      {
+        plo: { type: mongoose.Schema.Types.ObjectId, ref: 'PLO' },
+        list: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'PLONo',
+          },
+        ],
+      },
+    ],
+    _id: false,
   })
-  plos: PLONo[];
+  ploRequire: { plo: PLO; list: PLONo[] }[];
 }
 
 export const CourseManagementSchema =
