@@ -152,7 +152,7 @@ export const buildPart6Content = (
               'ปรับปรุงกระบวนวิชาช่วงเวลาการปรับปรุงหลักสูตร \n(Improving the course during the curriculum improvement period)',
             labelTH: 'ปรับปรุงกระบวนวิชาช่วงเวลาการปรับปรุงหลักสูตร',
           },
-          { label: 'อื่นๆ (Other)', labelTH: 'ไม่มี' },
+          { label: 'อื่นๆ (Other)', labelTH: 'อื่นๆ' },
         ],
       },
     ];
