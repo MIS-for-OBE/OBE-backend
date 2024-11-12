@@ -203,7 +203,7 @@ export class SectionService {
             const existStd = courseSection.students.find(
               (std) => std.student == std.student,
             );
-            return { student: std, scores: existStd.scores || [] };
+            return { student: std, scores: existStd?.scores || [] };
           });
         }
       });
