@@ -82,9 +82,6 @@ export class Section {
   @Prop()
   topic: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }] })
-  plos: PLONo[];
-
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF3' })
   TQF3: TQF3;
 
