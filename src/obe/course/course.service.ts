@@ -56,7 +56,7 @@ export class CourseService {
         if (searchDTO.search?.length) {
           setWhereWithSearchCourse(where, searchDTO.search);
         }
-        const courses = await this.model
+        let coursesQuery = this.model
           .find(where)
           .populate({
             path: 'sections',
@@ -75,10 +75,58 @@ export class CourseService {
           })
           .populate('TQF3')
           .populate('TQF5')
-          .sort({ [searchDTO.orderBy]: searchDTO.orderType })
-          .skip((searchDTO.page - 1) * searchDTO.limit)
-          .limit(searchDTO.limit);
-        if (searchDTO.page == 1) {
+          .sort({ [searchDTO.orderBy]: searchDTO.orderType });
+        if (!searchDTO.tqf3?.length && !searchDTO.tqf5?.length) {
+          coursesQuery = coursesQuery
+            .skip((searchDTO.page - 1) * searchDTO.limit)
+            .limit(searchDTO.limit);
+        }
+        let courses: any = await coursesQuery.exec();
+        if (searchDTO.tqf3.length || searchDTO.tqf5.length) {
+          const tqf3Filters = searchDTO.tqf3;
+          const tqf5Filters = searchDTO.tqf5;
+          courses =
+            courses
+              .map((course) => {
+                if (course.type == COURSE_TYPE.SEL_TOPIC) {
+                  const filter = course.sections.filter((sec) => {
+                    if (tqf3Filters.length && tqf5Filters.length) {
+                      return (
+                        tqf3Filters.includes(sec.TQF3!.status) &&
+                        tqf5Filters.includes(sec.TQF5!.status)
+                      );
+                    } else if (tqf3Filters.length) {
+                      return tqf3Filters.includes(sec.TQF3!.status);
+                    } else if (tqf5Filters.length) {
+                      return tqf5Filters.includes(sec.TQF5!.status);
+                    }
+                  });
+                  return filter.length
+                    ? { ...course._doc, sections: [...filter] }
+                    : undefined;
+                } else {
+                  return { ...course._doc };
+                }
+              })
+              .filter((course) => {
+                if (!course) return false;
+                else if (course.TQF3 && course.TQF5) {
+                  if (tqf3Filters.length && tqf5Filters.length) {
+                    return (
+                      tqf3Filters.includes(course.TQF3.status) &&
+                      tqf5Filters.includes(course.TQF5.status)
+                    );
+                  } else if (tqf3Filters.length) {
+                    return tqf3Filters.includes(course.TQF3.status);
+                  } else if (tqf5Filters.length) {
+                    return tqf5Filters.includes(course.TQF5.status);
+                  }
+                }
+                return true;
+              }) || [];
+          const totalCount = courses.length;
+          return { totalCount, courses, courseCode };
+        } else if (searchDTO.page == 1) {
           const totalCount = await this.model.countDocuments(where);
           return { totalCount, courses, courseCode };
         }
