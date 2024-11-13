@@ -298,8 +298,8 @@ export class CourseManagementService {
               sec.topic = newTopic;
             }
             if (sec.sectionNo == requestDTO.oldSectionNo) {
-              sec.isActive = requestDTO.openThisTerm;
               sec = { ...sec, ...requestDTO.data };
+              sec.isActive = requestDTO.openThisTerm;
             }
           });
           await course.save();
