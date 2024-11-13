@@ -32,7 +32,9 @@ export class Question {
 }
 export const QuestionSchema = SchemaFactory.createForClass(Question);
 
-@Schema()
+@Schema({
+  timestamps: { createdAt: true, updatedAt: false },
+})
 export class Assignment {
   @Prop({ unique: true, required: true, sparse: true })
   name: string;
