@@ -16,6 +16,7 @@ import { TQF3Module } from './obe/tqf3/tqf3.module';
 import { TQF5Module } from './obe/tqf5/tqf5.module';
 import mongoose from 'mongoose';
 import { globalTransformPlugin } from './common/plugins/globalTransform.plugin';
+import { ScoreModule } from './obe/score/score.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { globalTransformPlugin } from './common/plugins/globalTransform.plugin';
     CourseManagementModule,
     CourseModule,
     SectionModule,
+    ScoreModule,
     TQF3Module,
     TQF5Module,
   ],

@@ -66,12 +66,12 @@ export class DocumentInterceptor implements NestInterceptor {
       this.reqLogger.log('Request', {
         userToken,
         path: this.getFullPath(req),
-        ...(_.includes(['GET', 'DELETE'], req.method)
-          ? { query: req.query }
-          : {
-              body: buildBodyPayload(req.body),
-              query: _.isEmpty(req.query) ? undefined : req.query,
-            }),
+        // ...(_.includes(['GET', 'DELETE'], req.method)
+        //   ? { query: req.query }
+        //   : {
+        //       body: buildBodyPayload(req.body),
+        //       query: _.isEmpty(req.query) ? undefined : req.query,
+        //     }),
       });
     } catch (error) {
       // continue
