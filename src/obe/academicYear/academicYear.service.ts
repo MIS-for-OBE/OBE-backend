@@ -67,7 +67,27 @@ export class AcademicYearService {
         { isActive: true },
         { new: true },
       );
-      // await this.ploModel.updateMany({}, {});
+      const activePlo = await this.ploModel.find({ isActive: true });
+      await this.ploModel.updateMany(
+        { year: academic.year, semester: academic.semester },
+        { isActive: true },
+        { new: true },
+      );
+      const updatedPlo = await this.ploModel.find({
+        year: academic.year,
+        semester: academic.semester,
+        isActive: true,
+      });
+      const departmentCode = updatedPlo
+        .map(({ departmentCode }) => departmentCode)
+        .flat();
+      const updatePromises = activePlo.map((plo) => {
+        if (plo.departmentCode.some((item) => departmentCode.includes(item))) {
+          plo.isActive = false;
+          return plo.save();
+        }
+      });
+      await Promise.all(updatePromises);
 
       const courseManagements = await this.courseManagementModel.find({
         sections: {
