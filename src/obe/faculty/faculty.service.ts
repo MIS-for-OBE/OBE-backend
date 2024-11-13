@@ -41,7 +41,7 @@ export class FacultyService {
           },
           { [res.codeEN]: res.courseCode } as { [key: string]: number },
         );
-      if (!facultyCode.includes(res.codeEN)) {
+      if (!departmentCode.includes(res.codeEN)) {
         delete courseCodeMap[res.codeEN];
       }
       return courseCodeMap;
