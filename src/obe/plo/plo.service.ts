@@ -72,7 +72,6 @@ export class PLOService {
       if (searchDTO.name) {
         filter.name = searchDTO.name;
       } else {
-        filter.isActive = true;
         filter.year = { $lte: searchDTO.year };
         filter.semester = { $lte: searchDTO.semester };
         const faculty = await this.facultyModel.findOne({ facultyCode });
@@ -80,7 +79,16 @@ export class PLOService {
           ({ courseCode }) => courseCode === parseInt(searchDTO.courseCode),
         )?.codeEN;
       }
-      const plo = await this.model.findOne(filter);
+      const plosMatch = await this.model
+        .find(filter)
+        .sort({ year: 'desc', semester: 'desc' });
+      const plo = searchDTO.name
+        ? plosMatch[0]
+        : plosMatch.find(
+            (item) =>
+              item.year <= searchDTO.year &&
+              item.semester <= searchDTO.semester,
+          );
       if (plo && plo.data) {
         plo.data.sort((a, b) => a.no - b.no);
       }
