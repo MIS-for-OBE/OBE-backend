@@ -59,7 +59,7 @@ export const buildPart1Content = (
     doc
       .font(fontNormal)
       .text(
-        `${data.CourseCodeTha} ${data.CourseID ? data.CourseID.slice(-3) : ''} `,
+        `${data.CourseCodeTha} ${data.CourseID ? data.CourseID.slice(-3) : ''} (${data.CourseID})`,
       )
       .moveDown(0.6);
 

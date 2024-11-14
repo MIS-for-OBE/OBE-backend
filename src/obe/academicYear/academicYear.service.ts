@@ -149,7 +149,6 @@ export class AcademicYearService {
             }
             existingCourse.sections.push(dataSection);
           }
-          console.log('Section Added:', dataSection);
         }
       }
 

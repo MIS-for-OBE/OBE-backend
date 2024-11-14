@@ -132,8 +132,8 @@ export const buildPart4Content = (
       if (e && typeof e.height === 'number') {
         newTable += e.height;
 
-        console.log(`CLO ${e.cloIndex}`, `order ${e.order}`, e.height);
-        console.log(`newTable ${newTable}`);
+        // console.log(`CLO ${e.cloIndex}`, `order ${e.order}`, e.height);
+        // console.log(`newTable ${newTable}`);
 
         if (newTable > temp) {
           const indexToPop = rows.findIndex((row) => row[0] === e.clo);
@@ -141,7 +141,7 @@ export const buildPart4Content = (
             Number(e.cloIndex) +
             (e.order !== 0 ? 1 + addIndexNewInstance : addIndexNewInstance);
           addPageIndex.push(pageIndex);
-          console.log('pageIndex', pageIndex);
+          // console.log('pageIndex', pageIndex);
 
           if (indexToPop !== -1) {
             if (e.order !== 0) {
@@ -168,15 +168,15 @@ export const buildPart4Content = (
               rows.splice(indexToPop, 0, ...newInstances);
             }
           } else {
-            console.log('No item to pop');
+            // console.log('No item to pop');
           }
           newTable = e.height;
         }
       }
     });
 
-    console.log('addPage', addPageIndex);
-    console.log(rows);
+    // console.log('addPage', addPageIndex);
+    // console.log(rows);
 
     subRowHeight = [];
     cloHeight = [];
@@ -282,7 +282,7 @@ export const buildPart4Content = (
 
     function drawHeaders() {
       drawRow(tableTop, headers, true);
-      console.log(doc.y);
+      // console.log(doc.y);
     }
 
     function drawTable() {
@@ -290,7 +290,7 @@ export const buildPart4Content = (
 
       rows.forEach((row, cloIndex) => {
         if (addPageIndex.includes(cloIndex)) {
-          console.log(doc.y);
+          // console.log(doc.y);
           doc.addPage();
           currentY = doc.y;
         }
