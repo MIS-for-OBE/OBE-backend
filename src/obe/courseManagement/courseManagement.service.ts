@@ -48,9 +48,6 @@ export class CourseManagementService {
         facultyCode,
         searchDTO.departmentCode,
       );
-      if (searchDTO.isPloMapping) {
-        delete courseCode[Object.keys(courseCode)[0]];
-      }
       const where = {
         courseNo: {
           $in: Object.values(courseCode).map(
