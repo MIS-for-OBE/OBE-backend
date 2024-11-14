@@ -94,18 +94,18 @@ export const buildPart1Content = (
     doc.text('1 หลักสูตรและประเภทของกระบวนวิชา').moveDown(0.6);
     doc.font(fontNormal).text('1.1', { continued: true });
     const curriculum = ['สำหรับหลักสูตร', 'สำหรับหลายหลักสูตร'];
+    const checkCurriculum = data.curriculum.includes(curriculum[0]);
     doc
       .font(emoji)
-      .text(
-        setSymbol(data.curriculum == curriculum[0]),
-        doc.x + 9.5,
-        doc.y - 2,
-        { continued: true },
-      );
+      .text(setSymbol(checkCurriculum), doc.x + 9.5, doc.y - 2, {
+        continued: true,
+      });
     doc
       .font(fontNormal)
       .text(
-        'สำหรับหลักสูตร..........  สาขาวิชา..........',
+        checkCurriculum
+          ? data.curriculum
+          : 'สำหรับหลักสูตร..........  สาขาวิชา..........',
         doc.x + 5,
         doc.y + 2,
       );
