@@ -42,6 +42,8 @@ export const buildPart2Content = (
         },
       );
 
+    doc.moveDown(0.85);
+
     doc.text(data.Credit, {
       align: 'right',
     });
@@ -155,10 +157,11 @@ export const buildPart2Content = (
     doc.font(fontBold).text('เงื่อนไขที่ต้องผ่านก่อน', 55.5, doc.y, {
       continued: true,
     });
+    doc.moveDown(0.6);
 
     doc.font(fontNormal).text(data.PreText, doc.x + 10, doc.y);
 
-    doc.moveDown(0.6);
+    doc.moveDown(0.85);
   }
 
   // คำอธิบายลักษณะกระบวนวิชา
