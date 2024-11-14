@@ -265,7 +265,7 @@ export class TQF3Service {
       const department = faculty.department.find(
         ({ courseCode }) => courseCode == parseInt(course.courseNo.slice(0, 3)),
       );
-      data.FacultyNameEng = faculty.facultyEN;
+      data.FacultyNameEng = faculty?.facultyEN;
       data.DepartmentNameTha = department?.departmentTH;
       data.DepartmentNameEng = department?.departmentEN;
       if (!data.CourseID) {
@@ -275,9 +275,9 @@ export class TQF3Service {
         data.CourseTitleTha = course.courseName;
         data.CourseTitleEng = course.courseName;
         data.FacultyID = facultyCode;
-        data.FacultyNameTha = faculty.facultyTH;
-        data.CourseCodeTha = department.codeTH;
-        data.CourseCodeEng = department.codeEN;
+        data.FacultyNameTha = faculty?.facultyTH;
+        data.CourseCodeTha = department?.codeTH;
+        data.CourseCodeEng = department?.codeEN;
       }
 
       const tqf3: any = await this.model.findById(requestDTO.tqf3);
