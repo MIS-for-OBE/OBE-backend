@@ -74,10 +74,14 @@ export class PLOService {
       } else {
         filter.year = { $lte: searchDTO.year };
         filter.semester = { $lte: searchDTO.semester };
-        const faculty = await this.facultyModel.findOne({ facultyCode });
-        filter.departmentCode = faculty.department.find(
-          ({ courseCode }) => courseCode === parseInt(searchDTO.courseCode),
-        )?.codeEN;
+        if (searchDTO.codeEN) {
+          filter.departmentCode = searchDTO.codeEN;
+        } else {
+          const faculty = await this.facultyModel.findOne({ facultyCode });
+          filter.departmentCode = faculty.department.find(
+            ({ courseCode }) => courseCode === parseInt(searchDTO.courseCode),
+          )?.codeEN;
+        }
       }
       const plosMatch = await this.model
         .find(filter)
