@@ -116,4 +116,12 @@ export class ScoreService {
       throw error;
     }
   }
+
+  async publishScore(requestDTO: any): Promise<any> {
+    try {
+      console.log(requestDTO);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
