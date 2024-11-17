@@ -26,4 +26,13 @@ export class ScoreController {
       return responseDTO;
     });
   }
+
+  @Put('publish')
+  async publishScore(@Body() requestDTO: any): Promise<ResponseDTO<Section[]>> {
+    return this.service.publishScore(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
 }

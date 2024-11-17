@@ -290,15 +290,20 @@ export class CourseManagementService {
           (sec) => sec.sectionNo == requestDTO.oldSectionNo,
         );
         if (existSec) {
-          course.sections.forEach((sec) => {
-            if (sec.topic && sec.topic == oldTopic) {
-              sec.topic = newTopic;
+          course.sections = course.sections.map((sec) => {
+            if (sec.sectionNo === requestDTO.oldSectionNo) {
+              if (sec.topic && sec.topic === requestDTO.oldTopic) {
+                sec.topic = requestDTO.newTopic;
+              }
+              return {
+                ...sec,
+                ...requestDTO.data,
+                isActive: requestDTO.openThisTerm,
+              };
             }
-            if (sec.sectionNo == requestDTO.oldSectionNo) {
-              sec = { ...sec, ...requestDTO.data };
-              sec.isActive = requestDTO.openThisTerm;
-            }
+            return sec;
           });
+          course.markModified('sections');
           await course.save();
         } else if (requestDTO.openThisTerm) {
           const newSectionData = await this.createSection(
@@ -311,11 +316,7 @@ export class CourseManagementService {
               semester: requestDTO.semester,
               courseNo: requestDTO.courseNo,
             },
-            {
-              $push: {
-                sections: newSectionData,
-              },
-            },
+            { $push: { sections: newSectionData } },
             { new: true },
           );
         }
