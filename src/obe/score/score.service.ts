@@ -119,7 +119,24 @@ export class ScoreService {
 
   async publishScore(requestDTO: any): Promise<any> {
     try {
-      console.log(requestDTO);
+      const updateAssignments = await this.courseModel.findByIdAndUpdate(
+        requestDTO.course,
+        {
+          $set: {
+            'sections.$[section].assignments.$[assignment].isPublish':
+              requestDTO.isPublish,
+          },
+        },
+        {
+          arrayFilters: [
+            { 'section.sectionNo': { $in: requestDTO.sections } },
+            { 'assignment.name': { $in: requestDTO.assignments } },
+          ],
+          fields: ['sections.sectionNo', 'sections.assignments'],
+          new: true,
+        },
+      );
+      return updateAssignments;
     } catch (error) {
       throw error;
     }

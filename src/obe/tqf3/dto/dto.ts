@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 import { BaseDTO } from 'src/common/dto/base.dto';
 
 export class GeneratePdfDTO extends BaseDTO {
@@ -15,6 +15,13 @@ export class GeneratePdfDTO extends BaseDTO {
 
   @IsString()
   tqf3: string;
+
+  @IsBoolean()
+  @Transform((transformFn) => {
+    if (transformFn.value === 'true') return true;
+    else return false;
+  })
+  oneFile = false;
 
   @IsOptional()
   @IsString()

@@ -67,28 +67,43 @@ export class TQF3Controller {
         req.user.facultyCode,
         requestDTO,
       );
-      res.setHeader(
-        'Content-disposition',
-        `attachment; filename="TQF3_Parts_${requestDTO.courseNo}_${requestDTO.academicYear}_${requestDTO.academicTerm}.zip"`,
-      );
-      res.setHeader('Content-type', 'application/zip');
-      res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
-      const archive = archiver('zip', { zlib: { level: 9 } });
-      archive.on('error', (err) => {
-        throw err;
-      });
-      res.on('close', () => {
-        files.forEach((file) => fs.unlinkSync(file));
-      });
-      archive.pipe(res);
-      files.forEach((file) => {
-        const filePath = join(process.cwd(), file);
-        const stats = fs.statSync(filePath);
-        const bangkokOffset = 7 * 60 * 60 * 1000;
-        const modifiedDate = new Date(stats.mtime.getTime() + bangkokOffset);
-        archive.file(filePath, { name: file, date: modifiedDate });
-      });
-      await archive.finalize();
+      if (files.length === 1) {
+        const filePath = join(process.cwd(), files[0]);
+        res.setHeader(
+          'Content-disposition',
+          `attachment; filename="${files[0]}"`,
+        );
+        res.setHeader('Content-type', 'application/pdf');
+        res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+        const stream = fs.createReadStream(filePath);
+        stream.pipe(res);
+        stream.on('close', () => {
+          fs.unlinkSync(filePath);
+        });
+      } else {
+        res.setHeader(
+          'Content-disposition',
+          `attachment; filename="TQF3_Parts_${requestDTO.courseNo}_${requestDTO.academicYear}_${requestDTO.academicTerm}.zip"`,
+        );
+        res.setHeader('Content-type', 'application/zip');
+        res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+        const archive = archiver('zip', { zlib: { level: 9 } });
+        archive.on('error', (err) => {
+          throw err;
+        });
+        res.on('close', () => {
+          files.forEach((file) => fs.unlinkSync(file));
+        });
+        archive.pipe(res);
+        files.forEach((file) => {
+          const filePath = join(process.cwd(), file);
+          const stats = fs.statSync(filePath);
+          const bangkokOffset = 7 * 60 * 60 * 1000;
+          const modifiedDate = new Date(stats.mtime.getTime() + bangkokOffset);
+          archive.file(filePath, { name: file, date: modifiedDate });
+        });
+        await archive.finalize();
+      }
     } catch (error) {
       throw error;
     }
