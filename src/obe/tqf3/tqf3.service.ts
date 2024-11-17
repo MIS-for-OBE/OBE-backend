@@ -13,6 +13,8 @@ import {
 import { GeneratePdfBLL } from './bll/genPdf';
 import { Course } from '../course/schemas/course.schema';
 import { Faculty } from '../faculty/schemas/faculty.schema';
+import * as fs from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class TQF3Service {
@@ -283,7 +285,7 @@ export class TQF3Service {
       const tqf3: any = await this.model.findById(requestDTO.tqf3);
 
       const date = moment().format('DD-MM-YYYY');
-      const files = [];
+      let files = [];
 
       if (requestDTO.part1 !== undefined) {
         const filename = await this.generatePdfBLL.generatePdf(1, date, {
@@ -328,12 +330,18 @@ export class TQF3Service {
         files.push(filename);
       }
 
-      if (files.length > 1) {
+      if (requestDTO.oneFile) {
         const fileAllParts = await this.generatePdfBLL.mergePdfs(
           files,
           `TQF3_${course.courseNo}_All_Parts_${date}.pdf`,
         );
-        files.push(fileAllParts);
+        files.forEach((file) => {
+          const filePath = join(process.cwd(), file);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        });
+        files = [fileAllParts];
       }
 
       return files;
