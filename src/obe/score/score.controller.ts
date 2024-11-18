@@ -35,4 +35,37 @@ export class ScoreController {
       return responseDTO;
     });
   }
+
+  @Put('student')
+  async updateStudentScore(
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<Section[]>> {
+    return this.service.updateStudentScore(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Put()
+  async updateAssignment(
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<Section[]>> {
+    return this.service.updateAssignment(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Delete()
+  async deleteAssignment(
+    @Query() requestDTO: any,
+  ): Promise<ResponseDTO<Section[]>> {
+    return this.service.deleteAssignment(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
 }
