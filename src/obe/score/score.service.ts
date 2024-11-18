@@ -26,47 +26,54 @@ export class ScoreService {
       let updateCourse = await this.courseModel.findById(course);
       const updatePromises = sections.map(async (section: any) => {
         for (const student of section.students) {
-          if (!student.student) {
-            let existsUser = await this.userModel.findOne({
-              studentId: student.studentId,
-            });
-            if (!existsUser) {
-              existsUser = await this.userModel.create({
-                ...student,
-                role: ROLE.STUDENT,
-                enrollCourses: [
-                  {
-                    year,
-                    semester,
-                    courses: [{ course, section: section.sectionNo }],
-                  },
-                ],
-              });
-            } else {
-              const existsTerm = existsUser.enrollCourses.find(
-                (item) => item.year == year && item.semester == semester,
-              );
-              if (existsTerm) {
-                const existsCourse = existsTerm.courses.find(
-                  (item) => item.course == course,
-                );
-                if (existsCourse) {
-                  existsCourse.section = section.sectionNo;
-                } else {
-                  existsTerm.courses.push({
-                    course,
-                    section: section.sectionNo,
-                  });
-                }
-              } else {
-                existsUser.enrollCourses.push({
+          let existsUser = await this.userModel.findOne({
+            studentId: student.studentId,
+          });
+          if (!existsUser) {
+            existsUser = await this.userModel.create({
+              ...student,
+              role: ROLE.STUDENT,
+              enrollCourses: [
+                {
                   year,
                   semester,
                   courses: [{ course, section: section.sectionNo }],
+                },
+              ],
+            });
+          } else {
+            if (!existsUser.email && student.email?.includes('@cmu.ac.th')) {
+              existsUser.email = student.email;
+            }
+            if (!existsUser.firstNameEN && student.firstNameEN) {
+              existsUser.firstNameEN = student.firstNameEN;
+              existsUser.lastNameEN = student.lastNameEN;
+            }
+            const existsTerm = existsUser.enrollCourses.find(
+              (item) => item.year == year && item.semester == semester,
+            );
+            if (existsTerm) {
+              const existsCourse = existsTerm.courses.find(
+                (item) => item.course == course,
+              );
+              if (existsCourse) {
+                existsCourse.section = section.sectionNo;
+              } else {
+                existsTerm.courses.push({
+                  course,
+                  section: section.sectionNo,
                 });
               }
-              await existsUser.save();
+            } else {
+              existsUser.enrollCourses.push({
+                year,
+                semester,
+                courses: [{ course, section: section.sectionNo }],
+              });
             }
+            await existsUser.save();
+          }
+          if (!student.student) {
             student.student = existsUser.id;
           }
         }
