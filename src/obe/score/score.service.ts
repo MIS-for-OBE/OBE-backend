@@ -81,24 +81,28 @@ export class ScoreService {
           (sec) => sec.sectionNo == section.sectionNo,
         );
         if (courseSection) {
-          courseSection.students = section.students.map((student) => {
+          section.students.forEach((student) => {
             const existStd = courseSection.students.find(
               (std) => student.student == std.student,
-            ) || { scores: [] };
-            student.scores.forEach((score) => {
-              const existsAssignIndex = existStd.scores.findIndex(
-                ({ assignmentName }) => assignmentName === score.assignmentName,
-              );
-              if (existsAssignIndex > -1) {
-                existStd.scores[existsAssignIndex] = score;
-              } else {
-                existStd.scores.push(score);
-              }
-            });
-            return {
-              student: student.student,
-              scores: existStd.scores,
-            };
+            );
+            if (existStd) {
+              student.scores.forEach((score) => {
+                const existsAssignIndex = existStd.scores.findIndex(
+                  ({ assignmentName }) =>
+                    assignmentName === score.assignmentName,
+                );
+                if (existsAssignIndex > -1) {
+                  existStd.scores[existsAssignIndex] = score;
+                } else {
+                  existStd.scores.push(score);
+                }
+              });
+            } else {
+              courseSection.students.push({
+                student: student.student,
+                scores: student.scores,
+              });
+            }
           });
           if (courseSection.assignments.length) {
             section.assignments.forEach((assign) => {
