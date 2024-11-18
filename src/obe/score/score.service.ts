@@ -1,11 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Course, Section } from '../course/schemas/course.schema';
+import { Course } from '../course/schemas/course.schema';
 import { User } from '../user/schemas/user.schema';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
 import { TQF5 } from '../tqf5/schemas/tqf5.schema';
@@ -128,6 +124,73 @@ export class ScoreService {
     }
   }
 
+  async updateAssignment(requestDTO: any): Promise<any> {
+    try {
+      const updateAssignments = await this.courseModel
+        .findByIdAndUpdate(
+          requestDTO.course,
+          {
+            $set: {
+              'sections.$[section].assignments.$[assignment].name':
+                requestDTO.name,
+              'sections.$[section].students.$[].scores.$[score].assignmentName':
+                requestDTO.name,
+            },
+          },
+          {
+            arrayFilters: [
+              { 'section.assignments.name': requestDTO.oldName },
+              { 'assignment.name': requestDTO.oldName },
+              { 'score.assignmentName': requestDTO.oldName },
+            ],
+            fields: [
+              'sections.sectionNo',
+              'sections.assignments',
+              'sections.students',
+            ],
+            new: true,
+          },
+        )
+        .populate({
+          path: 'sections.students.student',
+          select:
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+        });
+      return updateAssignments;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteAssignment(requestDTO: any): Promise<any> {
+    try {
+      const course = await this.courseModel.findById(requestDTO.course);
+
+      course?.sections.forEach((section) => {
+        section.assignments = section.assignments.filter(
+          (assignment) => assignment.name !== requestDTO.name,
+        );
+        section.students.forEach((student) => {
+          student.scores = student.scores.filter(
+            (score) => score.assignmentName !== requestDTO.name,
+          );
+        });
+      });
+      await course.save();
+      const updateAssignments = await this.courseModel
+        .findById(requestDTO.course)
+        .populate({
+          path: 'sections.students.student',
+          select:
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+        })
+        .select('sections.sectionNo sections.students sections.assignments');
+      return updateAssignments;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async publishScore(requestDTO: any): Promise<any> {
     try {
       const updateAssignments = await this.courseModel.findByIdAndUpdate(
@@ -148,6 +211,13 @@ export class ScoreService {
         },
       );
       return updateAssignments;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateStudentScore(requestDTO: any): Promise<any> {
+    try {
     } catch (error) {
       throw error;
     }
