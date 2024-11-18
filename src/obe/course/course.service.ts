@@ -193,6 +193,12 @@ export class CourseService {
           course.sections = course.sections.filter(
             (section: any) => !section.topic || topics.includes(section.topic),
           );
+          course.sections.forEach((section) => {
+            section.students.sort(
+              (a, b) =>
+                parseInt(a.student.studentId) - parseInt(b.student.studentId),
+            );
+          });
           sortData(course.sections, 'sectionNo');
           sortData(course.sections, 'isActive', 'boolean');
           return course;
@@ -258,6 +264,12 @@ export class CourseService {
       course.sections = course.sections.filter(
         (section: any) => !section.topic || topics.includes(section.topic),
       );
+      course.sections.forEach((section) => {
+        section.students.sort(
+          (a, b) =>
+            parseInt(a.student.studentId) - parseInt(b.student.studentId),
+        );
+      });
       sortData(course.sections, 'sectionNo');
       sortData(course.sections, 'isActive', 'boolean');
       return course;
