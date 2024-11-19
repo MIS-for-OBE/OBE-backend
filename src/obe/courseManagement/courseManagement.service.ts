@@ -58,7 +58,7 @@ export class CourseManagementService {
       if (searchDTO.search?.length) {
         setWhereWithSearchCourse(where, searchDTO.search);
       }
-      const courses = await this.model
+      let coursesQuery = this.model
         .find(where)
         .populate({
           path: 'sections',
@@ -73,9 +73,13 @@ export class CourseManagementService {
             },
           ],
         })
-        .sort({ [searchDTO.orderBy]: searchDTO.orderType })
-        .skip((searchDTO.page - 1) * searchDTO.limit)
-        .limit(searchDTO.limit);
+        .sort({ [searchDTO.orderBy]: searchDTO.orderType });
+      if (!searchDTO.ignorePage) {
+        coursesQuery = coursesQuery
+          .skip((searchDTO.page - 1) * searchDTO.limit)
+          .limit(searchDTO.limit);
+      }
+      let courses: any = await coursesQuery.exec();
       await this.setIsActiveSections(where, courses);
       if (searchDTO.page == 1) {
         const totalCount = await this.model.countDocuments(where);
