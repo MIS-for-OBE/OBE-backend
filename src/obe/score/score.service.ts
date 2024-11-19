@@ -218,6 +218,31 @@ export class ScoreService {
 
   async updateStudentScore(requestDTO: any): Promise<any> {
     try {
+      await this.courseModel.findByIdAndUpdate(
+        requestDTO.course,
+        {
+          $set: {
+            'sections.$[section].students.$[student].scores.$[assignment].questions':
+              requestDTO.questions,
+          },
+        },
+        {
+          arrayFilters: [
+            { 'section.sectionNo': requestDTO.sectionNo },
+            { 'student.student': requestDTO.student },
+            { 'assignment.assignmentName': requestDTO.assignmentName },
+          ],
+        },
+      );
+      const updateStudentList = await this.courseModel
+        .findById(requestDTO.course)
+        .populate({
+          path: 'sections.students.student',
+          select:
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+        })
+        .select('sections._id sections.students');
+      return updateStudentList.sections;
     } catch (error) {
       throw error;
     }

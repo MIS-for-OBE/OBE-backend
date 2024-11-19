@@ -222,4 +222,117 @@ export class SectionService {
       throw error;
     }
   }
+
+  async addStudent(requestDTO: any): Promise<Section[]> {
+    try {
+      const student = await this.userModel.findOneAndUpdate(
+        { studentId: requestDTO.studentId },
+        {
+          $setOnInsert: {
+            ...requestDTO,
+            role: ROLE.STUDENT,
+          },
+          $addToSet: {
+            enrollCourses: {
+              year: requestDTO.year,
+              semester: requestDTO.semester,
+              courses: [],
+            },
+          },
+        },
+        { new: true, upsert: true },
+      );
+      await Promise.all([
+        this.courseModel.findByIdAndUpdate(
+          requestDTO.course,
+          {
+            $addToSet: {
+              'sections.$[section].students': { student: student.id },
+            },
+          },
+          {
+            arrayFilters: [{ 'section.sectionNo': requestDTO.sectionNo }],
+          },
+        ),
+        this.userModel.findByIdAndUpdate(
+          student.id,
+          {
+            $addToSet: {
+              'enrollCourses.$[enrollCourse].courses': {
+                course: requestDTO.course,
+                section: requestDTO.sectionNo,
+              },
+            },
+          },
+          {
+            arrayFilters: [
+              {
+                'enrollCourse.year': requestDTO.year,
+                'enrollCourse.semester': requestDTO.semester,
+              },
+            ],
+          },
+        ),
+      ]);
+      const updateStudentList = await this.courseModel
+        .findById(requestDTO.course)
+        .populate({
+          path: 'sections.students.student',
+          select:
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+        })
+        .select('sections._id sections.students');
+      return updateStudentList.sections;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteStudent(requestDTO: any): Promise<Section[]> {
+    try {
+      await Promise.all([
+        this.courseModel.findByIdAndUpdate(
+          requestDTO.course,
+          {
+            $pull: {
+              'sections.$[section].students': { student: requestDTO.student },
+            },
+          },
+          {
+            arrayFilters: [{ 'section.sectionNo': requestDTO.sectionNo }],
+          },
+        ),
+        this.userModel.findByIdAndUpdate(
+          requestDTO.student,
+          {
+            $pull: {
+              'enrollCourses.$[enrollCourse].courses': {
+                course: requestDTO.course,
+              },
+            },
+          },
+          {
+            arrayFilters: [
+              {
+                'enrollCourse.year': requestDTO.year,
+                'enrollCourse.semester': requestDTO.semester,
+              },
+            ],
+          },
+        ),
+      ]);
+
+      const updateStudentList = await this.courseModel
+        .findById(requestDTO.course)
+        .populate({
+          path: 'sections.students.student',
+          select:
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+        })
+        .select('sections._id sections.students');
+      return updateStudentList.sections;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
