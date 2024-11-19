@@ -323,6 +323,7 @@ export class CourseManagementService {
         return {
           updateSection: updateSection.find((sec) => sec.id == params.section),
           courseId: course.id,
+          secId: (existSec as any)?.id,
         };
       } else if (requestDTO.openThisTerm) {
         const newSectionData = await this.createSection(
