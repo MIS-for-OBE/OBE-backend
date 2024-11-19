@@ -29,6 +29,26 @@ export class SectionController {
     });
   }
 
+  @Post('student')
+  async addStudent(@Body() requestDTO: any): Promise<ResponseDTO<Section[]>> {
+    return this.service.addStudent(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
+  @Delete('student')
+  async deleteStudent(
+    @Query() requestDTO: any,
+  ): Promise<ResponseDTO<Section[]>> {
+    return this.service.deleteStudent(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Put('/active')
   async updateSectionActive(
     @Body() requestDTO: any,
