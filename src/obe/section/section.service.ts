@@ -209,7 +209,15 @@ export class SectionService {
       });
       await Promise.all(updatePromises);
       await updateCourse.save();
-      return updateCourse.sections;
+      const updateStudentList = await this.courseModel
+        .findById(course)
+        .populate({
+          path: 'sections.students.student',
+          select:
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+        })
+        .select('sections._id sections.students');
+      return updateStudentList.sections;
     } catch (error) {
       throw error;
     }
