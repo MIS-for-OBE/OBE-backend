@@ -160,21 +160,21 @@ export class AcademicYearService {
     }
   }
 
-  async updateProcessTqf3(
-    academicYearId: string,
-    requestDTO: any,
-  ): Promise<AcademicYear> {
-    try {
-      const res = await this.model.findByIdAndUpdate(
-        academicYearId,
-        { isProcessTQF3: requestDTO.isProcessTQF3 },
-        { new: true },
-      );
-      return res;
-    } catch (error) {
-      throw error;
-    }
-  }
+  // async updateProcessTqf3(
+  //   academicYearId: string,
+  //   requestDTO: any,
+  // ): Promise<AcademicYear> {
+  //   try {
+  //     const res = await this.model.findByIdAndUpdate(
+  //       academicYearId,
+  //       { isProcessTQF3: requestDTO.isProcessTQF3 },
+  //       { new: true },
+  //     );
+  //     return res;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   async deleteAcademicYear(id: string): Promise<AcademicYear> {
     try {
