@@ -34,7 +34,7 @@ export class GeneratePdfBLL {
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       try {
-        const filename = `TQF3_Part${part}_${date}.pdf`;
+        const filename = `TQF3_Part${part}_${data.academicTerm}${data.academicYear}_${date}.pdf`;
         const filePath = join(process.cwd(), filename);
 
         const doc = new PDFDocument({

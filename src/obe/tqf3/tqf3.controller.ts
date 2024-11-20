@@ -83,7 +83,7 @@ export class TQF3Controller {
       } else {
         res.setHeader(
           'Content-disposition',
-          `attachment; filename="TQF3_Parts_${requestDTO.courseNo}_${requestDTO.academicYear}_${requestDTO.academicTerm}.zip"`,
+          `attachment; filename="TQF3_Parts_${requestDTO.courseNo}_${requestDTO.academicTerm}${requestDTO.academicYear}.zip"`,
         );
         res.setHeader('Content-type', 'application/zip');
         res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
