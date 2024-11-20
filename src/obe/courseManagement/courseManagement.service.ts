@@ -435,7 +435,10 @@ export class CourseManagementService {
                 select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
               },
             ],
-          }),
+          })
+          .select(
+            '-sections.TQF3 -sections.TQF5 -sections.assignments -sections.students',
+          ),
       ]);
       if (course) {
         const topics = course.sections
