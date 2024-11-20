@@ -38,6 +38,17 @@ export class SectionController {
     });
   }
 
+  @Put('student')
+  async updateStudent(
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<Section[]>> {
+    return this.service.updateStudent(requestDTO).then((result) => {
+      const responseDTO = new ResponseDTO<Section[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Delete('student')
   async deleteStudent(
     @Query() requestDTO: any,

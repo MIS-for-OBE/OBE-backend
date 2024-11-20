@@ -154,8 +154,14 @@ export class ScoreService {
         .populate({
           path: 'sections.students.student',
           select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
         });
+      updateAssignments?.sections.forEach((section) => {
+        section.students.sort(
+          (a, b) =>
+            parseInt(a.student.studentId) - parseInt(b.student.studentId),
+        );
+      });
       return updateAssignments;
     } catch (error) {
       throw error;
@@ -177,14 +183,10 @@ export class ScoreService {
         });
       });
       await course.save();
-      const updateAssignments = await this.courseModel
-        .findById(requestDTO.course)
-        .populate({
-          path: 'sections.students.student',
-          select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
-        })
-        .select('sections.sectionNo sections.students sections.assignments');
+      const updateAssignments = await this.getUpdateStudentList(
+        requestDTO,
+        'sections.sectionNo sections.students sections.assignments',
+      );
       return updateAssignments;
     } catch (error) {
       throw error;
@@ -234,15 +236,36 @@ export class ScoreService {
           ],
         },
       );
+      const updateStudentList = await this.getUpdateStudentList(
+        requestDTO,
+        'sections._id sections.students',
+      );
+      return updateStudentList?.sections;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async getUpdateStudentList(
+    requestDTO: any,
+    fields: string,
+  ): Promise<Course> {
+    try {
       const updateStudentList = await this.courseModel
         .findById(requestDTO.course)
         .populate({
           path: 'sections.students.student',
           select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
         })
-        .select('sections._id sections.students');
-      return updateStudentList.sections;
+        .select(fields);
+      updateStudentList?.sections.forEach((section) => {
+        section.students.sort(
+          (a, b) =>
+            parseInt(a.student.studentId) - parseInt(b.student.studentId),
+        );
+      });
+      return updateStudentList;
     } catch (error) {
       throw error;
     }
