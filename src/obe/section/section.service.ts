@@ -214,7 +214,7 @@ export class SectionService {
         .populate({
           path: 'sections.students.student',
           select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
         })
         .select('sections._id sections.students');
       return updateStudentList.sections;
@@ -279,10 +279,66 @@ export class SectionService {
         .populate({
           path: 'sections.students.student',
           select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
         })
         .select('sections._id sections.students');
       return updateStudentList.sections;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateStudent(requestDTO: any): Promise<Section[]> {
+    try {
+      // const student = await this.userModel.findByIdAndUpdate(
+      //   requestDTO.student,
+      //   {
+      //     $set: {},
+      //   },
+      //   { new: true },
+      // );
+      // await Promise.all([
+      //   this.courseModel.findByIdAndUpdate(
+      //     requestDTO.course,
+      //     {
+      //       $addToSet: {
+      //         'sections.$[section].students': { student: student.id },
+      //       },
+      //     },
+      //     {
+      //       arrayFilters: [{ 'section.sectionNo': requestDTO.sectionNo }],
+      //     },
+      //   ),
+      //   this.userModel.findByIdAndUpdate(
+      //     student.id,
+      //     {
+      //       $addToSet: {
+      //         'enrollCourses.$[enrollCourse].courses': {
+      //           course: requestDTO.course,
+      //           section: requestDTO.sectionNo,
+      //         },
+      //       },
+      //     },
+      //     {
+      //       arrayFilters: [
+      //         {
+      //           'enrollCourse.year': requestDTO.year,
+      //           'enrollCourse.semester': requestDTO.semester,
+      //         },
+      //       ],
+      //     },
+      //   ),
+      // ]);
+      // const updateStudentList = await this.courseModel
+      //   .findById(requestDTO.course)
+      //   .populate({
+      //     path: 'sections.students.student',
+      //     select:
+      //       'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
+      //   })
+      //   .select('sections._id sections.students');
+      // return updateStudentList.sections;
+      return [];
     } catch (error) {
       throw error;
     }
@@ -327,7 +383,7 @@ export class SectionService {
         .populate({
           path: 'sections.students.student',
           select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
         })
         .select('sections._id sections.students');
       return updateStudentList.sections;

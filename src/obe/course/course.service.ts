@@ -166,7 +166,7 @@ export class CourseService {
                   {
                     path: 'student',
                     select:
-                      'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+                      'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
                   },
                 ],
               },
@@ -239,7 +239,7 @@ export class CourseService {
                 {
                   path: 'student',
                   select:
-                    'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+                    'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
                 },
               ],
             },

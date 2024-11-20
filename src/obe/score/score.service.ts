@@ -154,7 +154,7 @@ export class ScoreService {
         .populate({
           path: 'sections.students.student',
           select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
         });
       return updateAssignments;
     } catch (error) {
@@ -182,7 +182,7 @@ export class ScoreService {
         .populate({
           path: 'sections.students.student',
           select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
         })
         .select('sections.sectionNo sections.students sections.assignments');
       return updateAssignments;
@@ -239,7 +239,7 @@ export class ScoreService {
         .populate({
           path: 'sections.students.student',
           select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email',
+            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
         })
         .select('sections._id sections.students');
       return updateStudentList.sections;
