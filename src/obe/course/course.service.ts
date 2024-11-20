@@ -537,7 +537,7 @@ export class CourseService {
   async leaveCourse(userId: string, id: string): Promise<Course> {
     try {
       const leaveCourse = await this.model.findByIdAndUpdate(id, {
-        sections: { $pull: { coInstructors: userId } },
+        $pull: { 'sections.$[].coInstructors': userId },
       });
       if (!leaveCourse) {
         throw new NotFoundException('Course not found');
