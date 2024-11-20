@@ -209,15 +209,8 @@ export class SectionService {
       });
       await Promise.all(updatePromises);
       await updateCourse.save();
-      const updateStudentList = await this.courseModel
-        .findById(course)
-        .populate({
-          path: 'sections.students.student',
-          select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
-        })
-        .select('sections._id sections.students');
-      return updateStudentList.sections;
+      const updateStudentList = await this.getUpdateStudentList(requestDTO);
+      return updateStudentList;
     } catch (error) {
       throw error;
     }
@@ -274,15 +267,8 @@ export class SectionService {
           },
         ),
       ]);
-      const updateStudentList = await this.courseModel
-        .findById(requestDTO.course)
-        .populate({
-          path: 'sections.students.student',
-          select:
-            'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
-        })
-        .select('sections._id sections.students');
-      return updateStudentList.sections;
+      const updateStudentList = await this.getUpdateStudentList(requestDTO);
+      return updateStudentList;
     } catch (error) {
       throw error;
     }
@@ -290,55 +276,65 @@ export class SectionService {
 
   async updateStudent(requestDTO: any): Promise<Section[]> {
     try {
-      // const student = await this.userModel.findByIdAndUpdate(
-      //   requestDTO.student,
-      //   {
-      //     $set: {},
-      //   },
-      //   { new: true },
-      // );
-      // await Promise.all([
-      //   this.courseModel.findByIdAndUpdate(
-      //     requestDTO.course,
-      //     {
-      //       $addToSet: {
-      //         'sections.$[section].students': { student: student.id },
-      //       },
-      //     },
-      //     {
-      //       arrayFilters: [{ 'section.sectionNo': requestDTO.sectionNo }],
-      //     },
-      //   ),
-      //   this.userModel.findByIdAndUpdate(
-      //     student.id,
-      //     {
-      //       $addToSet: {
-      //         'enrollCourses.$[enrollCourse].courses': {
-      //           course: requestDTO.course,
-      //           section: requestDTO.sectionNo,
-      //         },
-      //       },
-      //     },
-      //     {
-      //       arrayFilters: [
-      //         {
-      //           'enrollCourse.year': requestDTO.year,
-      //           'enrollCourse.semester': requestDTO.semester,
-      //         },
-      //       ],
-      //     },
-      //   ),
-      // ]);
-      // const updateStudentList = await this.courseModel
-      //   .findById(requestDTO.course)
-      //   .populate({
-      //     path: 'sections.students.student',
-      //     select:
-      //       'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
-      //   })
-      //   .select('sections._id sections.students');
-      // return updateStudentList.sections;
-      return [];
+      const updateData: Partial<User> = {};
+      if (requestDTO.studentId) {
+        updateData.studentId = requestDTO.studentId;
+        if (requestDTO.email?.length) updateData.email = requestDTO.email;
+        if (requestDTO.firstNameTH) {
+          updateData.firstNameTH = requestDTO.firstNameTH;
+          updateData.lastNameTH = requestDTO.lastNameTH;
+        } else {
+          updateData.firstNameEN = requestDTO.firstNameEN;
+          updateData.lastNameEN = requestDTO.lastNameEN;
+        }
+      }
+      if (requestDTO.oldSectionNo !== requestDTO.sectionNo) {
+        updateData['enrollCourses.$[enrollCourse].courses.$[course].section'] =
+          requestDTO.sectionNo;
+      }
+      const dataStudent = (
+        await this.courseModel.findById(requestDTO.course)
+      ).sections
+        .find(({ sectionNo }) => sectionNo == requestDTO.oldSectionNo)
+        .students.find(({ student }) => student == requestDTO.student);
+
+      await Promise.all([
+        this.userModel.findByIdAndUpdate(
+          requestDTO.student,
+          { $set: updateData },
+          {
+            arrayFilters: [
+              {
+                'enrollCourse.year': requestDTO.year,
+                'enrollCourse.semester': requestDTO.semester,
+              },
+              { 'course.course': requestDTO.course },
+            ],
+          },
+        ),
+        requestDTO.oldSectionNo !== requestDTO.sectionNo &&
+          this.courseModel.findByIdAndUpdate(
+            requestDTO.course,
+            {
+              $pull: {
+                'sections.$[oldSection].students': {
+                  student: requestDTO.student,
+                },
+              },
+              $push: {
+                'sections.$[newSection].students': dataStudent,
+              },
+            },
+            {
+              arrayFilters: [
+                { 'oldSection.sectionNo': requestDTO.oldSectionNo },
+                { 'newSection.sectionNo': requestDTO.sectionNo },
+              ],
+            },
+          ),
+      ]);
+      const updateStudentList = await this.getUpdateStudentList(requestDTO);
+      return updateStudentList;
     } catch (error) {
       throw error;
     }
@@ -378,6 +374,15 @@ export class SectionService {
         ),
       ]);
 
+      const updateStudentList = await this.getUpdateStudentList(requestDTO);
+      return updateStudentList;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async getUpdateStudentList(requestDTO: any): Promise<Section[]> {
+    try {
       const updateStudentList = await this.courseModel
         .findById(requestDTO.course)
         .populate({
@@ -386,7 +391,13 @@ export class SectionService {
             'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
         })
         .select('sections._id sections.students');
-      return updateStudentList.sections;
+      updateStudentList?.sections.forEach((section) => {
+        section.students.sort(
+          (a, b) =>
+            parseInt(a.student.studentId) - parseInt(b.student.studentId),
+        );
+      });
+      return updateStudentList?.sections;
     } catch (error) {
       throw error;
     }

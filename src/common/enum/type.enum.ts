@@ -18,11 +18,6 @@ export enum EVALUATE_TYPE {
   P = 'P',
 }
 
-export enum TQF_TYPE {
-  TQF3 = 'TQF3',
-  TQF5 = 'TQF5',
-}
-
 export enum TQF_STATUS {
   NO_DATA = 'No Data',
   IN_PROGRESS = 'In Progress',
