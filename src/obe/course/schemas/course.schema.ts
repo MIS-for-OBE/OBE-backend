@@ -27,7 +27,7 @@ export class Question {
   @Prop()
   desc: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, min: 0 })
   fullScore: number;
 }
 export const QuestionSchema = SchemaFactory.createForClass(Question);
@@ -71,7 +71,7 @@ export class Section {
     type: [
       {
         student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        scores: [{ type: ScoreSchema }],
+        scores: { type: [{ type: ScoreSchema }], _id: false },
       },
     ],
     _id: false,

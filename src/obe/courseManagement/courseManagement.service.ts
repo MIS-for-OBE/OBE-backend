@@ -435,7 +435,10 @@ export class CourseManagementService {
                 select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
               },
             ],
-          }),
+          })
+          .select(
+            '-sections.TQF3 -sections.TQF5 -sections.assignments -sections.students',
+          ),
       ]);
       if (course) {
         const topics = course.sections
@@ -484,7 +487,7 @@ export class CourseManagementService {
           this.tqf5Model.findByIdAndDelete(deleteCourse.TQF5),
         ]);
       }
-      return { id, courseId: deleteCourse.id };
+      return { id, courseId: deleteCourse?.id };
     } catch (error) {
       throw error;
     }

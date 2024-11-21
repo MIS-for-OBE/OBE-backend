@@ -333,7 +333,7 @@ export class TQF3Service {
       if (requestDTO.oneFile) {
         const fileAllParts = await this.generatePdfBLL.mergePdfs(
           files,
-          `TQF3_${course.courseNo}_All_Parts_${date}.pdf`,
+          `TQF3_${course.courseNo}_${requestDTO.academicTerm}${requestDTO.academicYear}_All_Parts_${date}.pdf`,
         );
         files.forEach((file) => {
           const filePath = join(process.cwd(), file);

@@ -145,6 +145,7 @@ export class AuthenticationService {
       }
       user = await this.userModel.create(userData);
     } else if (!user.departmentCode?.length) {
+      userData.role = user.role;
       if (user.studentId) {
         await this.updateUserDepartment(userData, basicInfo, accessToken);
       }
@@ -190,7 +191,9 @@ export class AuthenticationService {
     user.studentId = basicInfo.student_id;
     user.role = this.isSupremeAdmin(basicInfo.cmuitaccount_name)
       ? ROLE.SUPREME_ADMIN
-      : ROLE.STUDENT;
+      : user.role == ROLE.INSTRUCTOR
+        ? ROLE.TA
+        : ROLE.STUDENT;
     user.departmentCode = await this.getDepartmentCode(
       user.facultyCode,
       stdInfo.department_name_TH,
