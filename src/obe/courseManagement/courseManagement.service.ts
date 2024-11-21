@@ -487,7 +487,7 @@ export class CourseManagementService {
           this.tqf5Model.findByIdAndDelete(deleteCourse.TQF5),
         ]);
       }
-      return { id, courseId: deleteCourse.id };
+      return { id, courseId: deleteCourse?.id };
     } catch (error) {
       throw error;
     }
