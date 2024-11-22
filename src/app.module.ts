@@ -17,13 +17,14 @@ import { TQF5Module } from './obe/tqf5/tqf5.module';
 import mongoose from 'mongoose';
 import { globalTransformPlugin } from './common/plugins/globalTransform.plugin';
 import { ScoreModule } from './obe/score/score.module';
+import { StudentModule } from './obe/student/student.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ load: [configuration], isGlobal: true }),
     AuthModule,
     AuthenticationModule,
-    // DB
+
     DatabaseModule,
     UserModule,
     FacultyModule,
@@ -35,6 +36,7 @@ import { ScoreModule } from './obe/score/score.module';
     ScoreModule,
     TQF3Module,
     TQF5Module,
+    StudentModule,
   ],
   controllers: [],
   providers: [],
