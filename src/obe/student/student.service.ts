@@ -43,27 +43,51 @@ export class StudentService {
         (term) =>
           term.year == searchDTO.year && term.semester == searchDTO.semester,
       )?.courses;
+
       const formattedCourses = selectTerm?.map((item: any) => {
-        let section = item.course.sections?.find(
-          ({ sectionNo }) => sectionNo == item.section,
+        const { course } = item;
+        const { sections } = course;
+
+        const sectionData = sections?.find(
+          ({ sectionNo }) => sectionNo === item.section,
         )?._doc;
-        if (section) {
-          section.id = section._id;
-          delete section._id;
-          delete section.isActive;
-          delete section.TQF3;
-          delete section.TQF5;
+
+        if (!sectionData) {
+          return {
+            id: course.id,
+            courseNo: course.courseNo,
+            courseName: course.courseName,
+            type: course.type,
+            scores: [],
+          };
         }
-        const scores = section?.students.find(
-          ({ student }) => student == authUser.id,
-        )?.scores;
+
+        const {
+          assignments,
+          students,
+          _id,
+          isActive,
+          TQF3,
+          TQF5,
+          ...restSectionData
+        } = sectionData;
+
+        const section = {
+          ...restSectionData,
+          id: _id,
+          assignments: this.formatAssignments(assignments, students),
+        };
+
+        const userScores =
+          students.find(({ student }) => student === authUser.id)?.scores || [];
+
         return {
-          id: item.course.id,
-          courseNo: item.course.courseNo,
-          courseName: item.course.courseName,
-          type: item.course.type,
+          id: course.id,
+          courseNo: course.courseNo,
+          courseName: course.courseName,
+          type: course.type,
           section,
-          scores,
+          scores: userScores,
         };
       });
 
@@ -77,5 +101,39 @@ export class StudentService {
     } catch (error) {
       throw error;
     }
+  }
+
+  private formatAssignments(assignments, students) {
+    return assignments.map((assignment) => {
+      const assignmentScores: number[] = [];
+      const questions = assignment.questions.map((question) => {
+        const questionScores = students.map((student) => {
+          const scores =
+            student.scores.find(
+              (scoreItem) => scoreItem.assignmentName === assignment.name,
+            )?.questions || [];
+          return scores.find((q) => q.name === question.name)?.score || 0;
+        });
+
+        return {
+          ...question._doc,
+          scores: questionScores,
+        };
+      });
+      students.forEach((student) => {
+        const totalScore = student.scores
+          .find((scoreItem) => scoreItem.assignmentName === assignment.name)
+          ?.questions.reduce((sum, { score }) => sum + score, 0);
+        if (totalScore != undefined) {
+          assignmentScores.push(totalScore);
+        }
+      });
+
+      return {
+        ...assignment._doc,
+        scores: assignmentScores,
+        questions,
+      };
+    });
   }
 }
