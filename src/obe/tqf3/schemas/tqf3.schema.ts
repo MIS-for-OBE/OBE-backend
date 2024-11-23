@@ -54,8 +54,8 @@ class Part1 {
   @Prop()
   curriculum: string;
 
-  @Prop({ type: String, enum: COURSE_TYPE })
-  courseType: COURSE_TYPE;
+  @Prop({ type: [String], enum: COURSE_TYPE })
+  courseType: COURSE_TYPE[];
 
   @Prop({ type: [Number] })
   studentYear: number[];

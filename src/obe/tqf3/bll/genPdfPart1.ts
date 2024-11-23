@@ -95,11 +95,9 @@ export const buildPart1Content = (
     doc.font(fontNormal).text('1.1', { continued: true });
     const curriculum = ['สำหรับหลักสูตร', 'สำหรับหลายหลักสูตร'];
     const checkCurriculum = data.curriculum.includes(curriculum[0]);
-    doc
-      .font(emoji)
-      .text(setSymbol(checkCurriculum), doc.x + 9.5, doc.y - 2, {
-        continued: true,
-      });
+    doc.font(emoji).text(setSymbol(checkCurriculum), doc.x + 9.5, doc.y - 2, {
+      continued: true,
+    });
     doc
       .font(fontNormal)
       .text(
@@ -128,7 +126,9 @@ export const buildPart1Content = (
       .font(emoji)
       .text(
         setSymbol(
-          [COURSE_TYPE.GENERAL, COURSE_TYPE.SPECIAL].includes(data.courseType),
+          data.courseType.some((type) =>
+            [COURSE_TYPE.GENERAL, COURSE_TYPE.SPECIAL].includes(type),
+          ),
         ),
         doc.x,
         doc.y - 2,
@@ -141,7 +141,7 @@ export const buildPart1Content = (
     doc
       .font(emoji)
       .text(
-        setSymbol(data.courseType == COURSE_TYPE.SEL_TOPIC),
+        setSymbol(data.courseType.includes(COURSE_TYPE.SEL_TOPIC)),
         doc.x,
         doc.y - 2,
         { continued: true },
@@ -152,9 +152,14 @@ export const buildPart1Content = (
       .moveDown(0.6);
     doc
       .font(emoji)
-      .text(setSymbol(data.courseType == COURSE_TYPE.FREE), doc.x, doc.y - 2, {
-        continued: true,
-      });
+      .text(
+        setSymbol(data.courseType.includes(COURSE_TYPE.FREE)),
+        doc.x,
+        doc.y - 2,
+        {
+          continued: true,
+        },
+      );
     doc
       .font(fontNormal)
       .text('วิชาเลือกเสรี', doc.x + 5, doc.y + 2)
