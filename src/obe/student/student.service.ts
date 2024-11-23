@@ -78,8 +78,13 @@ export class StudentService {
           assignments: this.formatAssignments(assignments, students),
         };
 
+        const assignmentPublish = section.assignments.map(({ name }) => name);
         const userScores =
-          students.find(({ student }) => student == authUser.id)?.scores || [];
+          students
+            .find(({ student }) => student == authUser.id)
+            ?.scores.filter(({ assignmentName }) =>
+              assignmentPublish.includes(assignmentName),
+            ) || [];
 
         return {
           id: course.id,
@@ -104,36 +109,38 @@ export class StudentService {
   }
 
   private formatAssignments(assignments, students) {
-    return assignments.map((assignment) => {
-      const assignmentScores: number[] = [];
-      const questions = assignment.questions.map((question) => {
-        const questionScores = students.map((student) => {
-          const scores =
-            student.scores.find(
-              (scoreItem) => scoreItem.assignmentName === assignment.name,
-            )?.questions || [];
-          return scores.find((q) => q.name === question.name)?.score || 0;
+    return assignments
+      .filter((assignment) => assignment.isPublish)
+      .map((assignment) => {
+        const assignmentScores: number[] = [];
+        const questions = assignment.questions.map((question) => {
+          const questionScores = students.map((student) => {
+            const scores =
+              student.scores.find(
+                (scoreItem) => scoreItem.assignmentName === assignment.name,
+              )?.questions || [];
+            return scores.find((q) => q.name === question.name)?.score || 0;
+          });
+
+          return {
+            ...question._doc,
+            scores: questionScores,
+          };
+        });
+        students.forEach((student) => {
+          const totalScore = student.scores
+            .find((scoreItem) => scoreItem.assignmentName === assignment.name)
+            ?.questions.reduce((sum, { score }) => sum + score, 0);
+          if (totalScore != undefined) {
+            assignmentScores.push(totalScore);
+          }
         });
 
         return {
-          ...question._doc,
-          scores: questionScores,
+          ...assignment._doc,
+          scores: assignmentScores,
+          questions,
         };
       });
-      students.forEach((student) => {
-        const totalScore = student.scores
-          .find((scoreItem) => scoreItem.assignmentName === assignment.name)
-          ?.questions.reduce((sum, { score }) => sum + score, 0);
-        if (totalScore != undefined) {
-          assignmentScores.push(totalScore);
-        }
-      });
-
-      return {
-        ...assignment._doc,
-        scores: assignmentScores,
-        questions,
-      };
-    });
   }
 }
