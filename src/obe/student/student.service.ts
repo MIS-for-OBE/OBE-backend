@@ -121,7 +121,7 @@ export class StudentService {
               )?.questions || [];
             return scores.find((q) => q.name === question.name)?.score || 0;
           });
-
+          questionScores.sort((a, b) => a - b);
           return {
             ...question._doc,
             scores: questionScores,
@@ -135,7 +135,7 @@ export class StudentService {
             assignmentScores.push(totalScore);
           }
         });
-
+        assignmentScores.sort((a, b) => a - b);
         return {
           ...assignment._doc,
           scores: assignmentScores,
