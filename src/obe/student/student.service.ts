@@ -79,7 +79,7 @@ export class StudentService {
         };
 
         const userScores =
-          students.find(({ student }) => student === authUser.id)?.scores || [];
+          students.find(({ student }) => student == authUser.id)?.scores || [];
 
         return {
           id: course.id,
