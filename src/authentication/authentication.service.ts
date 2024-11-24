@@ -129,7 +129,12 @@ export class AuthenticationService {
     basicInfo.firstname_EN = capitalize(basicInfo.firstname_EN);
     basicInfo.lastname_EN = capitalize(basicInfo.lastname_EN);
 
-    let user = await this.userModel.findOne({ email: basicInfo.cmuitaccount });
+    let user = await this.userModel.findOne({
+      $or: [
+        { studentId: basicInfo.student_id },
+        { email: basicInfo.cmuitaccount },
+      ],
+    });
     const userData: Partial<User> = {
       firstNameTH: basicInfo.firstname_TH,
       lastNameTH: basicInfo.lastname_TH,
