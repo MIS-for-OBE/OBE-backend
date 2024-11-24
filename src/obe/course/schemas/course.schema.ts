@@ -21,7 +21,7 @@ export const ScoreSchema = SchemaFactory.createForClass(Score);
 
 @Schema()
 export class Question {
-  @Prop({ unique: true, required: true, sparse: true })
+  @Prop({ required: true })
   name: string;
 
   @Prop()
@@ -36,7 +36,7 @@ export const QuestionSchema = SchemaFactory.createForClass(Question);
   timestamps: { createdAt: true, updatedAt: false },
 })
 export class Assignment {
-  @Prop({ unique: true, required: true, sparse: true })
+  @Prop({ required: true })
   name: string;
 
   @Prop({ default: false })

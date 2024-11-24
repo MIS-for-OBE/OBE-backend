@@ -72,7 +72,7 @@ class Part1 {
   @Prop()
   consultHoursWk: number;
 }
-export const Part1Schema = SchemaFactory.createForClass(Part1);
+const Part1Schema = SchemaFactory.createForClass(Part1);
 
 export type Part2TQF3 = Part2;
 @Schema({
@@ -98,7 +98,7 @@ class Part2 {
     labHour: number;
   }[];
 }
-export const Part2Schema = SchemaFactory.createForClass(Part2);
+const Part2Schema = SchemaFactory.createForClass(Part2);
 
 export type Part3TQF3 = Part3;
 @Schema({
@@ -111,7 +111,7 @@ class Part3 {
   @Prop({ type: [{ type: EvalSchema, ref: 'Eval' }] })
   eval: Eval[];
 }
-export const Part3Schema = SchemaFactory.createForClass(Part3);
+const Part3Schema = SchemaFactory.createForClass(Part3);
 
 export type Part4TQF3 = Part4;
 @Schema({
@@ -144,7 +144,7 @@ class Part4 {
     }[];
   }[];
 }
-export const Part4Schema = SchemaFactory.createForClass(Part4);
+const Part4Schema = SchemaFactory.createForClass(Part4);
 
 export type Part5TQF3 = Part5;
 @Schema({
@@ -157,7 +157,7 @@ class Part5 {
   @Prop()
   recDoc: string;
 }
-export const Part5Schema = SchemaFactory.createForClass(Part5);
+const Part5Schema = SchemaFactory.createForClass(Part5);
 
 export type Part6TQF3 = Part6;
 @Schema({
@@ -180,7 +180,7 @@ class Part6 {
     other?: string;
   }[];
 }
-export const Part6Schema = SchemaFactory.createForClass(Part6);
+const Part6Schema = SchemaFactory.createForClass(Part6);
 
 export type Part7TQF3 = Part7;
 @Schema({
@@ -201,7 +201,7 @@ class Part7 {
     plos: PLONo[];
   }[];
 }
-export const Part7Schema = SchemaFactory.createForClass(Part7);
+const Part7Schema = SchemaFactory.createForClass(Part7);
 
 export type TQF3Document = HydratedDocument<TQF3>;
 @Schema({
