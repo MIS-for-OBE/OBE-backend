@@ -199,10 +199,14 @@ export class AuthenticationService {
       : user.role == ROLE.INSTRUCTOR
         ? ROLE.TA
         : ROLE.STUDENT;
-    user.departmentCode = await this.getDepartmentCode(
-      user.facultyCode,
-      stdInfo.department_name_TH,
-    );
+    if (user.facultyCode == '06') {
+      user.departmentCode = await this.getDepartmentCode(
+        user.facultyCode,
+        stdInfo.department_name_TH,
+      );
+    } else {
+      user.departmentCode = [stdInfo.department_name_EN];
+    }
   }
 
   private async getDepartmentCode(facultyCode: string, departmentTH: string) {
