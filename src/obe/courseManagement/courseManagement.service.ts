@@ -286,6 +286,25 @@ export class CourseManagementService {
           ),
         ]);
       }
+      let updateSec = await this.model
+        .findOne({
+          courseNo: requestDTO.courseNo,
+        })
+        .populate({
+          path: 'sections',
+          populate: [
+            {
+              path: 'instructor',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+            {
+              path: 'coInstructors',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+          ],
+        })
+        .select('-sections.isActive')
+        .sort({ sectionNo: 'asc' });
       if (course) {
         if (!requestDTO.oldSectionNo) {
           requestDTO.oldSectionNo = requestDTO.data.sectionNo;
@@ -325,7 +344,9 @@ export class CourseManagementService {
           );
         }
         return {
-          updateSection: updateSection.find((sec) => sec.id == params.section),
+          updateSection: updateSec?.sections.find(
+            (sec: any) => sec.id == params.section,
+          ),
           courseId: course.id,
           secId: (existSec as any)?.id,
         };
@@ -353,7 +374,9 @@ export class CourseManagementService {
         course = await this.courseModel.create(data);
       }
       return {
-        updateSection: updateSection.find((sec) => sec.id == params.section),
+        updateSection: updateSec?.sections.find(
+          (sec: any) => sec.id == params.section,
+        ),
       };
     } catch (error) {
       throw error;
@@ -406,9 +429,6 @@ export class CourseManagementService {
 
       if (course) {
         course.sections.forEach((sec: any) => {
-          sec.instructor =
-            requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
-              .instructor ?? sec.instructor;
           sec.coInstructors =
             requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
               ?.coInstructors ?? sec.coInstructors;
