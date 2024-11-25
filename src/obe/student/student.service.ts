@@ -4,6 +4,9 @@ import { Model } from 'mongoose';
 import { Course } from '../course/schemas/course.schema';
 import { User } from '../user/schemas/user.schema';
 import { EnrollCourseSearchDTO } from './dto/search.dto';
+import { TQF3 } from '../tqf3/schemas/tqf3.schema';
+import { TQF5 } from '../tqf5/schemas/tqf5.schema';
+import { sortData } from 'src/common/function/function';
 
 @Injectable()
 export class StudentService {
@@ -22,22 +25,28 @@ export class StudentService {
         .select('enrollCourses')
         .populate({
           path: 'enrollCourses.courses.course',
-          select: 'courseNo courseName type sections',
-          populate: {
-            path: 'sections',
-            select:
-              'sectionNo topic instructor coInstructors assignments students',
-            populate: [
-              {
-                path: 'instructor',
-                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-              },
-              {
-                path: 'coInstructors',
-                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-              },
-            ],
-          },
+          select: 'courseNo courseName type sections TQF3 TQF5',
+          populate: [
+            {
+              path: 'sections',
+              select:
+                'sectionNo topic instructor coInstructors assignments students',
+              populate: [
+                {
+                  path: 'instructor',
+                  select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+                },
+                {
+                  path: 'coInstructors',
+                  select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+                },
+                { path: 'TQF3' },
+                { path: 'TQF5' },
+              ],
+            },
+            { path: 'TQF3' },
+            { path: 'TQF5' },
+          ],
         });
       const selectTerm = enrollCourses.enrollCourses?.find(
         (term) =>
@@ -62,6 +71,9 @@ export class StudentService {
           };
         }
 
+        let tqf3: TQF3 = course.TQF3;
+        let tqf5: TQF5 = course.TQF5;
+
         const {
           assignments,
           students,
@@ -71,6 +83,31 @@ export class StudentService {
           TQF5,
           ...restSectionData
         } = sectionData;
+
+        if (TQF3) {
+          tqf3 = TQF3;
+        }
+        if (TQF5) {
+          tqf5 = TQF5;
+        }
+
+        const clos = [];
+        tqf3.part4?.data.forEach((item) => {
+          const clo: any =
+            tqf3.part2.clo.find((c: any) => c.id == item.clo) ?? {};
+          const evals = [];
+          item.evals.forEach((itemE) => {
+            const evalItem = tqf3.part3.eval.find(
+              (e: any) => e.id == itemE.eval,
+            );
+            if (evalItem) {
+              evals.push(evalItem);
+            }
+          });
+          sortData(evals, 'no');
+          const plos = tqf3.part7?.data.find((c) => c.clo == clo.id)?.plos;
+          clos.push({ clo, evals, plos });
+        });
 
         const section = {
           ...restSectionData,
@@ -93,6 +130,7 @@ export class StudentService {
           type: course.type,
           section,
           scores: userScores,
+          clos,
         };
       });
 
