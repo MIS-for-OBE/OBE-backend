@@ -53,7 +53,7 @@ export const buildPart2Content = (
   // Teaching Method
   {
     // LEC
-    doc.font(fontBold).text('โปรดระบุลักษณะกระบวนวิชา', {
+    doc.font(fontBold).text('ลักษณะกระบวนวิชา', {
       align: 'left',
       continued: true,
     });
@@ -157,7 +157,6 @@ export const buildPart2Content = (
     doc.font(fontBold).text('เงื่อนไขที่ต้องผ่านก่อน', 55.5, doc.y, {
       continued: true,
     });
-    doc.moveDown(0.6);
 
     doc.font(fontNormal).text(data.PreText, doc.x + 10, doc.y);
 
@@ -210,7 +209,7 @@ export const buildPart2Content = (
 
       const tableTop = doc.y + 0.6;
       const tableLeft = 50;
-      const columnWidth = [375, 125];
+      const columnWidth = [385, 115];
 
       function calculateRowHeight(text, columnWidth) {
         const textHeight = doc.heightOfString(text, {
