@@ -406,6 +406,9 @@ export class CourseManagementService {
 
       if (course) {
         course.sections.forEach((sec: any) => {
+          sec.instructor =
+            requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
+              .instructor ?? sec.instructor;
           sec.coInstructors =
             requestDTO.data.find((item) => item.sectionNo == sec.sectionNo)
               ?.coInstructors ?? sec.coInstructors;
