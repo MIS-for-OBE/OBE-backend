@@ -45,7 +45,7 @@ export class TQF3Controller {
   }
 
   @Put('/:id/:part')
-  async updateCourse(
+  async saveEachPart(
     @Param() params: { id: string; part: string },
     @Body() requestDTO: any,
   ): Promise<ResponseDTO<TQF3>> {
