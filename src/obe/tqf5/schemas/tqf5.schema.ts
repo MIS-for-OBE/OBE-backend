@@ -9,21 +9,23 @@ export type Part1TQF5 = Part1;
 })
 class Part1 {
   @Prop({
-    type: {
-      sectionNo: Number,
-      A: Number,
-      Bplus: Number,
-      B: Number,
-      Cplus: Number,
-      C: Number,
-      Dplus: Number,
-      D: Number,
-      F: Number,
-      W: Number,
-      S: Number,
-      U: Number,
-      P: Number,
-    },
+    type: [
+      {
+        sectionNo: Number,
+        A: Number,
+        Bplus: Number,
+        B: Number,
+        Cplus: Number,
+        C: Number,
+        Dplus: Number,
+        D: Number,
+        F: Number,
+        W: Number,
+        S: Number,
+        U: Number,
+        P: Number,
+      },
+    ],
     _id: false,
   })
   courseEval: {
