@@ -226,8 +226,9 @@ export class TQF3Service {
       }
 
       tqf3Document.status =
-        (tqf3Document.part7 || params.part === 'part7') &&
-        !requestDTO.inProgress
+        ((tqf3Document.part7 || params.part === 'part7') &&
+          !requestDTO.inProgress) ||
+        requestDTO.done
           ? TQF_STATUS.DONE
           : TQF_STATUS.IN_PROGRESS;
 
