@@ -109,10 +109,11 @@ export class StudentService {
           clos.push({ clo, evals, plos });
         });
 
+        const allStudents = sections.map((sec) => sec.students).flat();
         const section = {
           ...restSectionData,
           id: _id,
-          assignments: this.formatAssignments(assignments, students),
+          assignments: this.formatAssignments(assignments, allStudents),
         };
 
         const assignmentPublish = section.assignments.map(({ name }) => name);
@@ -152,13 +153,15 @@ export class StudentService {
       .map((assignment) => {
         const assignmentScores: number[] = [];
         const questions = assignment.questions.map((question) => {
-          const questionScores = students.map((student) => {
-            const scores =
-              student.scores.find(
-                (scoreItem) => scoreItem.assignmentName === assignment.name,
-              )?.questions || [];
-            return scores.find((q) => q.name === question.name)?.score || 0;
-          });
+          const questionScores = students
+            .map((student) => {
+              const scores =
+                student.scores.find(
+                  (scoreItem) => scoreItem.assignmentName === assignment.name,
+                )?.questions || [];
+              return scores.find((q) => q.name === question.name)?.score;
+            })
+            .filter((score) => score !== undefined);
           questionScores.sort((a, b) => a - b);
           return {
             ...question._doc,
