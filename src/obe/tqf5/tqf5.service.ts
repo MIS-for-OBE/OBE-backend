@@ -8,6 +8,25 @@ import { TQF_STATUS } from 'src/common/enum/type.enum';
 export class TQF5Service {
   constructor(@InjectModel(TQF5.name) private readonly model: Model<TQF5>) {}
 
+  async changeMethod(params: { id: string }): Promise<TQF5> {
+    try {
+      const tqf5Document = await this.model.findByIdAndUpdate(
+        params.id,
+        {
+          $unset: { part2: 1, part3: 1 },
+          status: TQF_STATUS.IN_PROGRESS,
+        },
+        { new: true },
+      );
+      if (!tqf5Document) {
+        throw new NotFoundException('TQF5 not found.');
+      }
+      return tqf5Document;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async saveEachPart(
     params: { id: string; part: string },
     requestDTO: any,

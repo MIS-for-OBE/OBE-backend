@@ -18,6 +18,17 @@ import { TQF5 } from './schemas/tqf5.schema';
 export class TQF5Controller {
   constructor(private service: TQF5Service) {}
 
+  @Post('/:id/change-method')
+  async changeMethod(
+    @Param() params: { id: string },
+  ): Promise<ResponseDTO<TQF5>> {
+    return this.service.changeMethod(params).then((result) => {
+      const responseDTO = new ResponseDTO<TQF5>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
+  }
+
   @Put('/:id/:part')
   async saveEachPart(
     @Param() params: { id: string; part: string },
