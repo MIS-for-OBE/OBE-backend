@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { TQF_STATUS } from 'src/common/enum/type.enum';
-import { CLO } from 'src/obe/tqf3/schemas/tqf3.schema';
+import { CLO, Eval } from 'src/obe/tqf3/schemas/tqf3.schema';
 
 export type Part1TQF5 = Part1;
 @Schema({
@@ -87,7 +87,7 @@ class Part2 {
         clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
         assignments: [
           {
-            name: { type: String },
+            eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
             questions: { type: [String] },
           },
         ],
@@ -97,7 +97,7 @@ class Part2 {
   })
   data: {
     clo: CLO;
-    assignments: { name: string; questions: string[] }[];
+    assignments: { eval: Eval; questions: string[] }[];
   }[];
 }
 const Part2Schema = SchemaFactory.createForClass(Part2);
