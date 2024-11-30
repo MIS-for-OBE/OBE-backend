@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { TQF_STATUS } from 'src/common/enum/type.enum';
+import { METHOD_TQF5, TQF_STATUS } from 'src/common/enum/type.enum';
 import { CLO, Eval } from 'src/obe/tqf3/schemas/tqf3.schema';
 
 export type Part1TQF5 = Part1;
@@ -138,6 +138,9 @@ export type TQF5Document = HydratedDocument<TQF5>;
 export class TQF5 {
   @Prop({ required: true, enum: TQF_STATUS })
   status: TQF_STATUS;
+
+  @Prop({ enum: TQF_STATUS })
+  method?: METHOD_TQF5;
 
   @Prop({ type: Part1Schema, _id: false })
   part1?: Part1;

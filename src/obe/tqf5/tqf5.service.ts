@@ -8,12 +8,13 @@ import { TQF_STATUS } from 'src/common/enum/type.enum';
 export class TQF5Service {
   constructor(@InjectModel(TQF5.name) private readonly model: Model<TQF5>) {}
 
-  async changeMethod(params: { id: string }): Promise<TQF5> {
+  async changeMethod(params: { id: string }, requestDTO: any): Promise<TQF5> {
     try {
       const tqf5Document = await this.model.findByIdAndUpdate(
         params.id,
         {
           $unset: { part2: 1, part3: 1 },
+          method: requestDTO.method,
           status: TQF_STATUS.IN_PROGRESS,
         },
         { new: true },

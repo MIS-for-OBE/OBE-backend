@@ -23,3 +23,8 @@ export enum TQF_STATUS {
   IN_PROGRESS = 'In Progress',
   DONE = 'Done',
 }
+
+export enum METHOD_TQF5 {
+  SCORE_OBE = 'ScoreOBE+',
+  MANUAL = 'Manual',
+}

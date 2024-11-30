@@ -21,8 +21,9 @@ export class TQF5Controller {
   @Post('/:id/change-method')
   async changeMethod(
     @Param() params: { id: string },
+    @Body() requestDTO: any,
   ): Promise<ResponseDTO<TQF5>> {
-    return this.service.changeMethod(params).then((result) => {
+    return this.service.changeMethod(params, requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<TQF5>();
       responseDTO.data = result;
       return responseDTO;
