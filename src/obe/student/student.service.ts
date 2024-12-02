@@ -161,7 +161,7 @@ export class StudentService {
                 )?.questions || [];
               return scores.find((q) => q.name === question.name)?.score;
             })
-            .filter((score) => score >= 0 || score !== undefined);
+            .filter((score) => score >= 0 && score !== undefined);
           questionScores.sort((a, b) => a - b);
           return {
             ...question._doc,
