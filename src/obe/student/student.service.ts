@@ -161,7 +161,7 @@ export class StudentService {
                 )?.questions || [];
               return scores.find((q) => q.name === question.name)?.score;
             })
-            .filter((score) => score !== undefined);
+            .filter((score) => score >= 0 || score !== undefined);
           questionScores.sort((a, b) => a - b);
           return {
             ...question._doc,
@@ -171,7 +171,8 @@ export class StudentService {
         students.forEach((student) => {
           const totalScore = student.scores
             .find((scoreItem) => scoreItem.assignmentName === assignment.name)
-            ?.questions.reduce((sum, { score }) => sum + score, 0);
+            ?.questions.filter(({ score }) => score >= 0)
+            .reduce((sum, { score }) => sum + score, 0);
           if (totalScore != undefined) {
             assignmentScores.push(totalScore);
           }
