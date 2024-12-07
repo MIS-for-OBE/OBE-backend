@@ -145,13 +145,13 @@ export class TQF5 {
   @Prop({
     type: [
       {
-        eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
-        assignment: { type: String },
+        eval: { type: String },
+        assignment: { type: [String] },
       },
     ],
     _id: false,
   })
-  assignmentsMap?: { eval: Eval; assignment: string }[];
+  assignmentsMap?: { eval: string; assignment: string[] }[];
 
   @Prop({ type: Part1Schema, _id: false })
   part1?: Part1;

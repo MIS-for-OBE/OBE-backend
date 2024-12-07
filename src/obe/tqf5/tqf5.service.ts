@@ -31,17 +31,20 @@ export class TQF5Service {
   async mappingAssignments(
     params: { id: string },
     requestDTO: any,
-  ): Promise<TQF5> {
+  ): Promise<any> {
     try {
       const tqf5Document = await this.model.findByIdAndUpdate(
         params.id,
-        { assignmentsMap: requestDTO },
+        {
+          $unset: { part2: 1, part3: 1 },
+          assignmentsMap: requestDTO.assignments,
+        },
         { new: true },
       );
       if (!tqf5Document) {
         throw new NotFoundException('TQF5 not found.');
       }
-      return tqf5Document;
+      return tqf5Document.assignmentsMap;
     } catch (error) {
       throw error;
     }

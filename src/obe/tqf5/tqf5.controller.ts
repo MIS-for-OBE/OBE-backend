@@ -34,11 +34,11 @@ export class TQF5Controller {
   async mappingAssignments(
     @Param() params: { id: string },
     @Body() requestDTO: any,
-  ): Promise<ResponseDTO<TQF5>> {
+  ): Promise<ResponseDTO<any>> {
     return this.service
       .mappingAssignments(params, requestDTO)
       .then((result) => {
-        const responseDTO = new ResponseDTO<TQF5>();
+        const responseDTO = new ResponseDTO<any>();
         responseDTO.data = result;
         return responseDTO;
       });
