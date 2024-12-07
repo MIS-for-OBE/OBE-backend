@@ -13,10 +13,29 @@ export class TQF5Service {
       const tqf5Document = await this.model.findByIdAndUpdate(
         params.id,
         {
-          $unset: { part2: 1, part3: 1 },
+          $unset: { assignmentsMap: 1, part2: 1, part3: 1 },
           method: requestDTO.method,
           status: TQF_STATUS.IN_PROGRESS,
         },
+        { new: true },
+      );
+      if (!tqf5Document) {
+        throw new NotFoundException('TQF5 not found.');
+      }
+      return tqf5Document;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async mappingAssignments(
+    params: { id: string },
+    requestDTO: any,
+  ): Promise<TQF5> {
+    try {
+      const tqf5Document = await this.model.findByIdAndUpdate(
+        params.id,
+        { assignmentsMap: requestDTO },
         { new: true },
       );
       if (!tqf5Document) {

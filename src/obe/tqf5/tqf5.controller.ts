@@ -30,6 +30,20 @@ export class TQF5Controller {
     });
   }
 
+  @Post('/:id/mapping-assignment')
+  async mappingAssignments(
+    @Param() params: { id: string },
+    @Body() requestDTO: any,
+  ): Promise<ResponseDTO<TQF5>> {
+    return this.service
+      .mappingAssignments(params, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<TQF5>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
+  }
+
   @Put('/:id/:part')
   async saveEachPart(
     @Param() params: { id: string; part: string },

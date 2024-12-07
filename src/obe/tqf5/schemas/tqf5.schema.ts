@@ -142,6 +142,17 @@ export class TQF5 {
   @Prop({ enum: TQF_STATUS })
   method?: METHOD_TQF5;
 
+  @Prop({
+    type: [
+      {
+        eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
+        assignment: { type: String },
+      },
+    ],
+    _id: false,
+  })
+  assignmentsMap?: { eval: Eval; assignment: string }[];
+
   @Prop({ type: Part1Schema, _id: false })
   part1?: Part1;
 
