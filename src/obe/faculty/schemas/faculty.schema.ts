@@ -22,6 +22,18 @@ export class Department {
 }
 
 @Schema()
+export class Curriculum {
+  @Prop({ required: true })
+  nameTH: string;
+
+  @Prop({ required: true })
+  nameEN: string;
+
+  @Prop({ required: true })
+  code: string;
+}
+
+@Schema()
 export class Faculty {
   @Prop({ required: true, unique: true })
   facultyCode: string;
@@ -43,6 +55,9 @@ export class Faculty {
 
   @Prop()
   department: Department[];
+
+  @Prop()
+  curriculum: Curriculum[];
 }
 
 export const FacultySchema = SchemaFactory.createForClass(Faculty);

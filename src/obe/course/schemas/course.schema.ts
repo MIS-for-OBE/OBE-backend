@@ -4,7 +4,6 @@ import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { User } from 'src/obe/user/schemas/user.schema';
 import { TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
 import { TQF5 } from 'src/obe/tqf5/schemas/tqf5.schema';
-import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 
 @Schema()
 export class Score {
@@ -54,6 +53,9 @@ export const AssignmentSchema = SchemaFactory.createForClass(Assignment);
 export class Section {
   @Prop({ required: true })
   sectionNo: number;
+
+  @Prop()
+  curriculum: string;
 
   @Prop()
   addFirstTime: boolean;
