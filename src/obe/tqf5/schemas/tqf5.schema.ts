@@ -111,16 +111,19 @@ class Part3 {
     type: [
       {
         clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
-        sections: [
-          {
-            sectionNo: Number,
-            score0: Number,
-            score1: Number,
-            score2: Number,
-            score3: Number,
-            score4: Number,
-          },
-        ],
+        sections: {
+          type: [
+            {
+              sectionNo: Number,
+              score0: Number,
+              score1: Number,
+              score2: Number,
+              score3: Number,
+              score4: Number,
+            },
+          ],
+          _id: false,
+        },
       },
     ],
     _id: false,
