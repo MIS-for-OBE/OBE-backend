@@ -15,11 +15,13 @@ import { Course } from '../course/schemas/course.schema';
 import { Faculty } from '../faculty/schemas/faculty.schema';
 import * as fs from 'fs';
 import { join } from 'path';
+import { TQF5 } from '../tqf5/schemas/tqf5.schema';
 
 @Injectable()
 export class TQF3Service {
   constructor(
     @InjectModel(TQF3.name) private readonly model: Model<TQF3>,
+    @InjectModel(TQF5.name) private readonly tqf5Model: Model<TQF5>,
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(Faculty.name) private readonly facultyModel: Model<Faculty>,
     private readonly generatePdfBLL: GeneratePdfBLL,
@@ -223,6 +225,12 @@ export class TQF3Service {
         tqf3Document.part3.eval.sort((a: any, b: any) => a.no - b.no);
       } else {
         tqf3Document[params.part] = { ...requestDTO };
+        if (params.part === 'part4' && requestDTO.tqf5) {
+          await this.tqf5Model.findByIdAndUpdate(requestDTO.tqf5, {
+            $unset: { assignmentsMap: 1, part2: 1, part3: 1 },
+            status: TQF_STATUS.IN_PROGRESS,
+          });
+        }
       }
 
       tqf3Document.status =
