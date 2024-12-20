@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { BaseDTO } from 'src/common/dto/base.dto';
-import { CMU_OAUTH_ROLE } from 'src/common/enum/role.enum';
+import { CMU_ENTRAID_ROLE } from 'src/common/enum/role.enum';
 import { User } from 'src/obe/user/schemas/user.schema';
 
 export class LoginDTO extends BaseDTO {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'access token from CMU OAuth',
+    description: 'access token from CMU EntraID',
     type: String,
     example: 'kEnAAUZksDrpFfpKD8QgsSfJ74PhNPme',
   })
@@ -17,14 +17,14 @@ export class LoginDTO extends BaseDTO {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'CMU OAuth redirect uri',
+    description: 'CMU EntraID redirect uri',
     type: String,
-    example: 'http://localhost:3000/cmuOAuthCallback',
+    example: 'http://localhost:3000/cmuEntraIDCallback',
   })
   redirectUri: string;
 }
 
-export class CmuOAuthBasicInfoDTO extends BaseDTO {
+export class CmuEntraIDBasicInfoDTO extends BaseDTO {
   @IsString()
   cmuitaccount_name: string;
 
@@ -65,7 +65,7 @@ export class CmuOAuthBasicInfoDTO extends BaseDTO {
   organization_name_EN: string;
 
   @IsString()
-  itaccounttype_id: CMU_OAUTH_ROLE;
+  itaccounttype_id: CMU_ENTRAID_ROLE;
 
   @IsString()
   itaccounttype_TH: string;
@@ -74,7 +74,7 @@ export class CmuOAuthBasicInfoDTO extends BaseDTO {
   itaccounttype_EN: string;
 }
 
-export class CmuOAuthStdInfoDTO extends BaseDTO {
+export class CmuEntraIDStdInfoDTO extends BaseDTO {
   @IsString()
   student_id: string;
 
@@ -130,7 +130,7 @@ export class CmuOAuthStdInfoDTO extends BaseDTO {
   cmuitaccount: string;
 }
 
-export class CmuOAuthEmpInfoDTO extends BaseDTO {
+export class CmuEntraIDEmpInfoDTO extends BaseDTO {
   @IsString()
   Email: string;
 

@@ -7,15 +7,15 @@ import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
 import {
   TokenDTO,
-  CmuOAuthBasicInfoDTO,
+  CmuEntraIDBasicInfoDTO,
   LoginDTO,
-  CmuOAuthStdInfoDTO,
-  CmuOAuthEmpInfoDTO,
+  CmuEntraIDStdInfoDTO,
+  CmuEntraIDEmpInfoDTO,
 } from './dto/dto';
 import { capitalize } from 'lodash';
 import { Model } from 'mongoose';
 import { User } from 'src/obe/user/schemas/user.schema';
-import { CMU_OAUTH_ROLE, ROLE } from 'src/common/enum/role.enum';
+import { CMU_ENTRAID_ROLE, ROLE } from 'src/common/enum/role.enum';
 import { InjectModel } from '@nestjs/mongoose';
 import { Faculty } from 'src/obe/faculty/schemas/faculty.schema';
 import { AuthService } from 'src/auth/auth.service';
@@ -28,22 +28,22 @@ export class AuthenticationService {
     private readonly authService: AuthService,
   ) {}
 
-  private async getOAuthAccessTokenAsync(
+  private async getEntraIDAccessTokenAsync(
     code: string,
     redirectUri: string,
   ): Promise<string> {
     try {
       const response = await axios.post(
-        process.env.CMU_OAUTH_GET_TOKEN_URL,
-        {},
+        process.env.CMU_ENTRAID_GET_TOKEN_URL,
         {
-          params: {
-            code,
-            redirect_uri: redirectUri,
-            client_id: process.env.CMU_OAUTH_CLIENT_ID,
-            client_secret: process.env.CMU_OAUTH_CLIENT_SECRET,
-            grant_type: 'authorization_code',
-          },
+          code,
+          redirect_uri: redirectUri,
+          client_id: process.env.CMU_ENTRAID_CLIENT_ID,
+          client_secret: process.env.CMU_ENTRAID_CLIENT_SECRET,
+          scope: process.env.SCOPE,
+          grant_type: 'authorization_code',
+        },
+        {
           headers: {
             'content-type': 'application/x-www-form-urlencoded',
           },
@@ -51,16 +51,16 @@ export class AuthenticationService {
       );
       return response.data.access_token;
     } catch (err) {
-      console.error('Error getting OAuth access token:', err);
+      console.error('Error getting EntraID access token:', err);
       return null;
     }
   }
 
   private async getCMUBasicInfoAsync(
     accessToken: string,
-  ): Promise<CmuOAuthBasicInfoDTO> {
+  ): Promise<CmuEntraIDBasicInfoDTO> {
     try {
-      const response = await axios.get(process.env.CMU_OAUTH_GET_BASIC_INFO, {
+      const response = await axios.get(process.env.CMU_ENTRAID_GET_BASIC_INFO, {
         headers: { Authorization: 'Bearer ' + accessToken },
       });
       return response.data;
@@ -70,33 +70,33 @@ export class AuthenticationService {
     }
   }
 
-  private async getCMUStdInfoAsync(
-    accessToken: string,
-  ): Promise<CmuOAuthStdInfoDTO> {
-    try {
-      const response = await axios.get(process.env.CMU_OAUTH_GET_STD_INFO, {
-        headers: { Authorization: 'Bearer ' + accessToken },
-      });
-      return response.data;
-    } catch (err) {
-      console.error('Error getting CMU student info:', err);
-      return null;
-    }
-  }
+  // private async getCMUStdInfoAsync(
+  //   accessToken: string,
+  // ): Promise<CmuEntraIDStdInfoDTO> {
+  //   try {
+  //     const response = await axios.get(process.env.CMU_EntraID_GET_STD_INFO, {
+  //       headers: { Authorization: 'Bearer ' + accessToken },
+  //     });
+  //     return response.data;
+  //   } catch (err) {
+  //     console.error('Error getting CMU student info:', err);
+  //     return null;
+  //   }
+  // }
 
-  private async getCMUEmpInfoAsync(
-    accessToken: string,
-  ): Promise<CmuOAuthEmpInfoDTO> {
-    try {
-      const response = await axios.get(process.env.CMU_OAUTH_GET_EMP_INFO, {
-        headers: { Authorization: 'Bearer ' + accessToken },
-      });
-      return response.data;
-    } catch (err) {
-      console.error('Error getting CMU employee info:', err);
-      return null;
-    }
-  }
+  // private async getCMUEmpInfoAsync(
+  //   accessToken: string,
+  // ): Promise<CmuEntraIDEmpInfoDTO> {
+  //   try {
+  //     const response = await axios.get(process.env.CMU_ENTRAID_GET_EMP_INFO, {
+  //       headers: { Authorization: 'Bearer ' + accessToken },
+  //     });
+  //     return response.data;
+  //   } catch (err) {
+  //     console.error('Error getting CMU employee info:', err);
+  //     return null;
+  //   }
+  // }
 
   async login(body: LoginDTO): Promise<TokenDTO> {
     const { code, redirectUri } = body;
@@ -105,21 +105,21 @@ export class AuthenticationService {
       throw new BadRequestException('Invalid redirect uri');
 
     //get access token
-    const accessToken = await this.getOAuthAccessTokenAsync(
+    const accessToken = await this.getEntraIDAccessTokenAsync(
       body.code,
       body.redirectUri,
     );
     if (!accessToken)
-      throw new BadRequestException('Cannot get OAuth access token');
+      throw new BadRequestException('Cannot get EntraID access token');
 
     //get basic info
     const basicInfo = await this.getCMUBasicInfoAsync(accessToken);
     if (!basicInfo) throw new BadRequestException('Cannot get CMU basic info');
     if (
-      ![CMU_OAUTH_ROLE.STUDENT, CMU_OAUTH_ROLE.MIS].includes(
+      ![CMU_ENTRAID_ROLE.STUDENT, CMU_ENTRAID_ROLE.MIS].includes(
         basicInfo.itaccounttype_id,
       ) ||
-      (basicInfo.itaccounttype_id == CMU_OAUTH_ROLE.MIS &&
+      (basicInfo.itaccounttype_id == CMU_ENTRAID_ROLE.MIS &&
         basicInfo.organization_code != '06')
     )
       throw new ForbiddenException(
@@ -145,7 +145,7 @@ export class AuthenticationService {
     };
     if (!user) {
       userData.role = this.assignRole(basicInfo);
-      if (basicInfo.itaccounttype_id == CMU_OAUTH_ROLE.STUDENT) {
+      if (basicInfo.itaccounttype_id == CMU_ENTRAID_ROLE.STUDENT) {
         await this.updateUserDepartment(userData, basicInfo, accessToken);
       }
       user = await this.userModel.create(userData);
@@ -167,13 +167,13 @@ export class AuthenticationService {
     return dataRs;
   }
 
-  private assignRole(basicInfo: CmuOAuthBasicInfoDTO): ROLE {
+  private assignRole(basicInfo: CmuEntraIDBasicInfoDTO): ROLE {
     if (this.isSupremeAdmin(basicInfo.cmuitaccount_name))
       return ROLE.SUPREME_ADMIN;
     switch (basicInfo.itaccounttype_id) {
-      case CMU_OAUTH_ROLE.STUDENT:
+      case CMU_ENTRAID_ROLE.STUDENT:
         return ROLE.STUDENT;
-      case CMU_OAUTH_ROLE.MIS:
+      case CMU_ENTRAID_ROLE.MIS:
         return ROLE.INSTRUCTOR;
     }
   }
@@ -189,24 +189,24 @@ export class AuthenticationService {
 
   private async updateUserDepartment(
     user: Partial<User>,
-    basicInfo: CmuOAuthBasicInfoDTO,
+    basicInfo: CmuEntraIDBasicInfoDTO,
     accessToken: string,
   ) {
-    const stdInfo = await this.getCMUStdInfoAsync(accessToken);
+    // const stdInfo = await this.getCMUStdInfoAsync(accessToken);
     user.studentId = basicInfo.student_id;
     user.role = this.isSupremeAdmin(basicInfo.cmuitaccount_name)
       ? ROLE.SUPREME_ADMIN
       : user.role == ROLE.INSTRUCTOR
         ? ROLE.TA
         : ROLE.STUDENT;
-    if (user.facultyCode == '06') {
-      user.departmentCode = await this.getDepartmentCode(
-        user.facultyCode,
-        stdInfo.department_name_TH,
-      );
-    } else {
-      user.departmentCode = [stdInfo.department_name_EN];
-    }
+    // if (user.facultyCode == '06') {
+    //   user.departmentCode = await this.getDepartmentCode(
+    //     user.facultyCode,
+    //     stdInfo.department_name_TH,
+    //   );
+    // } else {
+    //   user.departmentCode = [stdInfo.department_name_EN];
+    // }
   }
 
   private async getDepartmentCode(facultyCode: string, departmentTH: string) {

@@ -1,4 +1,4 @@
-export enum CMU_OAUTH_ROLE {
+export enum CMU_ENTRAID_ROLE {
   MIS = 'MISEmpAcc',
   STUDENT = 'StdAcc',
   ALUMNI = 'AlumAcc',
