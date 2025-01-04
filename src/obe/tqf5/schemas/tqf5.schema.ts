@@ -85,12 +85,15 @@ class Part2 {
     type: [
       {
         clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
-        assignments: [
-          {
-            eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
-            questions: { type: [String] },
-          },
-        ],
+        assignments: {
+          type: [
+            {
+              eval: { type: mongoose.Schema.Types.ObjectId, ref: 'Eval' },
+              questions: { type: [String] },
+            },
+          ],
+          _id: false,
+        },
       },
     ],
     _id: false,
