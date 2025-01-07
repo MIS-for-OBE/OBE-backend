@@ -185,11 +185,11 @@ export class TQF3Service {
         }
         if (tqf3Document.part7?.data.length) {
           tqf3Document.part7.data = tqf3Document.part7.data.filter((item) =>
-            validCloIds.includes(item.clo.toString()),
+            validCloIds.includes(item.clo?.toString()),
           );
           tqf3Document.part7.data.sort((a: any, b: any) => {
-            const aIndex = cloIndexMap[a.clo.toString()];
-            const bIndex = cloIndexMap[b.clo.toString()];
+            const aIndex = cloIndexMap[a.clo?.toString()];
+            const bIndex = cloIndexMap[b.clo?.toString()];
             return (
               (aIndex !== undefined ? aIndex : Infinity) -
               (bIndex !== undefined ? bIndex : Infinity)
