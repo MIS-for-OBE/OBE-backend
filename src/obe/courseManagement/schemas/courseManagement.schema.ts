@@ -12,6 +12,9 @@ export class SectionManagement {
   sectionNo: number;
 
   @Prop()
+  curriculum: string;
+
+  @Prop()
   topic: string;
 
   @Prop({

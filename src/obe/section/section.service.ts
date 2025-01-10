@@ -276,18 +276,21 @@ export class SectionService {
 
   async updateStudent(requestDTO: any): Promise<Section[]> {
     try {
-      const updateData: Partial<User> = {};
-      if (requestDTO.studentId) {
-        updateData.studentId = requestDTO.studentId;
-        if (requestDTO.email?.length) updateData.email = requestDTO.email;
+      const updateStudent = await this.userModel.findById(requestDTO.student);
+      if (updateStudent) {
+        if (requestDTO.studentId)
+          updateStudent.studentId = requestDTO.studentId;
+        if (requestDTO.email) updateStudent.email = requestDTO.email;
         if (requestDTO.firstNameTH) {
-          updateData.firstNameTH = requestDTO.firstNameTH;
-          updateData.lastNameTH = requestDTO.lastNameTH;
+          updateStudent.firstNameTH = requestDTO.firstNameTH;
+          updateStudent.lastNameTH = requestDTO.lastNameTH;
         } else {
-          updateData.firstNameEN = requestDTO.firstNameEN;
-          updateData.lastNameEN = requestDTO.lastNameEN;
+          updateStudent.firstNameEN = requestDTO.firstNameEN;
+          updateStudent.lastNameEN = requestDTO.lastNameEN;
         }
+        await updateStudent.save();
       }
+      const updateData: Partial<User> = {};
       if (requestDTO.oldSectionNo !== requestDTO.sectionNo) {
         updateData['enrollCourses.$[enrollCourse].courses.$[course].section'] =
           requestDTO.sectionNo;

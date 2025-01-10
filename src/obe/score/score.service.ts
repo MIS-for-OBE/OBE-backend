@@ -126,6 +126,17 @@ export class ScoreService {
 
   async updateAssignment(requestDTO: any): Promise<any> {
     try {
+      const arrayFilters: any[] = [];
+      if (requestDTO.sectionNo) {
+        arrayFilters.push({ 'section.sectionNo': requestDTO.sectionNo });
+      } else {
+        arrayFilters.push({ 'section.assignments.name': requestDTO.oldName });
+      }
+      arrayFilters.push(
+        { 'assignment.name': requestDTO.oldName },
+        { 'score.assignmentName': requestDTO.oldName },
+      );
+
       const updateAssignments = await this.courseModel
         .findByIdAndUpdate(
           requestDTO.course,
@@ -138,11 +149,7 @@ export class ScoreService {
             },
           },
           {
-            arrayFilters: [
-              { 'section.assignments.name': requestDTO.oldName },
-              { 'assignment.name': requestDTO.oldName },
-              { 'score.assignmentName': requestDTO.oldName },
-            ],
+            arrayFilters,
             fields: [
               'sections.sectionNo',
               'sections.assignments',
@@ -173,6 +180,9 @@ export class ScoreService {
       const course = await this.courseModel.findById(requestDTO.course);
 
       course?.sections.forEach((section) => {
+        if (requestDTO.sectionNo && section.sectionNo != requestDTO.sectionNo) {
+          return;
+        }
         section.assignments = section.assignments.filter(
           (assignment) => assignment.name !== requestDTO.name,
         );

@@ -163,7 +163,7 @@ export const buildPart6Content = (
       doc.font(fontBold).text(`${item.no}. ${item.th}`, {
         align: 'left',
       });
-      doc.moveDown(0.3);
+      doc.moveDown(0.28);
 
       item.list.forEach((e, eIndex) => {
         const checkboxSymbol = setSymbol(
@@ -184,7 +184,7 @@ export const buildPart6Content = (
 
         doc.x -= 15;
 
-        doc.moveDown(0.3);
+        doc.moveDown(0.28);
       });
 
       if (data.data[index].detail.includes('อื่นๆ (Other)')) {
@@ -194,14 +194,14 @@ export const buildPart6Content = (
         });
         doc.x -= 15;
       }
-      doc.moveDown(0.3);
+      doc.moveDown(0.28);
 
       doc.x -= 15;
     });
 
     // Additional Topic
 
-    doc.moveDown(0.3);
+    doc.moveDown(0.28);
     if (data.data.length > 5) {
       data.data.slice(5).map((item, index) => {
         doc

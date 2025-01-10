@@ -36,20 +36,4 @@ export class SearchDTO {
   @IsString()
   @Type(() => String)
   orderType = '' as SortOrder;
-
-  @IsString()
-  @Type(() => String)
-  between = '';
-
-  @IsString()
-  @Type(() => String)
-  betweenDate = '';
-
-  getStartDate() {
-    return this.betweenDate.split(',')[0];
-  }
-
-  getEndDate() {
-    return this.betweenDate.split(',')[1];
-  }
 }

@@ -17,6 +17,7 @@ import {
   CourseManagement,
   CourseManagementDocument,
 } from './schemas/courseManagement.schema';
+import { CourseManagementSearchDTO } from './dto/search.dto';
 
 @Controller('/course-management')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -26,7 +27,7 @@ export class CourseManagementController {
   @Get()
   async searchCourseManagement(
     @Request() req,
-    @Query() searchDTO: any,
+    @Query() searchDTO: CourseManagementSearchDTO,
   ): Promise<ResponseDTO<CourseManagement[]>> {
     return this.service
       .searchCourseManagement(req.user.facultyCode, searchDTO)
@@ -39,7 +40,7 @@ export class CourseManagementController {
 
   @Get('one')
   async searchOneCourseManagement(
-    @Query() searchDTO: any,
+    @Query() searchDTO: CourseManagementSearchDTO,
   ): Promise<ResponseDTO<any>> {
     return this.service.searchOneCourseManagement(searchDTO).then((result) => {
       const responseDTO = new ResponseDTO<any>();
