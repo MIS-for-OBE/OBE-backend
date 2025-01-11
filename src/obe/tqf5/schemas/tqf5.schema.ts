@@ -118,6 +118,7 @@ class Part3 {
           type: [
             {
               eval: String,
+              sheet: [String],
               percent: Number,
               fullScore: Number,
               range0: Number,
@@ -149,6 +150,7 @@ class Part3 {
     clo: CLO;
     assess: {
       eval: string;
+      sheet: string[];
       percent: number;
       fullScore: number;
       range0: number;
