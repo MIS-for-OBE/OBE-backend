@@ -114,6 +114,19 @@ class Part3 {
     type: [
       {
         clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
+        assess: {
+          type: [
+            {
+              eval: String,
+              percent: Number,
+              fullScore: Number,
+              range0: Number,
+              range1: Number,
+              range2: Number,
+              range3: Number,
+            },
+          ],
+        },
         sections: {
           type: [
             {
@@ -127,12 +140,22 @@ class Part3 {
           ],
           _id: false,
         },
+        score: { type: Number },
       },
     ],
     _id: false,
   })
   data: {
     clo: CLO;
+    assess: {
+      eval: string;
+      percent: number;
+      fullScore: number;
+      range0: number;
+      range1: number;
+      range2: number;
+      range3: number;
+    }[];
     sections: {
       sectionNo: number;
       score0: number;
@@ -141,6 +164,7 @@ class Part3 {
       score3: number;
       score4: number;
     }[];
+    score: number;
   }[];
 }
 const Part3Schema = SchemaFactory.createForClass(Part3);
