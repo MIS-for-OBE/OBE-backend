@@ -508,6 +508,14 @@ export class CourseManagementService {
           }),
           this.tqf3Model.findByIdAndDelete(deleteCourse.TQF3),
           this.tqf5Model.findByIdAndDelete(deleteCourse.TQF5),
+          this.userModel.updateMany(
+            { 'enrollCourses.courses.course': deleteCourse.id },
+            {
+              $pull: {
+                'enrollCourses.$[].courses': { course: deleteCourse.id },
+              },
+            },
+          ),
         ]);
       }
       return { id, courseId: deleteCourse?.id };
