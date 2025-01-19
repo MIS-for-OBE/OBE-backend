@@ -42,7 +42,10 @@ export class CourseManagementService {
   ): Promise<any> {
     try {
       const where = {};
-      if (!searchDTO.curriculum.includes('All')) {
+      if (
+        searchDTO.curriculum.length &&
+        !searchDTO.curriculum.includes('All')
+      ) {
         where['sections.curriculum'] = { $in: searchDTO.curriculum };
       }
       if (searchDTO.search?.length) {
