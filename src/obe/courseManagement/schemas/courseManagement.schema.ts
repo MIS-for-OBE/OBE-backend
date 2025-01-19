@@ -69,9 +69,6 @@ export class CourseManagement {
   @Prop({ required: true, enum: COURSE_TYPE })
   type: COURSE_TYPE;
 
-  // @Prop({ required: true, enum: DEPARTMENT_CODE })
-  // dapartmentCode: DEPARTMENT_CODE;
-
   @Prop({ type: [SectionManagementSchema], default: [] })
   sections?: SectionManagement[];
 

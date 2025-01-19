@@ -35,7 +35,7 @@ export class PLO {
   facultyCode: string;
 
   @Prop({ required: true })
-  departmentCode: string[];
+  curriculum: string[];
 
   @Prop({ required: true })
   criteriaTH: string;

@@ -24,10 +24,7 @@ export class UserService {
     try {
       if (!body.agree) {
         const user = await this.model.findById(id);
-        if (
-          !user.departmentCode.includes('CPE') &&
-          (user.role !== ROLE.STUDENT || !user.studentId)
-        ) {
+        if (user.role !== ROLE.STUDENT || !user.studentId) {
           await this.model.findByIdAndDelete(id);
         }
       } else {

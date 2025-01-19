@@ -265,30 +265,23 @@ export class TQF3Service {
       );
       let data: CmuApiTqfCourseDTO = courseInfo.data[0];
       data = { ...data, ...requestDTO };
-      const [course, faculty] = await Promise.all([
-        this.courseModel.findOne({
-          year: requestDTO.academicYear,
-          semester: requestDTO.academicTerm,
-          courseNo: requestDTO.courseNo,
-        }),
-        this.facultyModel.findOne({ facultyCode: facultyCode }),
-      ]);
-      const department = faculty.department.find(
-        ({ courseCode }) => courseCode == parseInt(course.courseNo.slice(0, 3)),
-      );
-      data.FacultyNameEng = faculty?.facultyEN;
-      data.DepartmentNameTha = department?.departmentTH;
-      data.DepartmentNameEng = department?.departmentEN;
       if (!data.CourseID) {
+        const [course, faculty] = await Promise.all([
+          this.courseModel.findOne({
+            year: requestDTO.academicYear,
+            semester: requestDTO.academicTerm,
+            courseNo: requestDTO.courseNo,
+          }),
+          this.facultyModel.findOne({ facultyCode: facultyCode }),
+        ]);
         data.AcademicYear = course.year.toString();
         data.AcademicTerm = course.semester;
         data.CourseID = course.courseNo;
         data.CourseTitleTha = course.courseName;
         data.CourseTitleEng = course.courseName;
         data.FacultyID = facultyCode;
+        data.FacultyNameEng = faculty?.facultyEN;
         data.FacultyNameTha = faculty?.facultyTH;
-        data.CourseCodeTha = department?.codeTH;
-        data.CourseCodeEng = department?.codeEN;
       }
 
       const tqf3: any = await this.model.findById(requestDTO.tqf3);
@@ -342,7 +335,7 @@ export class TQF3Service {
       if (requestDTO.oneFile) {
         const fileAllParts = await this.generatePdfBLL.mergePdfs(
           files,
-          `TQF3_${course.courseNo}_${requestDTO.academicTerm}${requestDTO.academicYear}_All_Parts_${date}.pdf`,
+          `TQF3_${requestDTO.courseNo}_${requestDTO.academicTerm}${requestDTO.academicYear}_All_Parts_${date}.pdf`,
         );
         files.forEach((file) => {
           const filePath = join(process.cwd(), file);

@@ -28,7 +28,7 @@ export class CourseSearchDTO extends SearchDTO {
 
   @IsArray()
   @Type(() => String)
-  departmentCode: string[] = [];
+  curriculum: string[] = [];
 
   @IsArray()
   @Type(() => String)

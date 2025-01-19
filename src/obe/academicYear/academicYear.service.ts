@@ -78,11 +78,11 @@ export class AcademicYearService {
         semester: academic.semester,
         isActive: true,
       });
-      const departmentCode = updatedPlo
-        .map(({ departmentCode }) => departmentCode)
+      const curriculumCode = updatedPlo
+        .map(({ curriculum }) => curriculum)
         .flat();
       const updatePromises = activePlo.map((plo) => {
-        if (plo.departmentCode.some((item) => departmentCode.includes(item))) {
+        if (plo.curriculum.some((item) => curriculumCode.includes(item))) {
           plo.isActive = false;
           return plo.save();
         }
@@ -159,22 +159,6 @@ export class AcademicYearService {
       throw error;
     }
   }
-
-  // async updateProcessTqf3(
-  //   academicYearId: string,
-  //   requestDTO: any,
-  // ): Promise<AcademicYear> {
-  //   try {
-  //     const res = await this.model.findByIdAndUpdate(
-  //       academicYearId,
-  //       { isProcessTQF3: requestDTO.isProcessTQF3 },
-  //       { new: true },
-  //     );
-  //     return res;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
 
   async deleteAcademicYear(id: string): Promise<AcademicYear> {
     try {

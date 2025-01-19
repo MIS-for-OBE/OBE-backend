@@ -53,9 +53,6 @@ export class User {
   @Prop()
   facultyCode: string;
 
-  @Prop()
-  departmentCode: string[];
-
   @Prop({ required: true, enum: ROLE })
   role: string;
 

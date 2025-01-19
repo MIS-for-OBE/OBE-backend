@@ -146,13 +146,14 @@ export class AuthenticationService {
     if (!user) {
       userData.role = this.assignRole(basicInfo);
       if (basicInfo.itaccounttype_id == CMU_ENTRAID_ROLE.STUDENT) {
-        await this.updateUserDepartment(userData, basicInfo, accessToken);
+        userData.studentId = basicInfo.student_id;
       }
       user = await this.userModel.create(userData);
-    } else if (!user.departmentCode?.length) {
+    } else if (!user.termsOfService) {
       userData.role = user.role;
       if (user.studentId) {
-        await this.updateUserDepartment(userData, basicInfo, accessToken);
+        user.studentId = basicInfo.student_id;
+        user.role = user.role == ROLE.INSTRUCTOR ? ROLE.TA : ROLE.STUDENT;
       }
       user = await this.userModel.findByIdAndUpdate(
         user.id,
@@ -168,56 +169,11 @@ export class AuthenticationService {
   }
 
   private assignRole(basicInfo: CmuEntraIDBasicInfoDTO): ROLE {
-    if (this.isSupremeAdmin(basicInfo.cmuitaccount_name))
-      return ROLE.SUPREME_ADMIN;
     switch (basicInfo.itaccounttype_id) {
       case CMU_ENTRAID_ROLE.STUDENT:
         return ROLE.STUDENT;
       case CMU_ENTRAID_ROLE.MIS:
         return ROLE.INSTRUCTOR;
     }
-  }
-
-  private isSupremeAdmin(username: string): boolean {
-    return [
-      'thanaporn_chan',
-      'sawit_cha',
-      'worapitcha_muangyot',
-      'dome.potikanond',
-    ].includes(username);
-  }
-
-  private async updateUserDepartment(
-    user: Partial<User>,
-    basicInfo: CmuEntraIDBasicInfoDTO,
-    accessToken: string,
-  ) {
-    // const stdInfo = await this.getCMUStdInfoAsync(accessToken);
-    user.studentId = basicInfo.student_id;
-    user.role = this.isSupremeAdmin(basicInfo.cmuitaccount_name)
-      ? ROLE.SUPREME_ADMIN
-      : user.role == ROLE.INSTRUCTOR
-        ? ROLE.TA
-        : ROLE.STUDENT;
-    // if (user.facultyCode == '06') {
-    //   user.departmentCode = await this.getDepartmentCode(
-    //     user.facultyCode,
-    //     stdInfo.department_name_TH,
-    //   );
-    // } else {
-    //   user.departmentCode = [stdInfo.department_name_EN];
-    // }
-  }
-
-  private async getDepartmentCode(facultyCode: string, departmentTH: string) {
-    return [
-      await this.facultyModel
-        .findOne({ facultyCode })
-        .then(
-          (result) =>
-            result.department.find((dep) => dep.departmentTH == departmentTH)
-              .codeEN,
-        ),
-    ];
   }
 }
