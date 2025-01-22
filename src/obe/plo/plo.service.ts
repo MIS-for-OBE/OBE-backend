@@ -74,11 +74,6 @@ export class PLOService {
         filter.semester = { $lte: searchDTO.semester };
         if (searchDTO.curriculum) {
           filter.curriculum = searchDTO.curriculum;
-        } else {
-          const faculty = await this.facultyModel.findOne({ facultyCode });
-          filter.curriculum = faculty.curriculum.find(
-            ({ code }) => code === searchDTO.curriculum,
-          )?.code;
         }
       }
       const plosMatch = await this.model
