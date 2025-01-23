@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TQF5Controller } from './tqf5.controller';
 import { TQF5Service } from './tqf5.service';
 import { TQF3, TQF3Schema } from '../tqf3/schemas/tqf3.schema';
+import { GeneratePdfBLL } from './bll/genPdf';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { TQF3, TQF3Schema } from '../tqf3/schemas/tqf3.schema';
     ]),
   ],
   controllers: [TQF5Controller],
-  providers: [TQF5Service],
+  providers: [TQF5Service, GeneratePdfBLL],
 })
 export class TQF5Module {}
