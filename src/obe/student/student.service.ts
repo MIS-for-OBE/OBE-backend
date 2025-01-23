@@ -110,8 +110,10 @@ export class StudentService {
             clo,
             evals,
             plos,
-            assess: tqf5.part3?.data.find((itemA) => itemA.clo == clo.id)
-              ?.assess,
+            assess:
+              tqf5.part3?.data.find((itemA) => itemA.clo == clo.id)?.assess ||
+              [],
+            tqf5Part2: tqf5.part2?.data || [],
           });
         });
 
