@@ -106,7 +106,13 @@ export class StudentService {
           });
           sortData(evals, 'no');
           const plos = tqf3.part7?.data.find((c) => c.clo == clo.id)?.plos;
-          clos.push({ clo, evals, plos });
+          clos.push({
+            clo,
+            evals,
+            plos,
+            assess: tqf5.part3?.data.find((itemA) => itemA.clo == clo.id)
+              ?.assess,
+          });
         });
 
         const allStudents = sections.map((sec) => sec.students).flat();
