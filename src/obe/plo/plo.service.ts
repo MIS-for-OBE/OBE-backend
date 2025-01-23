@@ -22,7 +22,7 @@ export class PLOService {
       const isSAdmin = searchDTO.role == ROLE.SUPREME_ADMIN;
       const where: any = { facultyCode };
       if (!isSAdmin) {
-        where.departmentCode = { $in: searchDTO.departmentCode };
+        where.curriculum = { $in: searchDTO.curriculum };
       }
       if (searchDTO.manage) {
         where.isActive = true;
@@ -40,26 +40,24 @@ export class PLOService {
       if (searchDTO.manage || searchDTO.all) {
         return { totalCount, plos: data };
       }
-      const departmentCodes = isSAdmin
-        ? faculty.department.map((dep) => dep.codeEN)
-        : searchDTO.departmentCode;
-      const plos = departmentCodes.map((dep) => {
+      const curCodes = isSAdmin
+        ? faculty.curriculum.map(({ code }) => code)
+        : searchDTO.curriculum;
+      const plos = curCodes.map((cur) => {
         return {
-          departmentCode: dep,
-          departmentEN: faculty.department.find((code) => code.codeEN == dep)
-            .departmentEN,
+          ...faculty.curriculum.find(({ code }) => code == cur),
           collections: [],
         };
       });
-      plos.forEach((plo, index) => {
+      plos.forEach((plo: any) => {
         data.forEach((collection) => {
-          if (collection.departmentCode.includes(plo.departmentCode)) {
+          if (collection.curriculum.includes(plo.code)) {
             plo.collections.push(collection);
           }
         });
       });
       const filteredPLOs = plos.filter((plo) => plo.collections.length > 0);
-      sortData(filteredPLOs, 'departmentEN', 'string');
+      sortData(filteredPLOs, 'curriculumEN', 'string');
       return { totalCount, plos: filteredPLOs };
     } catch (error) {
       throw error;
@@ -74,13 +72,8 @@ export class PLOService {
       } else {
         filter.year = { $lte: searchDTO.year };
         filter.semester = { $lte: searchDTO.semester };
-        if (searchDTO.codeEN) {
-          filter.departmentCode = searchDTO.codeEN;
-        } else {
-          const faculty = await this.facultyModel.findOne({ facultyCode });
-          filter.departmentCode = faculty.department.find(
-            ({ courseCode }) => courseCode === parseInt(searchDTO.courseCode),
-          )?.codeEN;
+        if (searchDTO.curriculum) {
+          filter.curriculum = searchDTO.curriculum;
         }
       }
       const plosMatch = await this.model
@@ -119,22 +112,22 @@ export class PLOService {
 
   async createPLO(requestDTO: any): Promise<PLO> {
     try {
-      const existPloWithDep = await this.model.find({
+      const existPloWithCur = await this.model.find({
         semester: requestDTO.semester,
         year: requestDTO.year,
       });
-      if (existPloWithDep) {
-        const existDep = [];
-        existPloWithDep.forEach((plo) => {
-          requestDTO.departmentCode.forEach((dep) => {
-            if (plo.departmentCode.includes(dep) && !existDep.includes(dep))
-              existDep.push(dep);
+      if (existPloWithCur) {
+        const existCur = [];
+        existPloWithCur.forEach((plo) => {
+          requestDTO.curriculum.forEach((cur) => {
+            if (plo.curriculum.includes(cur) && !existCur.includes(cur))
+              existCur.push(cur);
           });
         });
-        if (existDep.length) {
+        if (existCur.length) {
           throw new BadRequestException({
-            title: `Department PLO Conflict`,
-            message: `${existDep.join(', ')} already exist PLO for semester ${requestDTO.semester}/${requestDTO.year}.`,
+            title: `Curriculum PLO Conflict`,
+            message: `${existCur.join(', ')} already exist PLO for semester ${requestDTO.semester}/${requestDTO.year}.`,
           });
         }
       }

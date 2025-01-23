@@ -40,19 +40,16 @@ export class CourseService {
   async searchCourse(authUser: any, searchDTO: CourseSearchDTO): Promise<any> {
     try {
       if (searchDTO.manage) {
-        const courseCode = await this.facultyService.getCourseCode(
-          authUser.facultyCode,
-          searchDTO.departmentCode,
-        );
         const where = {
           year: searchDTO.year,
           semester: searchDTO.semester,
-          courseNo: {
-            $in: Object.values(courseCode).map(
-              (code) => new RegExp('^' + ('000' + code).slice(-3)),
-            ),
-          },
         };
+        if (
+          searchDTO.curriculum.length &&
+          !searchDTO.curriculum.includes('All')
+        ) {
+          where['sections.curriculum'] = { $in: searchDTO.curriculum };
+        }
         if (searchDTO.search?.length) {
           setWhereWithSearchCourse(where, searchDTO.search);
         }
@@ -125,10 +122,10 @@ export class CourseService {
                 return true;
               }) || [];
           const totalCount = courses.length;
-          return { totalCount, courses, courseCode };
+          return { totalCount, courses };
         } else if (searchDTO.page == 1) {
           const totalCount = await this.model.countDocuments(where);
-          return { totalCount, courses, courseCode };
+          return { totalCount, courses };
         }
         return courses;
       } else {
@@ -521,6 +518,14 @@ export class CourseService {
         }),
         this.tqf3Model.findByIdAndDelete(deleteCourse.TQF3),
         this.tqf5Model.findByIdAndDelete(deleteCourse.TQF5),
+        this.userModel.updateMany(
+          { 'enrollCourses.courses.course': deleteCourse.id },
+          {
+            $pull: {
+              'enrollCourses.$[].courses': { course: deleteCourse.id },
+            },
+          },
+        ),
       ]);
 
       if (deleteCourse.addFirstTime) {

@@ -12,7 +12,6 @@ import {
 } from './schemas/courseManagement.schema';
 import { User } from '../user/schemas/user.schema';
 import { COURSE_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
-import { FacultyService } from '../faculty/faculty.service';
 import {
   setWhereWithSearchCourse,
   sortData,
@@ -36,25 +35,19 @@ export class CourseManagementService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(TQF3.name) private readonly tqf3Model: Model<TQF3>,
     @InjectModel(TQF5.name) private readonly tqf5Model: Model<TQF5>,
-    private readonly facultyService: FacultyService,
   ) {}
 
   async searchCourseManagement(
-    facultyCode: string,
     searchDTO: CourseManagementSearchDTO,
   ): Promise<any> {
     try {
-      const courseCode = await this.facultyService.getCourseCode(
-        facultyCode,
-        searchDTO.departmentCode,
-      );
-      const where = {
-        courseNo: {
-          $in: Object.values(courseCode).map(
-            (code) => new RegExp('^' + ('000' + code).slice(-3)),
-          ),
-        },
-      };
+      const where = {};
+      if (
+        searchDTO.curriculum.length &&
+        !searchDTO.curriculum.includes('All')
+      ) {
+        where['sections.curriculum'] = { $in: searchDTO.curriculum };
+      }
       if (searchDTO.search?.length) {
         setWhereWithSearchCourse(where, searchDTO.search);
       }
@@ -83,7 +76,7 @@ export class CourseManagementService {
       await this.setIsActiveSections(where, courses);
       if (searchDTO.page == 1) {
         const totalCount = await this.model.countDocuments(where);
-        return { totalCount, courses, courseCode };
+        return { totalCount, courses };
       }
       return courses;
     } catch (error) {
@@ -508,6 +501,14 @@ export class CourseManagementService {
           }),
           this.tqf3Model.findByIdAndDelete(deleteCourse.TQF3),
           this.tqf5Model.findByIdAndDelete(deleteCourse.TQF5),
+          this.userModel.updateMany(
+            { 'enrollCourses.courses.course': deleteCourse.id },
+            {
+              $pull: {
+                'enrollCourses.$[].courses': { course: deleteCourse.id },
+              },
+            },
+          ),
         ]);
       }
       return { id, courseId: deleteCourse?.id };

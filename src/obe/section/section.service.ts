@@ -284,7 +284,7 @@ export class SectionService {
         if (requestDTO.firstNameTH) {
           updateStudent.firstNameTH = requestDTO.firstNameTH;
           updateStudent.lastNameTH = requestDTO.lastNameTH;
-        } else {
+        } else if (requestDTO.firstNameEN) {
           updateStudent.firstNameEN = requestDTO.firstNameEN;
           updateStudent.lastNameEN = requestDTO.lastNameEN;
         }

@@ -26,16 +26,13 @@ export class CourseManagementController {
 
   @Get()
   async searchCourseManagement(
-    @Request() req,
     @Query() searchDTO: CourseManagementSearchDTO,
   ): Promise<ResponseDTO<CourseManagement[]>> {
-    return this.service
-      .searchCourseManagement(req.user.facultyCode, searchDTO)
-      .then((result) => {
-        const responseDTO = new ResponseDTO<CourseManagement[]>();
-        responseDTO.data = result;
-        return responseDTO;
-      });
+    return this.service.searchCourseManagement(searchDTO).then((result) => {
+      const responseDTO = new ResponseDTO<CourseManagement[]>();
+      responseDTO.data = result;
+      return responseDTO;
+    });
   }
 
   @Get('one')
