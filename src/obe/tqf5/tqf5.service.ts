@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import * as fs from 'fs';
 import { join } from 'path';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
+import { GeneratePdfBLL } from './bll/genPdf';
 
 @Injectable()
 export class TQF5Service {
