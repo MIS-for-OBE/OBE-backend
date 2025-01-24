@@ -21,9 +21,9 @@ export class FacultyController {
   constructor(private service: FacultyService) {}
 
   @Get()
-  async getFaculty(@Request() req): Promise<ResponseDTO<Faculty>> {
+  async getFaculty(@Request() req): Promise<ResponseDTO<any>> {
     return this.service.getFaculty(req.user.facultyCode).then((result) => {
-      const responseDTO = new ResponseDTO<Faculty>();
+      const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
     });
