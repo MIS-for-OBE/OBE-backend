@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { PLO } from '../plo/schemas/plo.schema';
 import { Course } from '../course/schemas/course.schema';
 import { CourseManagement } from '../courseManagement/schemas/courseManagement.schema';
+import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @Injectable()
 export class FacultyService {
@@ -73,7 +74,7 @@ export class FacultyService {
     );
   }
 
-  async createCurriculum(id: string, requestDTO: Curriculum): Promise<Faculty> {
+  async createCurriculum(id: string, requestDTO: Curriculum): Promise<any> {
     try {
       const res = await this.model.findByIdAndUpdate(
         id,
@@ -83,7 +84,7 @@ export class FacultyService {
       if (!res) {
         throw new NotFoundException('Faculty not found');
       }
-      return res;
+      return TEXT_ENUM.Success;
     } catch (error) {
       throw error;
     }
@@ -92,7 +93,7 @@ export class FacultyService {
   async updateCurriculum(
     params: { id: string; code: string },
     requestDTO: Curriculum,
-  ): Promise<Faculty> {
+  ): Promise<any> {
     try {
       const res = await this.model.findOneAndUpdate(
         { _id: params.id, 'curriculum.code': params.code },
@@ -102,13 +103,13 @@ export class FacultyService {
       if (!res) {
         throw new NotFoundException('Faculty not found');
       }
-      return res;
+      return TEXT_ENUM.Success;
     } catch (error) {
       throw error;
     }
   }
 
-  async deleteCurriculum(id: string, code: string): Promise<Faculty> {
+  async deleteCurriculum(id: string, code: string): Promise<any> {
     try {
       const res = await this.model.findByIdAndUpdate(
         id,
@@ -118,7 +119,7 @@ export class FacultyService {
       if (!res) {
         throw new NotFoundException('Faculty not found');
       }
-      return res;
+      return TEXT_ENUM.Success;
     } catch (error) {
       throw error;
     }
