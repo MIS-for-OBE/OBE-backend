@@ -28,8 +28,13 @@ export class PLOService {
         where.isActive = true;
       }
       if (searchDTO.year && searchDTO.semester) {
-        where.year = { $lte: searchDTO.year };
-        where.semester = { $lte: searchDTO.semester };
+        where.$or = [
+          { year: { $lt: searchDTO.year } },
+          {
+            year: searchDTO.year,
+            semester: { $lte: searchDTO.semester },
+          },
+        ];
       }
       const faculty = await this.facultyModel.findOne({ facultyCode });
       const totalCount = await this.model.countDocuments(where);
@@ -88,8 +93,13 @@ export class PLOService {
       if (searchDTO.name) {
         filter.name = searchDTO.name;
       } else {
-        filter.year = { $lte: searchDTO.year };
-        filter.semester = { $lte: searchDTO.semester };
+        filter.$or = [
+          { year: { $lt: searchDTO.year } },
+          {
+            year: searchDTO.year,
+            semester: { $lte: searchDTO.semester },
+          },
+        ];
         if (searchDTO.curriculum) {
           filter.curriculum = searchDTO.curriculum;
         }
