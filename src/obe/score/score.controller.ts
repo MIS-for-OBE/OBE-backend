@@ -12,12 +12,14 @@ import {
 import { ScoreService } from './score.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Section } from '../course/schemas/course.schema';
+import { Public } from 'src/auth/metadata/public.metadata';
 
 @Controller('/score')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class ScoreController {
   constructor(private service: ScoreService) {}
 
+  @Public()
   @Post()
   async uploadScore(@Body() requestDTO: any): Promise<ResponseDTO<Section[]>> {
     return this.service.uploadScore(requestDTO).then((result) => {

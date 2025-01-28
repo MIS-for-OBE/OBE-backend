@@ -17,15 +17,19 @@ export class PLOService {
     @InjectModel(PLO.name) private readonly model: Model<PLO>,
     @InjectModel(Faculty.name) private readonly facultyModel: Model<Faculty>,
   ) {}
+
   async searchPLO(facultyCode: string, searchDTO: any): Promise<any> {
     try {
-      const isSAdmin = searchDTO.role == ROLE.SUPREME_ADMIN;
       const where: any = { facultyCode };
-      if (!isSAdmin) {
+      if (searchDTO.curriculum) {
         where.curriculum = { $in: searchDTO.curriculum };
       }
       if (searchDTO.manage) {
         where.isActive = true;
+      }
+      if (searchDTO.year && searchDTO.semester) {
+        where.year = { $lte: searchDTO.year };
+        where.semester = { $lte: searchDTO.semester };
       }
       const faculty = await this.facultyModel.findOne({ facultyCode });
       const totalCount = await this.model.countDocuments(where);
@@ -37,12 +41,26 @@ export class PLOService {
           plo.data.sort((a, b) => a.no - b.no);
         });
       }
+      if (searchDTO.year && searchDTO.semester) {
+        const seenCurricula = new Set<string>();
+        const filteredPLOs: PLO[] = data.filter((plo) => {
+          const hasOverlap = plo.curriculum.some((cur) =>
+            seenCurricula.has(cur),
+          );
+          if (!hasOverlap) {
+            plo.curriculum.forEach((cur) => seenCurricula.add(cur));
+            return true;
+          }
+          return false;
+        });
+        return { plos: filteredPLOs };
+      }
       if (searchDTO.manage || searchDTO.all) {
         return { totalCount, plos: data };
       }
-      const curCodes = isSAdmin
-        ? faculty.curriculum.map(({ code }) => code)
-        : searchDTO.curriculum;
+      const curCodes = searchDTO.curriculum
+        ? searchDTO.curriculum
+        : faculty.curriculum.map(({ code }) => code);
       const plos = curCodes.map((cur) => {
         return {
           ...faculty.curriculum.find(({ code }) => code == cur),
