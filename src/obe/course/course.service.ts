@@ -73,7 +73,11 @@ export class CourseService {
           .populate('TQF3')
           .populate('TQF5')
           .sort({ [searchDTO.orderBy]: searchDTO.orderType });
-        if (!searchDTO.tqf3?.length && !searchDTO.tqf5?.length) {
+        if (
+          !searchDTO.tqf3?.length &&
+          !searchDTO.tqf5?.length &&
+          !searchDTO.ignorePage
+        ) {
           coursesQuery = coursesQuery
             .skip((searchDTO.page - 1) * searchDTO.limit)
             .limit(searchDTO.limit);
