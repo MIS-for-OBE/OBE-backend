@@ -58,7 +58,7 @@ export class PLOService {
           }
           return false;
         });
-        return { plos: filteredPLOs };
+        return { totalCount, plos: filteredPLOs };
       }
       if (searchDTO.manage || searchDTO.all) {
         return { totalCount, plos: data };
