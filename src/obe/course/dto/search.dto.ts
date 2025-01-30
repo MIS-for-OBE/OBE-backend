@@ -37,4 +37,11 @@ export class CourseSearchDTO extends SearchDTO {
   @IsArray()
   @Type(() => String)
   tqf5: string[] = [];
+
+  @IsBoolean()
+  @Transform((transformFn) => {
+    if (transformFn.value === 'true') return true;
+    else return false;
+  })
+  ploRequire = false;
 }

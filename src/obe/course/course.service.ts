@@ -83,6 +83,43 @@ export class CourseService {
             .limit(searchDTO.limit);
         }
         let courses: any = await coursesQuery.exec();
+        if (searchDTO.ploRequire) {
+          const ploRequire = await this.courseManagementModel
+            .find({
+              courseNo: { $in: courses.map(({ courseNo }) => courseNo) },
+            })
+            .select('courseNo ploRequire sections.topic sections.ploRequire')
+            .lean();
+          const ploRequireMap = new Map(
+            ploRequire.map((item) => [item.courseNo, item]),
+          );
+          courses = courses.map((course) => {
+            const coursePloRequire = ploRequireMap.get(course.courseNo);
+            if (!coursePloRequire) return course;
+            if (course.type === COURSE_TYPE.SEL_TOPIC) {
+              const updatedSections = course.sections.map((sec) => ({
+                ...sec._doc,
+                ploRequire:
+                  coursePloRequire.sections?.find(
+                    ({ topic }) => topic === sec.topic,
+                  )?.ploRequire || [],
+              }));
+              return {
+                ...course._doc,
+                id: course._id,
+                _id: undefined,
+                sections: updatedSections,
+              };
+            } else {
+              return {
+                ...course._doc,
+                id: course._id,
+                _id: undefined,
+                ploRequire: coursePloRequire.ploRequire || [],
+              };
+            }
+          });
+        }
         if (searchDTO.tqf3.length || searchDTO.tqf5.length) {
           const tqf3Filters = searchDTO.tqf3;
           const tqf5Filters = searchDTO.tqf5;
@@ -103,10 +140,15 @@ export class CourseService {
                     }
                   });
                   return filter.length
-                    ? { ...course._doc, sections: [...filter] }
+                    ? {
+                        ...course._doc,
+                        id: course._id,
+                        _id: undefined,
+                        sections: [...filter],
+                      }
                     : undefined;
                 } else {
-                  return { ...course._doc };
+                  return { ...course._doc, id: course._id, _id: undefined };
                 }
               })
               .filter((course) => {
