@@ -8,14 +8,16 @@ import * as moment from 'moment';
 import * as fs from 'fs';
 import { join } from 'path';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
-import { GeneratePdfBLL } from './bll/genPdf';
+import { GeneratePdfTqf5BLL } from './bll/genPdf';
+import { TQF3Service } from '../tqf3/tqf3.service';
 
 @Injectable()
 export class TQF5Service {
   constructor(
     @InjectModel(TQF5.name) private readonly model: Model<TQF5>,
     @InjectModel(TQF3.name) private readonly tqf3Model: Model<TQF3>,
-    private readonly generatePdfBLL: GeneratePdfBLL,
+    private readonly tqf3Service: TQF3Service,
+    private readonly generatePdfBLL: GeneratePdfTqf5BLL,
   ) {}
 
   async changeMethod(params: { id: string }, requestDTO: any): Promise<TQF5> {
@@ -129,24 +131,33 @@ export class TQF5Service {
       let files = [];
 
       if (requestDTO.part1 !== undefined) {
-        const filename = await this.generatePdfBLL.generatePdf(1, date, {
-          // ...data,
-          ...tqf5.part1._doc,
-        });
+        const filename = await this.generatePdfBLL.generatePdf(
+          1,
+          date,
+          {},
+          { ...tqf5.part1._doc },
+          { ...this.tqf3Service.populateTqf3Part4(tqf3) },
+        );
         files.push(filename);
       }
       if (requestDTO.part2 !== undefined) {
-        const filename = await this.generatePdfBLL.generatePdf(2, date, {
-          // ...data,
-          ...this.populatePart2(tqf5, tqf3),
-        });
+        const filename = await this.generatePdfBLL.generatePdf(
+          2,
+          date,
+          {},
+          { ...this.populatePart2(tqf5, tqf3) },
+          {},
+        );
         files.push(filename);
       }
       if (requestDTO.part3 !== undefined) {
-        const filename = await this.generatePdfBLL.generatePdf(3, date, {
-          // ...data,
-          ...this.populatePart3(tqf5, tqf3),
-        });
+        const filename = await this.generatePdfBLL.generatePdf(
+          3,
+          date,
+          {},
+          { ...this.populatePart3(tqf5, tqf3) },
+          {},
+        );
         files.push(filename);
       }
 

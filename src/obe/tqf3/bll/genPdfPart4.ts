@@ -124,7 +124,7 @@ export const buildPart4Content = (
       });
     });
 
-    let temp = 645; //limit height pdf
+    let temp = 645;
     let addIndexNewInstance = 0;
 
     let newTable = 0;
@@ -174,9 +174,6 @@ export const buildPart4Content = (
         }
       }
     });
-
-    // console.log('addPage', addPageIndex);
-    // console.log(rows);
 
     subRowHeight = [];
     cloHeight = [];
