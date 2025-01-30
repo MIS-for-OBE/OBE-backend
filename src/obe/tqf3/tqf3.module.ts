@@ -19,5 +19,6 @@ import { TQF5, TQF5Schema } from '../tqf5/schemas/tqf5.schema';
   ],
   controllers: [TQF3Controller],
   providers: [TQF3Service, GeneratePdfBLL],
+  exports: [TQF3Service],
 })
 export class TQF3Module {}

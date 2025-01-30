@@ -10,15 +10,18 @@ import { buildPart3Content } from './genPdfPart3';
 import { Part1TQF5, Part2TQF5, Part3TQF5 } from '../schemas/tqf5.schema';
 import { setupFonts } from './setUpPdf';
 import { PLONo } from 'src/obe/plo/schemas/plo.schema';
+import { Part4TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
 
 @Injectable()
-export class GeneratePdfBLL {
+export class GeneratePdfTqf5BLL {
   constructor() {}
 
   async generatePdf(
     part: number,
     date: string,
     data: Record<string, any>,
+    tqf5: Record<string, any>,
+    tqf3: Record<string, any>,
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       try {
@@ -36,13 +39,13 @@ export class GeneratePdfBLL {
         doc.initForm();
         switch (part) {
           case 1:
-            buildPart1Content(doc, font, data as Part1TQF5);
+            buildPart1Content(doc, font, tqf5 as Part1TQF5, tqf3 as Part4TQF3);
             break;
           case 2:
-            buildPart2Content(doc, font, data as Part2TQF5);
+            buildPart2Content(doc, font, tqf5 as Part2TQF5);
             break;
           case 3:
-            buildPart3Content(doc, font, data as Part3TQF5);
+            buildPart3Content(doc, font, tqf5 as Part3TQF5);
             break;
         }
         doc.end();

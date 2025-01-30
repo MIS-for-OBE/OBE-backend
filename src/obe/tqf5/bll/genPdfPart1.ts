@@ -1,6 +1,8 @@
 import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { Part1TQF5 } from '../schemas/tqf5.schema';
+import { Part4TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
+import { table } from 'console';
 
 export const buildPart1Content = (
   doc: PDFKit.PDFDocument,
@@ -9,7 +11,8 @@ export const buildPart1Content = (
     fontBold: string;
     emoji: string;
   },
-  data: Part1TQF5,
+  tqf5: Part1TQF5,
+  tqf3: Part4TQF3,
 ) => {
   const { fontNormal, fontBold, emoji } = font;
   const gradeTotals = {
@@ -27,7 +30,7 @@ export const buildPart1Content = (
     P: 0,
   };
 
-  data.courseEval.map((grade) => {
+  tqf5.courseEval.map((grade) => {
     gradeTotals.A += grade.A;
     gradeTotals.Bplus += grade.Bplus;
     gradeTotals.B += grade.B;
@@ -84,285 +87,413 @@ export const buildPart1Content = (
     .moveDown(0.6);
   // 4
   doc.text('4 การกระจายของระดับคะแนนและเกรด').moveDown(0.6);
+
   //Table
-  {
-    const headers = ['ลำดับชั้น', 'ช่วงคะแนน', 'จำนวนคน', 'ร้อยละ'];
 
-    const rows = [
-      // ['A', data.gradingCriteria.A, gradeTotals.A],
-      // ['B+', data.gradingCriteria.Bplus, gradeTotals.Bplus],
-      // ['B', data.gradingCriteria.B, gradeTotals.B],
-      // ['C+', data.gradingCriteria.Cplus, gradeTotals.Cplus],
-      // ['C', data.gradingCriteria.C, gradeTotals.C],
-      // ['D+', data.gradingCriteria.Dplus, gradeTotals.Dplus],
-      // ['D', data.gradingCriteria.D, gradeTotals.D],
-      // ['F', data.gradingCriteria.F, gradeTotals.F],
-      // ['W', data.gradingCriteria.W, gradeTotals.W],
-      // ['S', data.gradingCriteria.S, gradeTotals.S],
-      // ['U', data.gradingCriteria.U, gradeTotals.U],
+  let headers = ['ลำดับชั้น', 'ช่วงคะแนน', 'จำนวนคน', 'ร้อยละ'];
+
+  const grades = ['A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F', 'S', 'U'];
+
+  let rows = grades.map((grade) => {
+    const percent = (
+      (gradeTotals[grade.replace('+', 'plus')] / totalReg) *
+      100
+    ).toFixed(2);
+
+    return [
+      grade,
+      tqf5.gradingCriteria[grade.replace('+', 'plus')],
+      gradeTotals[grade.replace('+', 'plus')],
+      percent === '0.00' ? '0' : percent,
     ];
+  });
 
-    const tableTop = doc.y + 0.6;
-    const tableLeft = 50;
+  let tableTop = doc.y + 0.6;
+  let tableLeft = 50;
 
-    const columnWidth = [100, 260, 70, 70];
+  let columnWidth = [100, 260, 70, 70];
 
-    let subRowHeight: any[] = [];
-    const addPageIndex: any[] = [];
-    const evalRow: any[] = [];
-    let cloHeight: any[] = [];
+  let subRowHeight: any[] = [];
+  let addPageIndex: any[] = [];
+  let evalRow: any[] = [];
+  let cloHeight: any[] = [];
+  let tableNo = 2;
 
-    function calculateRowHeight(text, columnWidth) {
-      const textHeight = doc.heightOfString(text, {
-        width: columnWidth - 28,
-      });
-      return textHeight + 20;
+  function calculateRowHeight(text, columnWidth) {
+    const textHeight = doc.heightOfString(text, { width: columnWidth - 28 });
+    const rowHeight = 20;
+    if (tableNo === 1) {
+      return textHeight + rowHeight;
+    } else if (tableNo === 2) {
+      return Math.min(textHeight, doc.currentLineHeight()) + rowHeight;
     }
+    return textHeight + rowHeight;
+  }
 
-    function findEachEvalRowHeight(rows, subRowHeight, cloHeight) {
-      for (let index = 0; index < rows.length; index++) {
-        const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
-        cloHeight.push(maxHeightClo);
+  function findEachEvalRowHeight(rows, subRowHeight, cloHeight) {
+    for (let index = 0; index < rows.length; index++) {
+      const maxHeightClo = calculateRowHeight(rows[index][0], columnWidth[0]);
+      cloHeight.push(maxHeightClo);
 
-        for (let i = 0; i < rows[index][1].length; i++) {
-          const col1Height = calculateRowHeight(
-            rows[index][1][i],
-            columnWidth[1],
-          );
-          const col2Height = calculateRowHeight(
-            rows[index][2][i],
-            columnWidth[2],
-          );
-          const col3Height = calculateRowHeight(
-            rows[index][3][i],
-            columnWidth[3],
-          );
+      for (let i = 0; i < rows[index][1].length; i++) {
+        const col1Height = calculateRowHeight(
+          rows[index][1][i],
+          columnWidth[1],
+        );
+        const col2Height = calculateRowHeight(
+          rows[index][2][i],
+          columnWidth[2],
+        );
+        const col3Height = calculateRowHeight(
+          rows[index][3][i],
+          columnWidth[3],
+        );
 
-          const maxHeight = Math.max(col1Height, col2Height, col3Height);
+        const maxHeight = Math.max(col1Height, col2Height, col3Height);
 
-          subRowHeight.push({
-            clo: index,
-            height: maxHeight,
-          });
-        }
-      }
-    }
-
-    findEachEvalRowHeight(rows, subRowHeight, cloHeight);
-
-    rows.forEach((row, cloIndex) => {
-      row.forEach((cell, index) => {
-        const eachRowHeight: any[] = [];
-        subRowHeight.forEach((h) => {
-          if (h.clo === cloIndex) {
-            eachRowHeight.push(h);
-          }
+        subRowHeight.push({
+          clo: index,
+          height: maxHeight,
         });
-
-        if (index === 1 && Array.isArray(cell)) {
-          cell.forEach((_, i) => {
-            let subCellHeight = 0;
-            let sumOfCellRow = 0;
-            subRowHeight.forEach((sum) => {
-              if (sum.clo === cloIndex) {
-                sumOfCellRow += sum.height;
-              }
-            });
-
-            if (cloHeight[cloIndex] > sumOfCellRow) {
-              subCellHeight = cloHeight[cloIndex] / cell.length;
-            } else if (cloHeight[cloIndex] <= sumOfCellRow) {
-              subCellHeight = eachRowHeight[i].height;
-            }
-
-            evalRow.push({
-              clo: row[0],
-              cloIndex: `${cloIndex}`,
-              order: i,
-              height: subCellHeight,
-            });
-          });
-        }
-      });
-    });
-
-    let temp = 645; //limit height pdf
-    let addIndexNewInstance = 0;
-
-    let newTable = 0;
-    evalRow.forEach((e, i) => {
-      if (e && typeof e.height === 'number') {
-        newTable += e.height;
-
-        // console.log(`CLO ${e.cloIndex}`, `order ${e.order}`, e.height);
-        // console.log(`newTable ${newTable}`);
-
-        if (newTable > temp) {
-          const indexToPop = rows.findIndex((row) => row[0] === e.clo);
-          let pageIndex =
-            Number(e.cloIndex) +
-            (e.order !== 0 ? 1 + addIndexNewInstance : addIndexNewInstance);
-          addPageIndex.push(pageIndex);
-          // console.log('pageIndex', pageIndex);
-
-          if (indexToPop !== -1) {
-            if (e.order !== 0) {
-              const poppedItem = rows.splice(indexToPop, 1)[0];
-
-              const newInstances = [
-                [
-                  poppedItem[0],
-                  poppedItem[1].slice(0, e.order),
-                  poppedItem[2].slice(0, e.order),
-                  poppedItem[3].slice(0, e.order),
-                ],
-                [
-                  ' ',
-                  poppedItem[1].slice(e.order),
-                  poppedItem[2].slice(e.order),
-                  poppedItem[3].slice(e.order),
-                ],
-              ];
-
-              temp = 755; //limit height pdf
-              addIndexNewInstance++;
-
-              rows.splice(indexToPop, 0, ...newInstances);
-            }
-          } else {
-            // console.log('No item to pop');
-          }
-          newTable = e.height;
-        }
       }
-    });
+    }
+  }
 
-    // console.log('addPage', addPageIndex);
-    // console.log(rows);
+  findEachEvalRowHeight(rows, subRowHeight, cloHeight);
 
-    subRowHeight = [];
-    cloHeight = [];
-    findEachEvalRowHeight(rows, subRowHeight, cloHeight);
-
-    function drawSubTable(x, y, data, subTableWidth, col, cloIndex) {
+  rows.forEach((row, cloIndex) => {
+    row.forEach((cell, index) => {
       const eachRowHeight: any[] = [];
-      subRowHeight.map((h) => {
+      subRowHeight.forEach((h) => {
         if (h.clo === cloIndex) {
           eachRowHeight.push(h);
         }
       });
 
-      let subTableY = y;
-      data.map((row, i) => {
-        let subCellHeight = 0;
-        let sumOfCellRow = 0;
-        subRowHeight.forEach((sum) => {
-          if (sum.clo === cloIndex) {
-            sumOfCellRow += sum.height;
-          }
-        });
-
-        if (cloHeight[cloIndex] > sumOfCellRow) {
-          subCellHeight = cloHeight[cloIndex] / data.length;
-        } else if (cloHeight[cloIndex] <= sumOfCellRow) {
-          subCellHeight = eachRowHeight[i].height;
-        }
-
-        doc.rect(x, subTableY, subTableWidth, subCellHeight).stroke();
-
-        doc.font(fontNormal).text(row, x + 12 + (col > 1 && 4), subTableY + 8, {
-          width: subTableWidth - 30,
-          align: col > 1 ? 'center' : 'left',
-        });
-
-        subTableY += subCellHeight;
-      });
-      return subTableY - y;
-    }
-
-    function drawRow(y, row, isHeader = false, cloIndex = null) {
-      let rowHeight = 0;
-
-      row.forEach((cell, i) => {
-        let content = cell;
-
-        if (i !== 0 && Array.isArray(cell) && !isHeader) {
-          const subTableWidth = columnWidth[i];
-          const subTableHeight = drawSubTable(
-            tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 8,
-            y,
-            cell,
-            subTableWidth,
-            i,
-            cloIndex,
-          );
-
-          rowHeight = Math.max(rowHeight, subTableHeight);
-        } else {
-          content = Array.isArray(cell) ? cell.join('\n') : cell;
-          const cellHeight = calculateRowHeight(content, columnWidth[i]);
-          if (cellHeight > rowHeight) {
-            rowHeight = cellHeight;
-          }
-        }
-      });
-
-      row.forEach((cell, i) => {
-        doc
-          .rect(
-            tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 8,
-            y,
-            columnWidth[i],
-            rowHeight,
-          )
-          .stroke();
-
-        doc.font(isHeader ? fontBold : fontNormal);
-
-        if (i === 0 || !Array.isArray(cell) || isHeader) {
-          const lines = Array.isArray(cell) ? cell : [cell];
-          const lineHeight = doc.heightOfString(lines[0]);
-
-          lines.forEach((line, index) => {
-            doc.text(
-              line,
-              tableLeft +
-                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                18,
-              y + 10 + (isHeader ? index * lineHeight : 0),
-              {
-                width: columnWidth[i] - 20,
-                align: isHeader ? 'center' : 'left',
-              },
-            );
+      if (index === 1 && Array.isArray(cell)) {
+        cell.forEach((_, i) => {
+          let subCellHeight = 0;
+          let sumOfCellRow = 0;
+          subRowHeight.forEach((sum) => {
+            if (sum.clo === cloIndex) {
+              sumOfCellRow += sum.height;
+            }
           });
+
+          if (cloHeight[cloIndex] > sumOfCellRow) {
+            subCellHeight = cloHeight[cloIndex] / cell.length;
+          } else if (cloHeight[cloIndex] <= sumOfCellRow) {
+            subCellHeight = eachRowHeight[i].height;
+          }
+
+          evalRow.push({
+            clo: row[0],
+            cloIndex: `${cloIndex}`,
+            order: i,
+            height: subCellHeight,
+          });
+        });
+      }
+    });
+  });
+
+  let temp = 645;
+  let addIndexNewInstance = 0;
+
+  let newTable = 0;
+  evalRow.forEach((e, i) => {
+    if (e && typeof e.height === 'number') {
+      newTable += e.height;
+
+      if (newTable > temp) {
+        const indexToPop = rows.findIndex((row) => row[0] === e.clo);
+        let pageIndex =
+          Number(e.cloIndex) +
+          (e.order !== 0 ? 1 + addIndexNewInstance : addIndexNewInstance);
+        addPageIndex.push(pageIndex);
+
+        if (indexToPop !== -1) {
+          if (e.order !== 0) {
+            const poppedItem = rows.splice(indexToPop, 1)[0];
+
+            const newInstances = [
+              [
+                poppedItem[0],
+                poppedItem[1].slice(0, e.order),
+                poppedItem[2].slice(0, e.order),
+                poppedItem[3].slice(0, e.order),
+              ],
+              [
+                ' ',
+                poppedItem[1].slice(e.order),
+                poppedItem[2].slice(e.order),
+                poppedItem[3].slice(e.order),
+              ],
+            ];
+
+            temp = 755;
+            addIndexNewInstance++;
+
+            rows.splice(indexToPop, 0, ...newInstances);
+          }
+        }
+        newTable = e.height;
+      }
+    }
+  });
+
+  subRowHeight = [];
+  cloHeight = [];
+  findEachEvalRowHeight(rows, subRowHeight, cloHeight);
+
+  function drawSubTable(x, y, data, subTableWidth, col, cloIndex) {
+    const eachRowHeight: any[] = [];
+    subRowHeight.map((h) => {
+      if (h.clo === cloIndex) {
+        eachRowHeight.push(h);
+      }
+    });
+
+    let subTableY = y;
+    data.map((row, i) => {
+      let subCellHeight = 0;
+      let sumOfCellRow = 0;
+      subRowHeight.forEach((sum) => {
+        if (sum.clo === cloIndex) {
+          sumOfCellRow += sum.height;
         }
       });
 
-      return rowHeight;
-    }
+      if (cloHeight[cloIndex] > sumOfCellRow) {
+        subCellHeight = cloHeight[cloIndex] / data.length;
+      } else if (cloHeight[cloIndex] <= sumOfCellRow) {
+        subCellHeight = eachRowHeight[i].height;
+      }
 
-    function drawHeaders() {
-      drawRow(tableTop, headers, true);
-      // console.log(doc.y);
-    }
+      doc.rect(x, subTableY, subTableWidth, subCellHeight).stroke();
 
-    function drawTable() {
-      let currentY = tableTop + 63;
-
-      rows.forEach((row, cloIndex) => {
-        if (addPageIndex.includes(cloIndex)) {
-          // console.log(doc.y);
-          doc.addPage();
-          currentY = doc.y;
-        }
-
-        const rowHeight = drawRow(currentY, row, false, cloIndex);
-        currentY += rowHeight;
+      doc.font(fontNormal).text(row, x + 12 + (col > 1 && 4), subTableY + 8, {
+        width: subTableWidth - 30,
+        align: col > 1 ? 'center' : 'left',
       });
-    }
 
-    drawHeaders();
-    drawTable();
+      subTableY += subCellHeight;
+    });
+    return subTableY - y;
   }
+
+  function drawRow(y, row, isHeader = false, cloIndex = null) {
+    let rowHeight = 0;
+
+    row.forEach((cell, i) => {
+      let content = cell;
+
+      if (i !== 0 && Array.isArray(cell) && !isHeader) {
+        const subTableWidth = columnWidth[i];
+        const subTableHeight = drawSubTable(
+          tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 8,
+          y,
+          cell,
+          subTableWidth,
+          i,
+          cloIndex,
+        );
+
+        rowHeight = Math.max(rowHeight, subTableHeight);
+      } else {
+        content = Array.isArray(cell) ? cell.join('\n') : cell;
+        const cellHeight = calculateRowHeight(content, columnWidth[i]);
+        if (cellHeight > rowHeight) {
+          rowHeight = cellHeight;
+        }
+      }
+    });
+
+    row.forEach((cell, i) => {
+      doc
+        .rect(
+          tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 8,
+          y,
+          columnWidth[i],
+          rowHeight,
+        )
+        .stroke();
+
+      doc.font(isHeader ? fontBold : fontNormal);
+
+      if (i === 0 || !Array.isArray(cell) || isHeader) {
+        const lines = Array.isArray(cell) ? cell : [cell];
+        const lineHeight = doc.heightOfString(lines[0]);
+
+        lines.forEach((line, index) => {
+          doc.text(
+            line,
+            tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 18,
+            y + 10 + (isHeader ? index * lineHeight : 0),
+            {
+              width: columnWidth[i] - 20,
+              align: isHeader ? 'center' : 'left',
+            },
+          );
+        });
+      }
+    });
+
+    return rowHeight;
+  }
+
+  function drawHeaders() {
+    drawRow(tableTop, headers, true);
+  }
+
+  function drawTable() {
+    let currentY = tableTop + (tableNo === 2 ? 34 : 63);
+
+    rows.forEach((row, cloIndex) => {
+      if (addPageIndex.includes(cloIndex)) {
+        doc.addPage();
+        currentY = doc.y;
+      }
+
+      const rowHeight = drawRow(currentY, row, false, cloIndex);
+      currentY += rowHeight;
+    });
+  }
+
+  drawHeaders();
+  drawTable();
+
+  doc.y += 22;
+  doc.x += -440;
+
+  doc.font(fontBold, 14).text('จำนวนนักศึกษาที่ได้รับอักษรลำดับขั้น I', {
+    align: 'left',
+    continued: true,
+  });
+  doc
+    .font(fontNormal, 14)
+    .text(`${0} คน`, doc.x + 4)
+    .moveDown(0.6);
+
+  doc.font(fontBold, 14).text('จำนวนนักศึกษาที่ได้รับอักษรลำดับขั้น P', {
+    align: 'left',
+    continued: true,
+  });
+  doc
+    .font(fontNormal, 14)
+    .text(`${0} คน`, doc.x + 4)
+    .moveDown(0.6);
+
+  doc.font(fontBold, 14).text('จำนวนนักศึกษาที่ได้รับอักษรลำดับขั้น V', {
+    align: 'left',
+    continued: true,
+  });
+  doc
+    .font(fontNormal, 14)
+    .text(`${0} คน`, doc.x + 4)
+    .moveDown(0.6);
+
+  // min
+  doc.font(fontBold, 14).text('ค่าต่ำสุด(  MIN  ) :', {
+    align: 'center',
+    continued: true,
+  });
+  doc
+    .font(fontNormal, 14)
+    .text(`${0}`, doc.x + 20)
+    .moveDown(0.6);
+
+  // max
+  doc.font(fontBold, 14).text('ค่าสูงสุด(  MAX  ) :', doc.x - 2, doc.y, {
+    align: 'center',
+    continued: true,
+  });
+  doc
+    .font(fontNormal, 14)
+    .text(`${0}`, doc.x + 20)
+    .moveDown(0.6);
+
+  // SD
+  doc
+    .font(fontBold, 14)
+    .text('ส่วนเบี่ยงเบนมาตรฐาน(  SD  ) :', doc.x - 53, doc.y, {
+      align: 'center',
+      continued: true,
+    });
+  doc
+    .font(fontNormal, 14)
+    .text(`${0}`, doc.x + 20)
+    .moveDown(0.6);
+
+  //avg
+  doc.font(fontBold, 14).text('ค่าเฉลี่ยเลขคณิต(  X  ) :', doc.x + 32, doc.y, {
+    align: 'center',
+    continued: true,
+  });
+
+  doc
+    .font(fontNormal, 14)
+    .text(`${0}`, doc.x + 20)
+    .moveDown(0.6);
+
+  // 5
+  doc.x += 24;
+  doc
+    .font(fontBold, 14)
+    .text('5. ปัจจัยที่ทำให้ระดับคะแนนผิดปกติ (ถ้ามี)', {
+      align: 'left',
+    })
+    .moveDown(0.6);
+
+  doc.x += 12;
+  doc.font(fontNormal, 14).text(`ไม่มี`).moveDown(0.6);
+  doc.addPage();
+  // 6
+  doc
+    .font(fontBold, 14)
+    .text(
+      '6. ความคลาดเคลื่อนจากแผนการประเมินผลการเรียนรู้ที่กำหนดไว้ในรายละเอียดกระบวนวิชา',
+      {
+        align: 'left',
+      },
+    )
+    .moveDown(0.6);
+
+  headers = [
+    'ผลลัพธ์การเรียนรู้ (CLO)',
+    'วิธีการประเมินผลการเรียนรู้',
+    'สัปดาห์\nที่ประเมิน',
+    'สัดส่วน\nของการ\nประเมิน',
+  ];
+
+  // rows = tqf3.data.map(({ clo, evals }) => {
+  //   return [
+  //     `CLO: ${clo.no} ${clo.descTH}`,
+  //     evals.map((e) => e.eval.topicTH),
+  //     evals.map((e) => e.evalWeek),
+  //     evals.map((e) => e.percent + '%'),
+  //   ];
+  // });
+
+  tableTop = doc.y + 0.6;
+  tableLeft = 50;
+  columnWidth = [190, 170, 70, 70];
+  tableNo = 1;
+
+  drawHeaders();
+  // drawTable();
+
+  doc.y += 22;
+  doc.x += -465;
+
+  7;
+  doc.x += 24;
+  doc
+    .font(fontBold, 14)
+    .text('7. การทวนสอบผลสัมฤทธิ์ของนักศึกษา (ให้อ้างอิงจาก มคอ. 2 และ 3)', {
+      align: 'left',
+    });
+
+  doc.x += 12;
+  doc.font(fontNormal, 14).text(`-`).moveDown(0.6);
 };

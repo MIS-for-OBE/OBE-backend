@@ -313,7 +313,7 @@ export class TQF3Service {
       if (requestDTO.part4 !== undefined) {
         const filename = await this.generatePdfBLL.generatePdf(4, date, {
           ...data,
-          ...this.populatePart4(tqf3),
+          ...this.populateTqf3Part4(tqf3),
         });
         files.push(filename);
       }
@@ -352,7 +352,7 @@ export class TQF3Service {
     }
   }
 
-  private populatePart4(tqf3: TQF3) {
+  async populateTqf3Part4(tqf3: TQF3) {
     try {
       const part4 = tqf3.part4.data.map((item) => {
         const evals = [];
