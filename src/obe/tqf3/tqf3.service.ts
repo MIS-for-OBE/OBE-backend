@@ -352,7 +352,7 @@ export class TQF3Service {
     }
   }
 
-  async populateTqf3Part4(tqf3: TQF3) {
+  populateTqf3Part4(tqf3: TQF3) {
     try {
       const part4 = tqf3.part4.data.map((item) => {
         const evals = [];
