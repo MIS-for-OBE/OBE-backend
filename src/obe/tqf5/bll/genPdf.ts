@@ -4,9 +4,6 @@ import * as PDFDocument from 'pdfkit';
 import { PDFDocument as PDFLibDocument } from 'pdf-lib';
 import { join } from 'path';
 import { buildPart1Content } from './genPdfPart1';
-import { buildPart2Content } from './genPdfPart2';
-import { buildPart3Content } from './genPdfPart3';
-// import { from 'src/common/cmu-api/cmu-api.dto';
 import { Part1TQF5, Part2TQF5, Part3TQF5 } from '../schemas/tqf5.schema';
 import { setupFonts } from './setUpPdf';
 import { PLONo } from 'src/obe/plo/schemas/plo.schema';
@@ -41,15 +38,8 @@ export class GeneratePdfTqf5BLL {
           case 1:
             buildPart1Content(doc, font, tqf5 as Part1TQF5, tqf3 as Part4TQF3);
             break;
-          case 2:
-            buildPart2Content(doc, font, tqf5 as Part2TQF5);
-            break;
-          case 3:
-            buildPart3Content(doc, font, tqf5 as Part3TQF5);
-            break;
         }
         doc.end();
-
         writeStream.on('finish', () => resolve(filename));
         writeStream.on('error', reject);
       } catch (error) {

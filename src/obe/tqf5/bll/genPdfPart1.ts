@@ -2,7 +2,7 @@ import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { Part1TQF5 } from '../schemas/tqf5.schema';
 import { Part4TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
-import { table } from 'console';
+import { buildTqf3Part4Table } from 'src/obe/tqf3/bll/genPdfPart4';
 
 export const buildPart1Content = (
   doc: PDFKit.PDFDocument,
@@ -388,56 +388,52 @@ export const buildPart1Content = (
     align: 'left',
     continued: true,
   });
+
   doc
     .font(fontNormal, 14)
     .text(`${0} คน`, doc.x + 4)
     .moveDown(0.6);
 
-  // min
-  doc.font(fontBold, 14).text('ค่าต่ำสุด(  MIN  ) :', {
-    align: 'center',
-    continued: true,
-  });
-  doc
-    .font(fontNormal, 14)
-    .text(`${0}`, doc.x + 20)
-    .moveDown(0.6);
+  //  { // min
+  //   doc.font(fontBold, 14).text('ค่าต่ำสุด(  MIN  ) :', {
+  //     align: 'center',
+  //     continued: true,
+  //   });
+  //   doc
+  //     .font(fontNormal, 14)
+  //     .text(`${0}`, doc.x + 20)
+  //     .moveDown(0.6);
 
-  // max
-  doc.font(fontBold, 14).text('ค่าสูงสุด(  MAX  ) :', doc.x - 2, doc.y, {
-    align: 'center',
-    continued: true,
-  });
-  doc
-    .font(fontNormal, 14)
-    .text(`${0}`, doc.x + 20)
-    .moveDown(0.6);
+  //   // max
+  //   doc.font(fontBold, 14).text('ค่าสูงสุด(  MAX  ) :', doc.x - 2, doc.y, {
+  //     align: 'center',
+  //     continued: true,
+  //   });
+  //   doc
+  //     .font(fontNormal, 14)
+  //     .text(`${0}`, doc.x + 20)
+  //     .moveDown(0.6);
 
-  // SD
-  doc
-    .font(fontBold, 14)
-    .text('ส่วนเบี่ยงเบนมาตรฐาน(  SD  ) :', doc.x - 53, doc.y, {
-      align: 'center',
-      continued: true,
-    });
-  doc
-    .font(fontNormal, 14)
-    .text(`${0}`, doc.x + 20)
-    .moveDown(0.6);
+  //   // SD
+  //   doc
+  //     .font(fontBold, 14)
+  //     .text('ส่วนเบี่ยงเบนมาตรฐาน(  SD  ) :', doc.x - 53, doc.y, {
+  //       align: 'center',
+  //       continued: true,
+  //     });
+  //   doc
+  //     .font(fontNormal, 14)
+  //     .text(`${0}`, doc.x + 20)
+  //     .moveDown(0.6);
 
-  //avg
-  doc.font(fontBold, 14).text('ค่าเฉลี่ยเลขคณิต(  X  ) :', doc.x + 32, doc.y, {
-    align: 'center',
-    continued: true,
-  });
+  //   //avg
+  //   doc.font(fontBold, 14).text('ค่าเฉลี่ยเลขคณิต(  X  ) :', doc.x + 32, doc.y, {
+  //     align: 'center',
+  //     continued: true,
+  //   });}
 
-  doc
-    .font(fontNormal, 14)
-    .text(`${0}`, doc.x + 20)
-    .moveDown(0.6);
-
+  doc.y += 0.6;
   // 5
-  doc.x += 24;
   doc
     .font(fontBold, 14)
     .text('5. ปัจจัยที่ทำให้ระดับคะแนนผิดปกติ (ถ้ามี)', {
@@ -459,35 +455,19 @@ export const buildPart1Content = (
     )
     .moveDown(0.6);
 
-  headers = [
-    'ผลลัพธ์การเรียนรู้ (CLO)',
-    'วิธีการประเมินผลการเรียนรู้',
-    'สัปดาห์\nที่ประเมิน',
-    'สัดส่วน\nของการ\nประเมิน',
-  ];
+  buildTqf3Part4Table(doc, font, tqf3);
 
-  // rows = tqf3.data.map(({ clo, evals }) => {
-  //   return [
-  //     `CLO: ${clo.no} ${clo.descTH}`,
-  //     evals.map((e) => e.eval.topicTH),
-  //     evals.map((e) => e.evalWeek),
-  //     evals.map((e) => e.percent + '%'),
-  //   ];
-  // });
+  // 7
 
-  tableTop = doc.y + 0.6;
-  tableLeft = 50;
-  columnWidth = [190, 170, 70, 70];
-  tableNo = 1;
+  if (doc.y + 50 > doc.page.height - doc.page.margins.bottom) {
+    doc.addPage();
+    doc.y = doc.page.margins.top + 40;
+  } else {
+    doc.y += 65;
+  }
 
-  drawHeaders();
-  // drawTable();
+  doc.x = doc.page.margins.left;
 
-  doc.y += 22;
-  doc.x += -465;
-
-  7;
-  doc.x += 24;
   doc
     .font(fontBold, 14)
     .text('7. การทวนสอบผลสัมฤทธิ์ของนักศึกษา (ให้อ้างอิงจาก มคอ. 2 และ 3)', {

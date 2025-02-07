@@ -93,37 +93,6 @@ export class TQF5Service {
     requestDTO: GeneratePdfDTO,
   ): Promise<any> {
     try {
-      // const courseInfo = await axios.get(
-      //   `${process.env.BASE_CMU_API}course-template`,
-      //   {
-      //     params: {
-      //       courseid: requestDTO.courseNo,
-      //       academicyear: requestDTO.academicYear,
-      //       academicterm: requestDTO.academicTerm,
-      //     } as CmuApiTqfCourseSearchDTO,
-      //   },
-      // );
-      // let data: CmuApiTqfCourseDTO = courseInfo.data[0];
-      // data = { ...data, ...requestDTO };
-      // if (!data.CourseID) {
-      //   const [course, faculty] = await Promise.all([
-      //     this.courseModel.findOne({
-      //       year: requestDTO.academicYear,
-      //       semester: requestDTO.academicTerm,
-      //       courseNo: requestDTO.courseNo,
-      //     }),
-      //     this.facultyModel.findOne({ facultyCode: facultyCode }),
-      //   ]);
-      //   data.AcademicYear = course.year.toString();
-      //   data.AcademicTerm = course.semester;
-      //   data.CourseID = course.courseNo;
-      //   data.CourseTitleTha = course.courseName;
-      //   data.CourseTitleEng = course.courseName;
-      //   data.FacultyID = facultyCode;
-      //   data.FacultyNameEng = faculty?.facultyEN;
-      //   data.FacultyNameTha = faculty?.facultyTH;
-      // }
-
       const tqf3: any = await this.tqf3Model.findById(requestDTO.tqf3);
       const tqf5: any = await this.model.findById(requestDTO.tqf5);
 
@@ -137,26 +106,6 @@ export class TQF5Service {
           {},
           { ...tqf5.part1._doc },
           { ...this.tqf3Service.populateTqf3Part4(tqf3) },
-        );
-        files.push(filename);
-      }
-      if (requestDTO.part2 !== undefined) {
-        const filename = await this.generatePdfBLL.generatePdf(
-          2,
-          date,
-          {},
-          { ...this.populatePart2(tqf5, tqf3) },
-          {},
-        );
-        files.push(filename);
-      }
-      if (requestDTO.part3 !== undefined) {
-        const filename = await this.generatePdfBLL.generatePdf(
-          3,
-          date,
-          {},
-          { ...this.populatePart3(tqf5, tqf3) },
-          {},
         );
         files.push(filename);
       }
@@ -174,7 +123,6 @@ export class TQF5Service {
         });
         files = [fileAllParts];
       }
-
       return files;
     } catch (error) {
       throw error;
