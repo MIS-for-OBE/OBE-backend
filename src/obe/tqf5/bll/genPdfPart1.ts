@@ -1,5 +1,3 @@
-import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
-import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { Part1TQF5 } from '../schemas/tqf5.schema';
 import { Part4TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
 import { buildTqf3Part4Table } from 'src/obe/tqf3/bll/genPdfPart4';
@@ -394,44 +392,6 @@ export const buildPart1Content = (
     .text(`${0} คน`, doc.x + 4)
     .moveDown(0.6);
 
-  //  { // min
-  //   doc.font(fontBold, 14).text('ค่าต่ำสุด(  MIN  ) :', {
-  //     align: 'center',
-  //     continued: true,
-  //   });
-  //   doc
-  //     .font(fontNormal, 14)
-  //     .text(`${0}`, doc.x + 20)
-  //     .moveDown(0.6);
-
-  //   // max
-  //   doc.font(fontBold, 14).text('ค่าสูงสุด(  MAX  ) :', doc.x - 2, doc.y, {
-  //     align: 'center',
-  //     continued: true,
-  //   });
-  //   doc
-  //     .font(fontNormal, 14)
-  //     .text(`${0}`, doc.x + 20)
-  //     .moveDown(0.6);
-
-  //   // SD
-  //   doc
-  //     .font(fontBold, 14)
-  //     .text('ส่วนเบี่ยงเบนมาตรฐาน(  SD  ) :', doc.x - 53, doc.y, {
-  //       align: 'center',
-  //       continued: true,
-  //     });
-  //   doc
-  //     .font(fontNormal, 14)
-  //     .text(`${0}`, doc.x + 20)
-  //     .moveDown(0.6);
-
-  //   //avg
-  //   doc.font(fontBold, 14).text('ค่าเฉลี่ยเลขคณิต(  X  ) :', doc.x + 32, doc.y, {
-  //     align: 'center',
-  //     continued: true,
-  //   });}
-
   doc.y += 0.6;
   // 5
   doc
@@ -455,15 +415,13 @@ export const buildPart1Content = (
     )
     .moveDown(0.6);
 
-  buildTqf3Part4Table(doc, font, tqf3);
-
-  // 7
+  const currentY = buildTqf3Part4Table(doc, font, tqf3);
 
   if (doc.y + 50 > doc.page.height - doc.page.margins.bottom) {
     doc.addPage();
     doc.y = doc.page.margins.top + 40;
   } else {
-    doc.y += 65;
+    doc.y = currentY + 10;
   }
 
   doc.x = doc.page.margins.left;

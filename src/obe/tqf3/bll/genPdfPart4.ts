@@ -1,6 +1,5 @@
 import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import { Part4TQF3 } from '../schemas/tqf3.schema';
-import { height } from 'pdfkit/js/page';
 
 export const buildPart4Content = (
   doc: PDFKit.PDFDocument,
@@ -173,13 +172,12 @@ export const buildTqf3Part4Table = (
               ],
             ];
 
-            temp = 755; //limit height pdf
+            temp = 755;
             addIndexNewInstance++;
 
             rows.splice(indexToPop, 0, ...newInstances);
           }
         } else {
-          // console.log('No item to pop');
         }
         newTable = e.height;
       }
@@ -288,15 +286,13 @@ export const buildTqf3Part4Table = (
 
   function drawHeaders() {
     drawRow(tableTop, headers, true);
-    // console.log(doc.y);
   }
 
-  function drawTable() {
-    let currentY = tableTop + 63;
+  let currentY = tableTop + 63;
 
+  function drawTable() {
     rows.forEach((row, cloIndex) => {
       if (addPageIndex.includes(cloIndex)) {
-        // console.log(doc.y);
         doc.addPage();
         currentY = doc.y;
       }
@@ -304,8 +300,12 @@ export const buildTqf3Part4Table = (
       const rowHeight = drawRow(currentY, row, false, cloIndex);
       currentY += rowHeight;
     });
+
+    return currentY;
   }
 
   drawHeaders();
   drawTable();
+
+  return currentY;
 };
