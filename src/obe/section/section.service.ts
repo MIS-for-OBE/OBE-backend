@@ -46,15 +46,20 @@ export class SectionService {
       const newTopic = requestDTO.data.topic;
 
       const updateFields = {};
+      const unsetFields: any = {};
       for (const key in requestDTO.data) {
-        updateFields[`sections.$[sec].${key}`] = requestDTO.data[key];
+        if (requestDTO.data[key] === null) {
+          unsetFields[`sections.$[sec].${key}`] = 1;
+        } else {
+          updateFields[`sections.$[sec].${key}`] = requestDTO.data[key];
+        }
       }
       await this.courseManagementModel.findOneAndUpdate(
         {
           courseNo: requestDTO.courseNo,
           'sections.sectionNo': requestDTO.oldSectionNo,
         },
-        { $set: updateFields },
+        { $set: updateFields, $unset: unsetFields },
         {
           arrayFilters: [{ 'sec.sectionNo': requestDTO.oldSectionNo }],
           new: true,
@@ -85,7 +90,7 @@ export class SectionService {
           semester: requestDTO.semester,
           courseNo: requestDTO.courseNo,
         },
-        { $set: updateFields },
+        { $set: updateFields, $unset: unsetFields },
         {
           arrayFilters: [{ 'sec._id': id }],
           new: true,

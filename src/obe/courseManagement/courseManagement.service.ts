@@ -247,13 +247,18 @@ export class CourseManagementService {
       const newTopic = requestDTO.data.topic;
 
       const updateFields = {};
+      const unsetFields: any = {};
       for (const key in requestDTO.data) {
-        updateFields[`sections.$[sec].${key}`] = requestDTO.data[key];
+        if (requestDTO.data[key] === null) {
+          unsetFields[`sections.$[sec].${key}`] = 1;
+        } else {
+          updateFields[`sections.$[sec].${key}`] = requestDTO.data[key];
+        }
       }
       updateCourse = await this.model
         .findByIdAndUpdate(
           params.id,
-          { $set: updateFields },
+          { $set: updateFields, $unset: unsetFields },
           { arrayFilters: [{ 'sec._id': params.section }], new: true },
         )
         .select('-sections.isActive')
@@ -305,11 +310,17 @@ export class CourseManagementService {
         let existSec = course.sections.find(
           (sec) => sec.sectionNo == requestDTO.oldSectionNo,
         );
+        if (requestDTO.data.curriculum == null) {
+          delete requestDTO.data.curriculum;
+        }
         if (existSec) {
           course.sections = course.sections.map((sec) => {
             if (sec.sectionNo === requestDTO.oldSectionNo) {
               if (sec.topic && sec.topic === requestDTO.oldTopic) {
                 sec.topic = requestDTO.newTopic;
+              }
+              if (!requestDTO.data.curriculum) {
+                sec.curriculum = undefined;
               }
               return {
                 ...sec,
