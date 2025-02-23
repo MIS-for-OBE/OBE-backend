@@ -105,7 +105,10 @@ export class StudentService {
             }
           });
           sortData(evals, 'no');
-          const plos = tqf3.part7?.list;
+          const plos = tqf3.part7?.list.map(({ curriculum, data }) => ({
+            curriculum,
+            list: data.find((c) => c.clo == clo.id)?.plos || [],
+          }));
           clos.push({
             clo,
             evals,
