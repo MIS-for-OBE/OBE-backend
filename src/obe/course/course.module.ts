@@ -3,7 +3,6 @@ import { CourseService } from './course.service';
 import { CourseController } from './course.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Course, CourseSchema } from './schemas/course.schema';
-import { FacultyService } from '../faculty/faculty.service';
 import {
   CourseManagement,
   CourseManagementSchema,
@@ -27,6 +26,6 @@ import { PLO, PLOSchema } from '../plo/schemas/plo.schema';
     ]),
   ],
   controllers: [CourseController],
-  providers: [CourseService, FacultyService],
+  providers: [CourseService],
 })
 export class CourseModule {}

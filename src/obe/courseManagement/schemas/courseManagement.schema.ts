@@ -21,6 +21,7 @@ export class SectionManagement {
     type: [
       {
         plo: { type: mongoose.Schema.Types.ObjectId, ref: 'PLO' },
+        curriculum: { type: String },
         list: [
           {
             type: mongoose.Schema.Types.ObjectId,
@@ -31,7 +32,7 @@ export class SectionManagement {
     ],
     _id: false,
   })
-  ploRequire: { plo: PLO; list: PLONo[] }[];
+  ploRequire: { plo: PLO; curriculum: string; list: PLONo[] }[];
 
   @Prop()
   semester: number[];
@@ -76,6 +77,7 @@ export class CourseManagement {
     type: [
       {
         plo: { type: mongoose.Schema.Types.ObjectId, ref: 'PLO' },
+        curriculum: { type: String },
         list: [
           {
             type: mongoose.Schema.Types.ObjectId,
@@ -86,7 +88,7 @@ export class CourseManagement {
     ],
     _id: false,
   })
-  ploRequire: { plo: PLO; list: PLONo[] }[];
+  ploRequire: { plo: PLO; curriculum: string; list: PLONo[] }[];
 }
 
 export const CourseManagementSchema =

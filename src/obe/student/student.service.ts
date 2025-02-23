@@ -105,7 +105,7 @@ export class StudentService {
             }
           });
           sortData(evals, 'no');
-          const plos = tqf3.part7?.data.find((c) => c.clo == clo.id)?.plos;
+          const plos = tqf3.part7?.list;
           clos.push({
             clo,
             evals,

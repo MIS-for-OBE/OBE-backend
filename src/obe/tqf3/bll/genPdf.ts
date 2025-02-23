@@ -9,7 +9,6 @@ import { buildPart3Content } from './genPdfPart3';
 import { buildPart4Content } from './genPdfPart4';
 import { buildPart5Content } from './genPdfPart5';
 import { buildPart6Content } from './genPdfPart6';
-import { buildPart7Content } from './genPdfPart7';
 import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import {
   Part1TQF3,
@@ -18,10 +17,8 @@ import {
   Part4TQF3,
   Part5TQF3,
   Part6TQF3,
-  Part7TQF3,
 } from '../schemas/tqf3.schema';
 import { setupFonts } from './setUpPdf';
-import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 
 @Injectable()
 export class GeneratePdfBLL {
@@ -87,14 +84,6 @@ export class GeneratePdfBLL {
               doc,
               font,
               data as CmuApiTqfCourseDTO & Part6TQF3,
-            );
-            break;
-          case 7:
-            buildPart7Content(
-              doc,
-              font,
-              data as CmuApiTqfCourseDTO &
-                Part7TQF3 & { ploList: (PLONo & { id: string })[] },
             );
             break;
         }

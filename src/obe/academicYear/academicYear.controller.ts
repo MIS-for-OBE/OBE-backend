@@ -54,18 +54,6 @@ export class AcademicYearController {
     });
   }
 
-  // @Put('/:id/tqf')
-  // async updateProcessTqf3(
-  //   @Param('id') id: string,
-  //   @Body() requestDTO: any,
-  // ): Promise<ResponseDTO<AcademicYear>> {
-  //   return this.service.updateProcessTqf3(id, requestDTO).then((result) => {
-  //     const responseDTO = new ResponseDTO<AcademicYear>();
-  //     responseDTO.data = result;
-  //     return responseDTO;
-  //   });
-  // }
-
   @Delete('/:id')
   async deleteAcademicYear(
     @Param('id') id: string,

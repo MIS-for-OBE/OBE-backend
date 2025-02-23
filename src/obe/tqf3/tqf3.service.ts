@@ -183,18 +183,23 @@ export class TQF3Service {
             );
           });
         }
-        if (tqf3Document.part7?.data.length) {
-          tqf3Document.part7.data = tqf3Document.part7.data.filter((item) =>
-            validCloIds.includes(item.clo?.toString()),
-          );
-          tqf3Document.part7.data.sort((a: any, b: any) => {
-            const aIndex = cloIndexMap[a.clo?.toString()];
-            const bIndex = cloIndexMap[b.clo?.toString()];
-            return (
-              (aIndex !== undefined ? aIndex : Infinity) -
-              (bIndex !== undefined ? bIndex : Infinity)
+        if (tqf3Document.part7?.list.length) {
+          tqf3Document.part7.list = tqf3Document.part7.list.map((cur) => {
+            cur.data = cur.data.filter((item) =>
+              validCloIds.includes(item.clo?.toString()),
             );
+            return cur;
           });
+          tqf3Document.part7.list.forEach((item) =>
+            item.data.sort((a: any, b: any) => {
+              const aIndex = cloIndexMap[a.clo?.toString()];
+              const bIndex = cloIndexMap[b.clo?.toString()];
+              return (
+                (aIndex !== undefined ? aIndex : Infinity) -
+                (bIndex !== undefined ? bIndex : Infinity)
+              );
+            }),
+          );
         }
       } else if (params.part === 'part3') {
         if (!tqf3Document.part3) tqf3Document.part3 = {} as any;
@@ -234,7 +239,9 @@ export class TQF3Service {
       }
 
       tqf3Document.status =
-        ((tqf3Document.part7 || params.part === 'part7') &&
+        ((tqf3Document.part6 ||
+          tqf3Document.part7 ||
+          ['part6', 'part7'].includes(params.part)) &&
           !requestDTO.inProgress) ||
         requestDTO.done
           ? TQF_STATUS.DONE
@@ -374,22 +381,6 @@ export class TQF3Service {
         };
       });
       return { data: part4 };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  private populatePart7(tqf3: TQF3) {
-    try {
-      const part7 = tqf3.part7.data.map((item) => {
-        return {
-          clo: tqf3.part2.clo.find(
-            (clo: any) => clo._id.toString() === item.clo.toString(),
-          ),
-          plos: item.plos,
-        };
-      });
-      return { data: part7 };
     } catch (error) {
       throw error;
     }

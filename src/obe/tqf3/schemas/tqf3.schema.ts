@@ -190,15 +190,26 @@ class Part7 {
   @Prop({
     type: [
       {
-        clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
-        plos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+        curriculum: { type: String },
+        data: {
+          type: [
+            {
+              clo: { type: mongoose.Schema.Types.ObjectId, ref: 'CLO' },
+              plos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PLONo' }],
+            },
+          ],
+          _id: false,
+        },
       },
     ],
     _id: false,
   })
-  data: {
-    clo: CLO;
-    plos: PLONo[];
+  list: {
+    curriculum: string;
+    data: {
+      clo: CLO;
+      plos: PLONo[];
+    }[];
   }[];
 }
 const Part7Schema = SchemaFactory.createForClass(Part7);

@@ -23,7 +23,6 @@ import {
   CmuApiTqfCourseSearchDTO,
   CmuApiTqfCourseDTO,
 } from 'src/common/cmu-api/cmu-api.dto';
-import { FacultyService } from '../faculty/faculty.service';
 
 @Injectable()
 export class CourseService {
@@ -34,7 +33,6 @@ export class CourseService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(TQF3.name) private readonly tqf3Model: Model<TQF3>,
     @InjectModel(TQF5.name) private readonly tqf5Model: Model<TQF5>,
-    private readonly facultyService: FacultyService,
   ) {}
 
   async searchCourse(authUser: any, searchDTO: CourseSearchDTO): Promise<any> {

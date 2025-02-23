@@ -46,8 +46,4 @@ export class GeneratePdfDTO extends BaseDTO {
   @IsOptional()
   @IsString()
   part6?: string;
-
-  @IsOptional()
-  @IsString()
-  part7?: string;
 }
