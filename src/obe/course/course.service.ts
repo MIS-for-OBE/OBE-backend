@@ -240,7 +240,7 @@ export class CourseService {
                 parseInt(a.student.studentId) - parseInt(b.student.studentId),
             );
           });
-          sortData(course.sections, 'sectionNo');
+          sortData(course.sections, 'sectionTopic');
           sortData(course.sections, 'isActive', 'boolean');
           return course;
         });

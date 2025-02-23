@@ -120,7 +120,7 @@ export class CourseManagementService {
       ...where,
     });
     courses.forEach((course) => {
-      course.sections.sort((a, b) => a.sectionNo - b.sectionNo);
+      sortData(course.sections, 'sectionTopic');
       const curCourse = activeCourses.find(
         (e) => e.courseNo == course.courseNo,
       );

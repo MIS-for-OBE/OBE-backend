@@ -8,6 +8,12 @@ export const sortData = (
 ) => {
   const isAscending = ['asc', 'ASC'].includes(typeSort);
   data?.sort((a, b) => {
+    if (key == 'sectionTopic') {
+      if (a.topic !== b.topic) {
+        return a.topic.localeCompare(b.topic);
+    }
+    return a.sectionNo - b.sectionNo;
+    }
     const aValue =
       a[key] ?? (typeKey === 'number' ? 0 : typeKey === 'boolean' ? false : '');
     const bValue =
