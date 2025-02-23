@@ -4,9 +4,8 @@ import * as PDFDocument from 'pdfkit';
 import { PDFDocument as PDFLibDocument } from 'pdf-lib';
 import { join } from 'path';
 import { buildPart1Content } from './genPdfPart1';
-import { Part1TQF5, Part2TQF5, Part3TQF5 } from '../schemas/tqf5.schema';
+import { Part1TQF5Curriculum } from '../schemas/tqf5.schema';
 import { setupFonts } from './setUpPdf';
-import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 import { Part4TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
 
 @Injectable()
@@ -36,7 +35,12 @@ export class GeneratePdfTqf5BLL {
         doc.initForm();
         switch (part) {
           case 1:
-            buildPart1Content(doc, font, tqf5 as Part1TQF5, tqf3 as Part4TQF3);
+            buildPart1Content(
+              doc,
+              font,
+              tqf5 as Part1TQF5Curriculum,
+              tqf3 as Part4TQF3,
+            );
             break;
         }
         doc.end();

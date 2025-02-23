@@ -104,7 +104,11 @@ export class TQF5Service {
           1,
           date,
           {},
-          { ...tqf5.part1._doc },
+          {
+            ...tqf5.part1.list.find(
+              ({ curriculum }) => curriculum == requestDTO.curriculum,
+            )._doc,
+          },
           { ...this.tqf3Service.populateTqf3Part4(tqf3) },
         );
         files.push(filename);

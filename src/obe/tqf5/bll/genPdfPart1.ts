@@ -1,4 +1,4 @@
-import { Part1TQF5 } from '../schemas/tqf5.schema';
+import { Part1TQF5Curriculum } from '../schemas/tqf5.schema';
 import { Part4TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
 import { buildTqf3Part4Table } from 'src/obe/tqf3/bll/genPdfPart4';
 
@@ -9,7 +9,7 @@ export const buildPart1Content = (
     fontBold: string;
     emoji: string;
   },
-  tqf5: Part1TQF5,
+  tqf5: Part1TQF5Curriculum,
   tqf3: Part4TQF3,
 ) => {
   const { fontNormal, fontBold, emoji } = font;

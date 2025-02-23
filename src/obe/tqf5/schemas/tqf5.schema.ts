@@ -3,11 +3,11 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { METHOD_TQF5, TQF_STATUS } from 'src/common/enum/type.enum';
 import { CLO, Eval } from 'src/obe/tqf3/schemas/tqf3.schema';
 
-export type Part1TQF5 = Part1;
-@Schema({
-  timestamps: { createdAt: false, updatedAt: true },
-})
-class Part1 {
+@Schema()
+export class Part1TQF5Curriculum {
+  @Prop()
+  curriculum: string | null;
+
   @Prop({
     type: [
       {
@@ -73,6 +73,18 @@ class Part1 {
     S: string;
     U: string;
   };
+}
+
+export const Part1TQF5CurriculumSchema =
+  SchemaFactory.createForClass(Part1TQF5Curriculum);
+
+export type Part1TQF5 = Part1;
+@Schema({
+  timestamps: { createdAt: false, updatedAt: true },
+})
+class Part1 {
+  @Prop({ type: [Part1TQF5Curriculum], _id: false })
+  list: Part1TQF5Curriculum[];
 }
 const Part1Schema = SchemaFactory.createForClass(Part1);
 

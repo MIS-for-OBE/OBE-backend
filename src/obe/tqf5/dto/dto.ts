@@ -26,15 +26,10 @@ export class GeneratePdfDTO extends BaseDTO {
   })
   oneFile = false;
 
+  @IsString()
+  curriculum: string;
+
   @IsOptional()
   @IsString()
   part1?: string;
-
-  @IsOptional()
-  @IsString()
-  part2?: string;
-
-  @IsOptional()
-  @IsString()
-  part3?: string;
 }
