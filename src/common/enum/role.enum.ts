@@ -15,6 +15,6 @@ export enum ROLE {
   STUDENT = 'Student',
   TA = 'TA',
   INSTRUCTOR = 'Instructor',
+  CURRICULUM_ADMIN = 'Curr. Admin',
   ADMIN = 'Admin',
-  SUPREME_ADMIN = 'S. Admin',
 }

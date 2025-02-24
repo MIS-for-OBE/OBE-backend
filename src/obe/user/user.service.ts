@@ -61,7 +61,7 @@ export class UserService {
     }
   }
 
-  async updateAdmin(data: any): Promise<User> {
+  async updateCurrAdmin(data: any): Promise<User> {
     try {
       let res;
       if (data.id) {
@@ -76,12 +76,12 @@ export class UserService {
     }
   }
 
-  async updateSAdmin(id: string, data: any): Promise<any> {
+  async updateAdmin(id: string, data: any): Promise<any> {
     try {
-      const user = await this.updateUserRoleById(id, ROLE.ADMIN);
+      const user = await this.updateUserRoleById(id, ROLE.CURRICULUM_ADMIN);
       const newSAdmin = await this.updateUserRoleById(
         data.id,
-        ROLE.SUPREME_ADMIN,
+        ROLE.ADMIN,
       );
 
       return { user, newSAdmin };
@@ -114,9 +114,9 @@ export class UserService {
       if (user) {
         if (user.role == role) {
           throw new BadRequestException(
-            `${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`} is already an admin`,
+            `${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`} is already a curriculum admin`,
           );
-        } else if (user.role == ROLE.SUPREME_ADMIN) {
+        } else if (user.role == ROLE.ADMIN) {
           throw new BadRequestException(
             `Cannot change the role of ${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`}`,
           );

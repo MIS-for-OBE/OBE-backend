@@ -59,21 +59,21 @@ export class UserController {
     });
   }
 
-  @Put('admin')
-  async updateAdmin(@Body() body: any): Promise<ResponseDTO<User>> {
-    return this.service.updateAdmin(body).then((result) => {
+  @Put('curr-admin')
+  async updateCurrAdmin(@Body() body: any): Promise<ResponseDTO<User>> {
+    return this.service.updateCurrAdmin(body).then((result) => {
       const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
     });
   }
 
-  @Put('s-admin')
-  async updateSAdmin(
+  @Put('admin')
+  async updateAdmin(
     @Request() req,
     @Body() body: any,
   ): Promise<ResponseDTO<any>> {
-    return this.service.updateSAdmin(req.user.id, body).then((result) => {
+    return this.service.updateAdmin(req.user.id, body).then((result) => {
       const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
