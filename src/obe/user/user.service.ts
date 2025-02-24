@@ -65,9 +65,13 @@ export class UserService {
     try {
       let res;
       if (data.id) {
-        res = await this.updateUserRoleById(data.id, data.role);
+        res = await this.updateUserById(data.id, data.role, data.curriculums);
       } else {
-        res = await this.updateOrCreateUserByEmail(data.email, data.role);
+        res = await this.updateOrCreateUserByEmail(
+          data.email,
+          data.role,
+          data.curriculums,
+        );
       }
 
       return res;
@@ -78,26 +82,35 @@ export class UserService {
 
   async updateAdmin(id: string, data: any): Promise<any> {
     try {
-      const user = await this.updateUserRoleById(id, ROLE.CURRICULUM_ADMIN);
-      const newSAdmin = await this.updateUserRoleById(
-        data.id,
-        ROLE.ADMIN,
+      const user = await this.updateUserById(
+        id,
+        ROLE.CURRICULUM_ADMIN,
+        data.curriculums,
       );
+      const newAdmin = await this.updateUserById(data.id, ROLE.ADMIN, []);
 
-      return { user, newSAdmin };
+      return { user, newAdmin };
     } catch (error) {
       throw error;
     }
   }
 
-  private async updateUserRoleById(
+  private async updateUserById(
     userId: string,
     role: string,
+    curriculums: string[] | undefined,
   ): Promise<User> {
     try {
+      const update: any = { role };
+      const unset: any = {};
+      if (curriculums?.length) {
+        update.curriculums = curriculums;
+      } else {
+        unset.curriculums = 1;
+      }
       return await this.model.findByIdAndUpdate(
         userId,
-        { role },
+        { $set: update, $unset: unset },
         { new: true },
       );
     } catch (error) {
@@ -108,6 +121,7 @@ export class UserService {
   private async updateOrCreateUserByEmail(
     email: string,
     role: string,
+    curriculums: string[],
   ): Promise<User> {
     try {
       let user = await this.model.findOne({ email });
@@ -123,11 +137,11 @@ export class UserService {
         }
         user = await this.model.findOneAndUpdate(
           { email },
-          { role },
+          { role, curriculums },
           { new: true },
         );
       } else {
-        user = await this.model.create({ email, role });
+        user = await this.model.create({ email, role, curriculums });
       }
       return user;
     } catch (error) {

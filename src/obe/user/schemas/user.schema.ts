@@ -57,6 +57,9 @@ export class User {
   role: string;
 
   @Prop()
+  curriculums: string[];
+
+  @Prop()
   termsOfService?: boolean;
 
   @Prop({ type: [EnrollCourseSchema], _id: false })
