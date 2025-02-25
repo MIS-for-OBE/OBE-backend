@@ -93,13 +93,17 @@ export class PLOService {
       if (searchDTO.name) {
         filter.name = searchDTO.name;
       } else {
-        filter.$or = [
-          { year: { $lt: searchDTO.year } },
-          {
-            year: searchDTO.year,
-            semester: { $lte: searchDTO.semester },
-          },
-        ];
+        if (searchDTO.year && searchDTO.semester) {
+          filter.$or = [
+            { year: { $lt: searchDTO.year } },
+            {
+              year: searchDTO.year,
+              semester: { $lte: searchDTO.semester },
+            },
+          ];
+        } else if (searchDTO.year) {
+          filter.year = { $lte: searchDTO.year };
+        }
         if (searchDTO.curriculum) {
           filter.curriculum = searchDTO.curriculum;
         }
@@ -112,7 +116,7 @@ export class PLOService {
         : plosMatch.find(
             (item) =>
               item.year <= searchDTO.year &&
-              item.semester <= searchDTO.semester,
+              (searchDTO.semester ? item.semester <= searchDTO.semester : true),
           );
       if (plo && plo.data) {
         plo.data.sort((a, b) => a.no - b.no);

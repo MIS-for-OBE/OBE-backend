@@ -38,10 +38,10 @@ export class CourseService {
   async searchCourse(authUser: any, searchDTO: CourseSearchDTO): Promise<any> {
     try {
       if (searchDTO.manage) {
-        const where = {
-          year: searchDTO.year,
-          semester: searchDTO.semester,
-        };
+        const where = { year: searchDTO.year };
+        if (searchDTO.semester) {
+          where['semester'] = searchDTO.semester;
+        }
         if (
           searchDTO.curriculum.length &&
           !searchDTO.curriculum.includes('All')
@@ -311,7 +311,7 @@ export class CourseService {
             parseInt(a.student.studentId) - parseInt(b.student.studentId),
         );
       });
-      sortData(course.sections, 'sectionNo');
+      sortData(course.sections, 'sectionTopic');
       sortData(course.sections, 'isActive', 'boolean');
       return course;
     } catch (error) {

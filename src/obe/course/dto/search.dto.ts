@@ -1,4 +1,10 @@
-import { IsArray, IsBoolean, IsNumber, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { SearchDTO } from 'src/common/dto/search.dto';
 
@@ -9,11 +15,12 @@ export class CourseSearchDTO extends SearchDTO {
   })
   year = '';
 
+  @IsOptional()
   @IsNumber()
   @Transform((transformFn) => {
     return parseInt(transformFn.value);
   })
-  semester = '';
+  semester;
 
   @IsBoolean()
   @Transform((transformFn) => {
