@@ -126,11 +126,7 @@ export class UserService {
     try {
       let user = await this.model.findOne({ email });
       if (user) {
-        if (user.role == role) {
-          throw new BadRequestException(
-            `${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`} is already a curriculum admin`,
-          );
-        } else if (user.role == ROLE.ADMIN) {
+        if (user.role == ROLE.ADMIN) {
           throw new BadRequestException(
             `Cannot change the role of ${user.firstNameEN ? `${user.firstNameEN} ${user.lastNameEN}` : `${email}`}`,
           );
