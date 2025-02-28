@@ -51,4 +51,11 @@ export class CourseSearchDTO extends SearchDTO {
     else return false;
   })
   ploRequire = false;
+
+  @IsBoolean()
+  @Transform((transformFn) => {
+    if (transformFn.value === 'true') return true;
+    else return false;
+  })
+  curriculumPlo = false;
 }

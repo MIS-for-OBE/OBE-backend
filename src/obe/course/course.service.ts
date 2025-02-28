@@ -38,7 +38,13 @@ export class CourseService {
   async searchCourse(authUser: any, searchDTO: CourseSearchDTO): Promise<any> {
     try {
       if (searchDTO.manage) {
-        const where = { year: searchDTO.year };
+        const where: any = { year: searchDTO.year };
+        if (searchDTO.curriculumPlo) {
+          where['year'] = {
+            $gt: parseInt(searchDTO.year) - 5,
+            $lte: parseInt(searchDTO.year),
+          };
+        }
         if (searchDTO.semester) {
           where['semester'] = searchDTO.semester;
         }
