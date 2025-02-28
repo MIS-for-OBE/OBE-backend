@@ -402,7 +402,7 @@ export const buildPart1Content = (
     .moveDown(0.6);
 
   doc.x += 12;
-  doc.font(fontNormal, 14).text(`ไม่มี`).moveDown(0.6);
+  doc.font(fontNormal, 14).text(`${tqf5.abnormalScoreFactor}`).moveDown(0.6);
   doc.addPage();
   // 6
   doc
@@ -433,5 +433,5 @@ export const buildPart1Content = (
     });
 
   doc.x += 12;
-  doc.font(fontNormal, 14).text(`-`).moveDown(0.6);
+  doc.font(fontNormal, 14).text(`${tqf5.reviewingSLO}`).moveDown(0.6);
 };

@@ -73,6 +73,12 @@ export class Part1TQF5Curriculum {
     S: string;
     U: string;
   };
+
+  @Prop()
+  abnormalScoreFactor: string | null;
+
+  @Prop()
+  reviewingSLO: string | null;
 }
 
 export const Part1TQF5CurriculumSchema =
