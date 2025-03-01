@@ -4,6 +4,17 @@ import { HydratedDocument } from 'mongoose';
 export type FacultyDocument = HydratedDocument<Faculty>;
 
 @Schema()
+export class Department {
+  @Prop({ required: true })
+  nameTH: string;
+
+  @Prop({ required: true })
+  nameEN: string;
+
+  @Prop({ required: true })
+  code: string;
+}
+@Schema()
 export class Curriculum {
   @Prop({ required: true })
   nameTH: string;
@@ -28,6 +39,9 @@ export class Faculty {
 
   @Prop({ required: true })
   code: string;
+
+  @Prop()
+  department: Department[];
 
   @Prop()
   curriculum: Curriculum[];

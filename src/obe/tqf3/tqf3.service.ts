@@ -272,23 +272,31 @@ export class TQF3Service {
       );
       let data: CmuApiTqfCourseDTO = courseInfo.data[0];
       data = { ...data, ...requestDTO };
+
       if (!data.CourseID) {
-        const [course, faculty] = await Promise.all([
-          this.courseModel.findOne({
-            year: requestDTO.academicYear,
-            semester: requestDTO.academicTerm,
-            courseNo: requestDTO.courseNo,
-          }),
-          this.facultyModel.findOne({ facultyCode: facultyCode }),
-        ]);
+        const course = await this.courseModel.findOne({
+          year: requestDTO.academicYear,
+          semester: requestDTO.academicTerm,
+          courseNo: requestDTO.courseNo,
+        });
         data.AcademicYear = course.year.toString();
         data.AcademicTerm = course.semester;
         data.CourseID = course.courseNo;
         data.CourseTitleTha = course.courseName;
         data.CourseTitleEng = course.courseName;
         data.FacultyID = facultyCode;
+      }
+      if (!data.FacultyNameEng) {
+        const faculty = await this.facultyModel.findOne({
+          facultyCode: facultyCode,
+        });
         data.FacultyNameEng = faculty?.facultyEN;
         data.FacultyNameTha = faculty?.facultyTH;
+        const department = faculty.department.find(
+          ({ code }) => code == data.CourseCodeEng,
+        );
+        data.DepartmentNameEng = department?.nameEN;
+        data.DepartmentNameTha = department?.nameTH;
       }
 
       const tqf3: any = await this.model.findById(requestDTO.tqf3);
