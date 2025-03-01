@@ -84,11 +84,11 @@ export class StudentService {
       );
       const ploList = await this.ploModel.find();
 
-      const formattedCourses = selectTerm?.map((item: any) => {
-        const { course } = item;
+      const formattedCourses = selectTerm?.map((e: any) => {
+        const { course } = e;
         const { sections } = course;
         const sectionData = sections?.find(
-          ({ sectionNo }) => sectionNo === item.section,
+          ({ sectionNo }) => sectionNo === e.section,
         )?._doc;
 
         if (!sectionData) {
@@ -136,9 +136,6 @@ export class StudentService {
               assignmentPublish.includes(assignmentName),
             ) || [];
 
-        const coursePloRequire = ploRequireMap.get(course.courseNo).ploRequire;
-        let plo = {};
-        const plos = [];
         const clos = [];
         tqf3.part4?.data.forEach((item) => {
           const clo: any =
@@ -150,21 +147,37 @@ export class StudentService {
           );
           clos.push({ clo, score });
         });
-        // tqf3.part7?.list
-        //   .find(({ curriculum }) => curriculum == section.curriculum)
-        //   ?.data.forEach(() => {
-        //     //   const clos = tqf3.part7?.list
-        //     //   ?.find((e) => e.curriculum == curriculum)
-        //     //   ?.data.filter(({ plos }) => (plos as string[]).includes(plo))
-        //     //   .map(({ clo }) => clo);
-        //     // const sum = clos?.length
-        //     //   ? tqf5.part3?.data
-        //     //       .filter(({ clo }) => clos?.includes(clo))
-        //     //       .reduce((a, b) => a + b.score, 0)
-        //     //   : undefined;
-        //     // return sum ? (sum / (clos?.length ?? 1)).toFixed(2) : dash ? "-" : "N/A";
-        //   });
-
+        const coursePloRequire = ploRequireMap
+          .get(course.courseNo)
+          .ploRequire.filter(
+            ({ curriculum }) => curriculum == section.curriculum,
+          );
+        const tqf3Part7 = tqf3.part7?.list.find(
+          ({ curriculum }) => curriculum == section.curriculum,
+        )?.data;
+        const plo: Partial<PLO> =
+          ploList.find(
+            ({ curriculum, data, id }) =>
+              curriculum.includes(section.curriculum) &&
+              data.find((item2: any) =>
+                coursePloRequire.find(
+                  (item) =>
+                    item.plo == id &&
+                    item.list.map((id) => id.toString()).includes(item2.id),
+                ),
+              ),
+          ) ?? {};
+        const plos = [];
+        if (!clos.every(({ score }) => score === '-')) {
+          plo?.data?.forEach((item: any) => {
+            const score = this.calPloStudentScore(item, tqf3Part7, clos);
+            plos.push({
+              ...item._doc,
+              name: `PLO ${item.no}`,
+              score,
+            });
+          });
+        }
         return {
           id: course.id,
           courseNo: course.courseNo,
@@ -230,6 +243,7 @@ export class StudentService {
   }
 
   private calCloStudentScore(tqf5Part2: any, scores: any[], assess: any[]) {
+    if (!scores.length) return '-';
     const assigns = scores
       .filter(({ assignmentName }) =>
         tqf5Part2?.assignments.map((e) =>
@@ -249,8 +263,6 @@ export class StudentService {
           .flatMap((s) => s.questions)
           .includes(`${e.sheet}-${e.name}`),
       );
-    console.log('assigns === ', assigns);
-
     const cloScores: { score: number; percent: number }[] = [];
     assess.forEach((e) => {
       const score = assigns
@@ -277,5 +289,18 @@ export class StudentService {
     else if (3 <= avgCloScore && avgCloScore < 4) return 3;
     else if (4 <= avgCloScore) return 4;
     else return '-';
+  }
+
+  private calPloStudentScore(item: any, tqf3Part7: any, clos: any[]) {
+    const cloList = tqf3Part7
+      ?.filter(({ plos }: any) => plos.includes(item.id))
+      .map(({ clo }) => clo)
+      .map((id) => id.toString());
+    const sum = cloList?.length
+      ? clos
+          .filter(({ clo }) => cloList?.includes(clo.id))
+          .reduce((a, b) => a + b.score, 0)
+      : undefined;
+    return sum ? sum / (cloList?.length ?? 1) : '-';
   }
 }
