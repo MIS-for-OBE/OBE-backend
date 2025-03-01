@@ -2,6 +2,7 @@ import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import { TEACHING_METHOD, EVALUATE_TYPE } from 'src/common/enum/type.enum';
 import { Part2TQF3 } from '../schemas/tqf3.schema';
 import { setSymbol } from './setUpPdf';
+import { height } from 'pdfkit/js/page';
 
 export const buildPart2Content = (
   doc: PDFKit.PDFDocument,
@@ -218,7 +219,7 @@ export const buildPart2Content = (
         return textHeight + 20;
       }
 
-      function drawRow(y, row, isHeader = false) {
+      function drawRow(y, row, isHeader = false, height = false) {
         let rowHeight = 0;
 
         row.forEach((cell, i) => {
@@ -228,64 +229,71 @@ export const buildPart2Content = (
           }
         });
 
-        doc.lineWidth(0.5);
+        if (!height) {
+          doc.lineWidth(0.5);
 
-        row.forEach((cell, i) => {
-          doc
-            .rect(
+          row.forEach((cell, i) => {
+            doc
+              .rect(
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  6.5,
+                y,
+                columnWidth[i],
+                rowHeight,
+              )
+              .stroke();
+
+            if (isHeader) {
+              doc.font(fontBold);
+            } else {
+              doc.font(fontNormal);
+            }
+
+            doc.text(
+              cell,
               tableLeft +
                 columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                6.5,
-              y,
-              columnWidth[i],
-              rowHeight,
-            )
-            .stroke();
-
-          if (isHeader) {
-            doc.font(fontBold);
-          } else {
-            doc.font(fontNormal);
-          }
-
-          doc.text(
-            cell,
-            tableLeft +
-              columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-              10 +
-              8,
-            y + 10,
-            {
-              width: columnWidth[i] - 20,
-              align: isHeader || i > 1 ? 'center' : 'left',
-              wordSpacing: 1,
-            },
-          );
-        });
-
+                10 +
+                8,
+              y + 10,
+              {
+                width: columnWidth[i] - 20,
+                align: isHeader || i > 1 ? 'center' : 'left',
+                wordSpacing: 1,
+              },
+            );
+          });
+        }
         return rowHeight;
       }
 
       function drawHeaders() {
         drawRow(tableTop, headers, true);
       }
-
       function drawTable() {
-        let currentY = tableTop + 34.5;
-        let totalTableHeight = 0;
+        let currentY = tableTop + 34.5; // Initial position
 
+        const maxY = 780;
+
+        if (currentY > maxY) {
+          doc.addPage();
+          currentY = 47;
+        }
         rows.forEach((row) => {
-          if (doc.y > 730) {
+          const rowHeight = drawRow(currentY, row, false, true);
+
+          if (currentY + rowHeight > maxY) {
             doc.addPage();
             currentY = doc.y;
+            drawRow(currentY, row);
+          } else {
+            drawRow(currentY, row);
           }
-          const rowHeight = drawRow(currentY, row);
-          totalTableHeight += rowHeight;
+
           currentY += rowHeight;
         });
-
         doc.y = currentY;
-        return totalTableHeight;
       }
 
       drawHeaders();
@@ -342,7 +350,13 @@ export const buildPart2Content = (
         return textHeight + 20;
       }
 
-      function drawRow(y, row, isHeader = false, isLastRow = false) {
+      function drawRow(
+        y,
+        row,
+        isHeader = false,
+        isLastRow = false,
+        height = false,
+      ) {
         let rowHeight = 0;
 
         row.forEach((cell, i) => {
@@ -356,111 +370,108 @@ export const buildPart2Content = (
         doc.lineWidth(0.5);
 
         let heightSubHeader = 0;
-
-        row.forEach((cell, i) => {
-          // if (doc.y > 700) {
-          //   doc.addPage();
-          // }
-          if (isHeader && i > 1) {
-            rowHeight = rowHeight / 2;
-            if (i === 2) {
-              doc
-                .rect(
-                  tableLeft +
-                    columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                    6.5,
-                  y,
-                  columnWidth[2] + columnWidth[3],
-                  rowHeight,
-                )
-                .stroke();
-
-              doc.text(
-                'จำนวนชั่วโมง',
-                tableLeft +
-                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                  6,
-                y + 5,
-                {
-                  width: columnWidth[2] + columnWidth[3],
-                  align: 'center',
-                },
-              );
-            }
-            doc
-              .rect(
-                tableLeft +
-                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                  6.5,
-                y + rowHeight,
-                columnWidth[i],
-                rowHeight,
-              )
-              .stroke();
-            heightSubHeader = rowHeight;
-            rowHeight = rowHeight * 2;
-          } else {
-            if (isLastRow) {
-              lastRowColumns.forEach(({ width, offset }) => {
+        if (!height) {
+          row.forEach((cell, i) => {
+            if (isHeader && i > 1) {
+              rowHeight = rowHeight / 2;
+              if (i === 2) {
                 doc
-                  .rect(tableLeft + offset + 6.5, y, width, rowHeight)
+                  .rect(
+                    tableLeft +
+                      columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                      6.5,
+                    y,
+                    columnWidth[2] + columnWidth[3],
+                    rowHeight,
+                  )
                   .stroke();
-              });
-            } else {
+
+                doc.text(
+                  'จำนวนชั่วโมง',
+                  tableLeft +
+                    columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                    6,
+                  y + 5,
+                  {
+                    width: columnWidth[2] + columnWidth[3],
+                    align: 'center',
+                  },
+                );
+              }
               doc
                 .rect(
                   tableLeft +
                     columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
                     6.5,
-                  y,
+                  y + rowHeight,
                   columnWidth[i],
                   rowHeight,
                 )
                 .stroke();
-            }
-          }
-
-          doc.font(isHeader ? fontBold : fontNormal);
-
-          const lines = Array.isArray(cell) ? cell : [cell];
-          const lineHeight = doc.heightOfString(lines[0]);
-
-          lines.forEach((line, index) => {
-            let textLeftPosition =
-              tableLeft +
-              columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-              10 +
-              8;
-
-            let textWidth = columnWidth[i] - 20;
-
-            if (isLastRow) {
-              lastRowColumns.forEach(({ width, offset }, i) => {
-                let textLeftPosition = tableLeft + offset + 10 + 8;
-                let textWidth = width - 20;
-
-                doc.text(row[i], textLeftPosition, y + 10, {
-                  width: textWidth,
-                  align: 'center',
-                });
-              });
+              heightSubHeader = rowHeight;
+              rowHeight = rowHeight * 2;
             } else {
-              doc.text(
-                line,
-                textLeftPosition,
-                y +
-                  10 +
-                  (isHeader && index * lineHeight) +
-                  (isHeader && i > 1 && heightSubHeader - 5),
-                {
-                  width: textWidth,
-                  align: isHeader || i > 1 ? 'center' : 'left',
-                },
-              );
+              if (isLastRow) {
+                lastRowColumns.forEach(({ width, offset }) => {
+                  doc
+                    .rect(tableLeft + offset + 6.5, y, width, rowHeight)
+                    .stroke();
+                });
+              } else {
+                doc
+                  .rect(
+                    tableLeft +
+                      columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                      6.5,
+                    y,
+                    columnWidth[i],
+                    rowHeight,
+                  )
+                  .stroke();
+              }
             }
-          });
-        });
 
+            doc.font(isHeader ? fontBold : fontNormal);
+
+            const lines = Array.isArray(cell) ? cell : [cell];
+            const lineHeight = doc.heightOfString(lines[0]);
+
+            lines.forEach((line, index) => {
+              let textLeftPosition =
+                tableLeft +
+                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                10 +
+                8;
+
+              let textWidth = columnWidth[i] - 20;
+
+              if (isLastRow) {
+                lastRowColumns.forEach(({ width, offset }, i) => {
+                  let textLeftPosition = tableLeft + offset + 10 + 8;
+                  let textWidth = width - 20;
+
+                  doc.text(row[i], textLeftPosition, y + 10, {
+                    width: textWidth,
+                    align: 'center',
+                  });
+                });
+              } else {
+                doc.text(
+                  line,
+                  textLeftPosition,
+                  y +
+                    10 +
+                    (isHeader && index * lineHeight) +
+                    (isHeader && i > 1 && heightSubHeader - 5),
+                  {
+                    width: textWidth,
+                    align: isHeader || i > 1 ? 'center' : 'left',
+                  },
+                );
+              }
+            });
+          });
+        }
         return rowHeight;
       }
 
@@ -470,14 +481,26 @@ export const buildPart2Content = (
 
       function drawTable() {
         let currentY = tableTop + 49;
+        const maxY = 780;
+        if (currentY > maxY) {
+          doc.addPage();
+          currentY = 47;
+        }
         rows.forEach((row) => {
-          if (doc.y > 730) {
+          const rowHeight = drawRow(currentY, row, false, false, true);
+          if (currentY + rowHeight > maxY) {
+            console.log(currentY + rowHeight);
+
             doc.addPage();
             currentY = doc.y;
+            drawRow(currentY, row);
+          } else {
+            drawRow(currentY, row);
           }
-          const rowHeight = drawRow(currentY, row);
+
           currentY += rowHeight;
         });
+
         drawRow(currentY, ['รวม', totalLec, totalLab], false, true);
       }
 

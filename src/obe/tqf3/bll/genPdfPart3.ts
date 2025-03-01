@@ -114,7 +114,7 @@ export const buildPart3Content = (
         return textHeight + 20;
       }
 
-      function drawRow(y, row, isHeader = false) {
+      function drawRow(y, row, isHeader = false, height = false) {
         let rowHeight = 0;
 
         row.forEach((cell, i) => {
@@ -127,38 +127,40 @@ export const buildPart3Content = (
 
         doc.lineWidth(0.5);
 
-        row.forEach((cell, i) => {
-          doc
-            .rect(
-              tableLeft +
-                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                8,
-              y,
-              columnWidth[i],
-              rowHeight,
-            )
-            .stroke();
+        if (!height) {
+          row.forEach((cell, i) => {
+            doc
+              .rect(
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  8,
+                y,
+                columnWidth[i],
+                rowHeight,
+              )
+              .stroke();
 
-          doc.font(isHeader ? fontBold : fontNormal);
+            doc.font(isHeader ? fontBold : fontNormal);
 
-          const lines = Array.isArray(cell) ? cell : [cell];
-          const lineHeight = doc.heightOfString(lines[0]);
+            const lines = Array.isArray(cell) ? cell : [cell];
+            const lineHeight = doc.heightOfString(lines[0]);
 
-          lines.forEach((line, index) => {
-            doc.text(
-              line,
-              tableLeft +
-                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
-                10 +
-                8,
-              y + 10 + (isHeader && index * lineHeight),
-              {
-                width: columnWidth[i] - 20,
-                align: isHeader || i === 3 ? 'center' : 'left',
-              },
-            );
+            lines.forEach((line, index) => {
+              doc.text(
+                line,
+                tableLeft +
+                  columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                  10 +
+                  8,
+                y + 10 + (isHeader && index * lineHeight),
+                {
+                  width: columnWidth[i] - 20,
+                  align: isHeader || i === 3 ? 'center' : 'left',
+                },
+              );
+            });
           });
-        });
+        }
 
         return rowHeight;
       }
@@ -168,13 +170,25 @@ export const buildPart3Content = (
       }
 
       function drawTable() {
-        let currentY = tableTop + 63;
+        let currentY = tableTop + 63; // Initial position
+        const maxY = 780;
+
+        if (currentY > maxY) {
+          doc.addPage();
+          currentY = 47;
+        }
         rows.forEach((row) => {
-          if (doc.y > 730) {
+          // not draw table return only height
+          const rowHeight = drawRow(currentY, row, false, true);
+
+          if (currentY + rowHeight > maxY) {
             doc.addPage();
             currentY = doc.y;
+            drawRow(currentY, row);
+          } else {
+            drawRow(currentY, row);
           }
-          const rowHeight = drawRow(currentY, row);
+
           currentY += rowHeight;
         });
       }
