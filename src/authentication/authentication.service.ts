@@ -3,15 +3,8 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
-import {
-  TokenDTO,
-  CmuEntraIDBasicInfoDTO,
-  LoginDTO,
-  CmuEntraIDStdInfoDTO,
-  CmuEntraIDEmpInfoDTO,
-} from './dto/dto';
+import { TokenDTO, CmuEntraIDBasicInfoDTO, LoginDTO } from './dto/dto';
 import { capitalize } from 'lodash';
 import { Model } from 'mongoose';
 import { User } from 'src/obe/user/schemas/user.schema';
@@ -69,34 +62,6 @@ export class AuthenticationService {
       return null;
     }
   }
-
-  // private async getCMUStdInfoAsync(
-  //   accessToken: string,
-  // ): Promise<CmuEntraIDStdInfoDTO> {
-  //   try {
-  //     const response = await axios.get(process.env.CMU_EntraID_GET_STD_INFO, {
-  //       headers: { Authorization: 'Bearer ' + accessToken },
-  //     });
-  //     return response.data;
-  //   } catch (err) {
-  //     console.error('Error getting CMU student info:', err);
-  //     return null;
-  //   }
-  // }
-
-  // private async getCMUEmpInfoAsync(
-  //   accessToken: string,
-  // ): Promise<CmuEntraIDEmpInfoDTO> {
-  //   try {
-  //     const response = await axios.get(process.env.CMU_ENTRAID_GET_EMP_INFO, {
-  //       headers: { Authorization: 'Bearer ' + accessToken },
-  //     });
-  //     return response.data;
-  //   } catch (err) {
-  //     console.error('Error getting CMU employee info:', err);
-  //     return null;
-  //   }
-  // }
 
   async login(body: LoginDTO): Promise<TokenDTO> {
     const { code, redirectUri } = body;

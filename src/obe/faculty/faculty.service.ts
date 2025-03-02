@@ -71,9 +71,7 @@ export class FacultyService {
       }
       await this.ploModel.updateOne(
         { _id: requestDTO.plo },
-        {
-          $push: { curriculum: requestDTO.code },
-        },
+        { $push: { curriculum: requestDTO.code } },
       );
       return TEXT_ENUM.Success;
     } catch (error) {

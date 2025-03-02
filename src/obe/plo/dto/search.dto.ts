@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsString } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { SearchDTO } from 'src/common/dto/search.dto';
 
@@ -26,18 +20,4 @@ export class PLOSearchDTO extends SearchDTO {
     else return false;
   })
   all = false;
-
-  @IsOptional()
-  @IsNumber()
-  @Transform((transformFn) => {
-    return parseInt(transformFn.value);
-  })
-  year;
-
-  @IsOptional()
-  @IsNumber()
-  @Transform((transformFn) => {
-    return parseInt(transformFn.value);
-  })
-  semester;
 }
