@@ -1,17 +1,26 @@
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { SearchDTO } from 'src/common/dto/search.dto';
 
 export class EnrollCourseSearchDTO extends SearchDTO {
+  @IsOptional()
   @IsNumber()
   @Transform((transformFn) => {
     return parseInt(transformFn.value);
   })
-  year = 2567;
+  year;
 
+  @IsOptional()
   @IsNumber()
   @Transform((transformFn) => {
     return parseInt(transformFn.value);
   })
-  semester = 1;
+  semester;
+
+  @IsBoolean()
+  @Transform((transformFn) => {
+    if (transformFn.value === 'true') return true;
+    else return false;
+  })
+  all = false;
 }

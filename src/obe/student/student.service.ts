@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Course } from '../course/schemas/course.schema';
 import { User } from '../user/schemas/user.schema';
 import { EnrollCourseSearchDTO } from './dto/search.dto';
-import { CLO, TQF3 } from '../tqf3/schemas/tqf3.schema';
+import { TQF3 } from '../tqf3/schemas/tqf3.schema';
 import { TQF5 } from '../tqf5/schemas/tqf5.schema';
-import { sortData } from 'src/common/function/function';
 import { CourseManagement } from '../courseManagement/schemas/courseManagement.schema';
 import { PLO } from '../plo/schemas/plo.schema';
 
@@ -14,7 +12,6 @@ import { PLO } from '../plo/schemas/plo.schema';
 export class StudentService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
-    @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(CourseManagement.name)
     private readonly courseManagementModel: Model<CourseManagement>,
     @InjectModel(PLO.name) private readonly ploModel: Model<PLO>,
@@ -30,7 +27,7 @@ export class StudentService {
         .select('enrollCourses')
         .populate({
           path: 'enrollCourses.courses.course',
-          select: 'courseNo courseName type sections TQF3 TQF5',
+          select: 'year semester courseNo courseName type sections TQF3 TQF5',
           populate: [
             {
               path: 'sections',
@@ -53,10 +50,13 @@ export class StudentService {
             { path: 'TQF5' },
           ],
         });
-      const selectTerm = enrollCourses.enrollCourses?.find(
-        (term) =>
-          term.year == searchDTO.year && term.semester == searchDTO.semester,
-      )?.courses;
+      const selectTerm = searchDTO.all
+        ? enrollCourses.enrollCourses.flatMap(({ courses }) => courses)
+        : enrollCourses.enrollCourses?.find(
+            (term) =>
+              term.year == searchDTO.year &&
+              term.semester == searchDTO.semester,
+          )?.courses;
 
       const ploRequire = await this.courseManagementModel
         .find({
@@ -156,22 +156,13 @@ export class StudentService {
           ({ curriculum }) => curriculum == section.curriculum,
         )?.data;
         const plo: Partial<PLO> =
-          ploList.find(
-            ({ curriculum, data, id }) =>
-              curriculum.includes(section.curriculum) &&
-              data.find((item2: any) =>
-                coursePloRequire.find(
-                  (item) =>
-                    item.plo == id &&
-                    item.list.map((id) => id.toString()).includes(item2.id),
-                ),
-              ),
+          ploList.find(({ curriculum }) =>
+            curriculum.includes(section.curriculum),
           ) ?? {};
         const plos = [];
         if (!clos.every(({ score }) => score === '-')) {
           plo?.data?.forEach((item: any) => {
             const score = this.calPloStudentScore(item, tqf3Part7, clos);
-
             plos.push({
               ...item._doc,
               name: `PLO ${item.no}`,
@@ -182,6 +173,8 @@ export class StudentService {
         }
         return {
           id: course.id,
+          year: course.year,
+          semester: course.semester,
           courseNo: course.courseNo,
           courseName: course.courseName,
           type: course.type,
