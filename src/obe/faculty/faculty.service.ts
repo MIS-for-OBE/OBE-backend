@@ -24,25 +24,33 @@ export class FacultyService {
         throw new NotFoundException('Faculty not found');
       }
 
-      const [
-        ploCurriculumCodes,
-        courseManagementCurriculums,
-        courseCurriculums,
-      ] = await Promise.all([
-        this.getPloCurriculumCodes(facultyCode),
-        this.getCourseManagementCurriculums(),
-        this.getCourseCurriculums(),
+      const [course, courseManagement] = await Promise.all([
+        this.courseModel
+          .find({
+            ['sections.curriculum']: {
+              $in: res.curriculum.map(({ code }) => code),
+            },
+          })
+          .select('sections.curriculum'),
+        this.courseManagementModel
+          .find({
+            ['sections.curriculum']: {
+              $in: res.curriculum.map(({ code }) => code),
+            },
+          })
+          .select('sections.curriculum'),
       ]);
-      const allCurriculumCodes = [
-        ...new Set([
-          ...ploCurriculumCodes,
-          ...courseManagementCurriculums,
-          ...courseCurriculums,
-        ]),
-      ];
+      const allCurriculumCodes = new Set([
+        ...course.flatMap(({ sections }) =>
+          sections.flatMap((section) => section.curriculum).filter(Boolean),
+        ),
+        ...courseManagement.flatMap(({ sections }) =>
+          sections.flatMap((section) => section.curriculum).filter(Boolean),
+        ),
+      ]);
 
       res.curriculum.forEach((cur) => {
-        cur.disable = allCurriculumCodes.includes(cur.code);
+        cur.disable = allCurriculumCodes.has(cur.code);
       });
 
       return res;
@@ -51,30 +59,7 @@ export class FacultyService {
     }
   }
 
-  private async getPloCurriculumCodes(facultyCode: string): Promise<string[]> {
-    const plos = await this.ploModel.find({ facultyCode }).select('curriculum');
-    return plos.flatMap((plo) => plo.curriculum);
-  }
-
-  private async getCourseManagementCurriculums(): Promise<string[]> {
-    const courseManagements = await this.courseManagementModel
-      .find({ 'sections.curriculum': { $exists: true } })
-      .select('sections.curriculum');
-    return courseManagements.flatMap((course) =>
-      course.sections.map((section) => section.curriculum),
-    );
-  }
-
-  private async getCourseCurriculums(): Promise<string[]> {
-    const courses = await this.courseModel
-      .find({ 'sections.curriculum': { $exists: true } })
-      .select('sections.curriculum');
-    return courses.flatMap((course) =>
-      course.sections.map((section) => section.curriculum),
-    );
-  }
-
-  async createCurriculum(id: string, requestDTO: Curriculum): Promise<any> {
+  async createCurriculum(id: string, requestDTO: any): Promise<any> {
     try {
       const res = await this.model.findByIdAndUpdate(
         id,
@@ -84,6 +69,12 @@ export class FacultyService {
       if (!res) {
         throw new NotFoundException('Faculty not found');
       }
+      await this.ploModel.updateOne(
+        { _id: requestDTO.plo },
+        {
+          $push: { curriculum: requestDTO.code },
+        },
+      );
       return TEXT_ENUM.Success;
     } catch (error) {
       throw error;
@@ -92,7 +83,7 @@ export class FacultyService {
 
   async updateCurriculum(
     params: { id: string; code: string },
-    requestDTO: Curriculum,
+    requestDTO: any,
   ): Promise<any> {
     try {
       const res = await this.model.findOneAndUpdate(
@@ -103,6 +94,14 @@ export class FacultyService {
       if (!res) {
         throw new NotFoundException('Faculty not found');
       }
+      await this.ploModel.findOneAndUpdate(
+        { curriculum: params.code },
+        { $pull: { curriculum: requestDTO.code } },
+      );
+      await this.ploModel.updateOne(
+        { _id: requestDTO.plo },
+        { $push: { curriculum: requestDTO.code } },
+      );
       return TEXT_ENUM.Success;
     } catch (error) {
       throw error;
@@ -119,6 +118,10 @@ export class FacultyService {
       if (!res) {
         throw new NotFoundException('Faculty not found');
       }
+      await this.ploModel.findOneAndUpdate(
+        { curriculum: code },
+        { $pull: { curriculum: code } },
+      );
       return TEXT_ENUM.Success;
     } catch (error) {
       throw error;

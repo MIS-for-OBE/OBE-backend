@@ -23,15 +23,6 @@ export class PLO {
   name: string;
 
   @Prop({ required: true })
-  year: number;
-
-  @Prop({ required: true })
-  semester: number;
-
-  @Prop({ required: true, default: false })
-  isActive: boolean;
-
-  @Prop({ required: true })
   facultyCode: string;
 
   @Prop({ required: true })

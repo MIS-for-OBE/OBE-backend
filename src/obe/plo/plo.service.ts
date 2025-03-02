@@ -6,16 +6,17 @@ import {
 import { PLO } from './schemas/plo.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { ROLE } from 'src/common/enum/role.enum';
-import { Faculty } from '../faculty/schemas/faculty.schema';
-import { sortData } from 'src/common/function/function';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
+import { Course } from '../course/schemas/course.schema';
+import { CourseManagement } from '../courseManagement/schemas/courseManagement.schema';
 
 @Injectable()
 export class PLOService {
   constructor(
     @InjectModel(PLO.name) private readonly model: Model<PLO>,
-    @InjectModel(Faculty.name) private readonly facultyModel: Model<Faculty>,
+    @InjectModel(Course.name) private readonly courseModel: Model<Course>,
+    @InjectModel(CourseManagement.name)
+    private readonly courseManagementModel: Model<CourseManagement>,
   ) {}
 
   async searchPLO(facultyCode: string, searchDTO: any): Promise<any> {
@@ -24,64 +25,35 @@ export class PLOService {
       if (searchDTO.curriculum) {
         where.curriculum = { $in: searchDTO.curriculum };
       }
-      if (searchDTO.manage) {
-        where.isActive = true;
-      }
-      if (searchDTO.year && searchDTO.semester) {
-        where.$or = [
-          { year: { $lt: searchDTO.year } },
-          {
-            year: searchDTO.year,
-            semester: { $lte: searchDTO.semester },
-          },
-        ];
-      }
-      const faculty = await this.facultyModel.findOne({ facultyCode });
       const totalCount = await this.model.countDocuments(where);
-      const data = await this.model
-        .find(where)
-        .sort({ year: 'desc', semester: 'desc' });
+      const data: any = await this.model.find(where).sort({ name: 'asc' });
       if (data && data.length) {
-        data.forEach((plo) => {
+        for (const plo of data) {
           plo.data.sort((a, b) => a.no - b.no);
-        });
+          const [course, courseManagement] = await Promise.all([
+            this.courseModel
+              .find({ ['sections.curriculum']: { $in: plo.curriculum } })
+              .select('sections.curriculum'),
+            this.courseManagementModel
+              .find({ ['sections.curriculum']: { $in: plo.curriculum } })
+              .select('sections.curriculum'),
+          ]);
+          const allCurriculumCodes = new Set([
+            ...course.flatMap(({ sections }) =>
+              sections.flatMap((section) => section.curriculum).filter(Boolean),
+            ),
+            ...courseManagement.flatMap(({ sections }) =>
+              sections.flatMap((section) => section.curriculum).filter(Boolean),
+            ),
+          ]);
+          if (!plo.curriculum.length) plo._doc.canEdit = true;
+          plo.curriculum.forEach((cur) => {
+            plo._doc.canEdit = allCurriculumCodes.has(cur);
+          });
+        }
       }
-      if (searchDTO.year && searchDTO.semester) {
-        const seenCurricula = new Set<string>();
-        const filteredPLOs: PLO[] = data.filter((plo) => {
-          const hasOverlap = plo.curriculum.some((cur) =>
-            seenCurricula.has(cur),
-          );
-          if (!hasOverlap) {
-            plo.curriculum.forEach((cur) => seenCurricula.add(cur));
-            return true;
-          }
-          return false;
-        });
-        return { totalCount, plos: filteredPLOs };
-      }
-      if (searchDTO.manage || searchDTO.all) {
-        return { totalCount, plos: data };
-      }
-      const curCodes = searchDTO.curriculum
-        ? searchDTO.curriculum
-        : faculty.curriculum.map(({ code }) => code);
-      const plos = curCodes.map((cur) => {
-        return {
-          ...faculty.curriculum.find(({ code }) => code == cur),
-          collections: [],
-        };
-      });
-      plos.forEach((plo: any) => {
-        data.forEach((collection) => {
-          if (collection.curriculum.includes(plo.code)) {
-            plo.collections.push(collection);
-          }
-        });
-      });
-      const filteredPLOs = plos.filter((plo) => plo.collections.length > 0);
-      sortData(filteredPLOs, 'curriculumEN', 'string');
-      return { totalCount, plos: filteredPLOs };
+
+      return { totalCount, plos: data };
     } catch (error) {
       throw error;
     }
@@ -89,37 +61,35 @@ export class PLOService {
 
   async searchOnePLO(facultyCode: string, searchDTO: any): Promise<any> {
     try {
-      const filter: any = {};
+      const where: any = { facultyCode };
       if (searchDTO.name) {
-        filter.name = searchDTO.name;
-      } else {
-        if (searchDTO.year && searchDTO.semester) {
-          filter.$or = [
-            { year: { $lt: searchDTO.year } },
-            {
-              year: searchDTO.year,
-              semester: { $lte: searchDTO.semester },
-            },
-          ];
-        } else if (searchDTO.year) {
-          filter.year = { $lte: searchDTO.year };
-        }
-        if (searchDTO.curriculum) {
-          filter.curriculum = searchDTO.curriculum;
-        }
+        where.name = searchDTO.name;
+      } else if (searchDTO.curriculum) {
+        where.curriculum = searchDTO.curriculum;
       }
-      const plosMatch = await this.model
-        .find(filter)
-        .sort({ year: 'desc', semester: 'desc' });
-      const plo = searchDTO.name
-        ? plosMatch[0]
-        : plosMatch.find(
-            (item) =>
-              item.year <= searchDTO.year &&
-              (searchDTO.semester ? item.semester <= searchDTO.semester : true),
-          );
+      const plo: any = await this.model.findOne(where);
       if (plo && plo.data) {
         plo.data.sort((a, b) => a.no - b.no);
+        const [course, courseManagement] = await Promise.all([
+          this.courseModel
+            .find({ ['sections.curriculum']: { $in: plo.curriculum } })
+            .select('sections.curriculum'),
+          this.courseManagementModel
+            .find({ ['sections.curriculum']: { $in: plo.curriculum } })
+            .select('sections.curriculum'),
+        ]);
+        const allCurriculumCodes = new Set([
+          ...course.flatMap(({ sections }) =>
+            sections.flatMap((section) => section.curriculum).filter(Boolean),
+          ),
+          ...courseManagement.flatMap(({ sections }) =>
+            sections.flatMap((section) => section.curriculum).filter(Boolean),
+          ),
+        ]);
+        if (!plo.curriculum.length) plo._doc.canEdit = true;
+        plo.curriculum.forEach((cur) => {
+          plo._doc.canEdit = allCurriculumCodes.has(cur);
+        });
       }
       return plo || {};
     } catch (error) {
@@ -144,27 +114,7 @@ export class PLOService {
 
   async createPLO(requestDTO: any): Promise<PLO> {
     try {
-      const existPloWithCur = await this.model.find({
-        semester: requestDTO.semester,
-        year: requestDTO.year,
-      });
-      if (existPloWithCur) {
-        const existCur = [];
-        existPloWithCur.forEach((plo) => {
-          requestDTO.curriculum.forEach((cur) => {
-            if (plo.curriculum.includes(cur) && !existCur.includes(cur))
-              existCur.push(cur);
-          });
-        });
-        if (existCur.length) {
-          throw new BadRequestException({
-            title: `Curriculum PLO Conflict`,
-            message: `${existCur.join(', ')} already exist PLO for semester ${requestDTO.semester}/${requestDTO.year}.`,
-          });
-        }
-      }
-      const newPLO = await this.model.create(requestDTO);
-      return newPLO;
+      return await this.model.create(requestDTO);
     } catch (error) {
       throw error;
     }
