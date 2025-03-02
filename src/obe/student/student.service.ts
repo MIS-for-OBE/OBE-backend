@@ -171,10 +171,12 @@ export class StudentService {
         if (!clos.every(({ score }) => score === '-')) {
           plo?.data?.forEach((item: any) => {
             const score = this.calPloStudentScore(item, tqf3Part7, clos);
+
             plos.push({
               ...item._doc,
               name: `PLO ${item.no}`,
-              score,
+              score: score == '-' ? 0 : score,
+              ...(score == '-' && { notMap: true }),
             });
           });
         }
@@ -246,7 +248,7 @@ export class StudentService {
     if (!scores.length) return '-';
     const assigns = scores
       .filter(({ assignmentName }) =>
-        tqf5Part2?.assignments.map((e) =>
+        tqf5Part2?.assignments?.map((e) =>
           e.questions
             .flatMap((s) => s.substring(0, s.lastIndexOf('-')))
             .includes(assignmentName),
