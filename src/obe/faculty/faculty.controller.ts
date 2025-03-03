@@ -31,14 +31,17 @@ export class FacultyController {
 
   @Post('/:id')
   async createCurriculum(
+    @Request() req,
     @Param('id') id: string,
     @Body() requestDTO: Curriculum,
   ): Promise<ResponseDTO<Faculty>> {
-    return this.service.createCurriculum(id, requestDTO).then((result) => {
-      const responseDTO = new ResponseDTO<Faculty>();
-      responseDTO.data = result;
-      return responseDTO;
-    });
+    return this.service
+      .createCurriculum(req.user, id, requestDTO)
+      .then((result) => {
+        const responseDTO = new ResponseDTO<Faculty>();
+        responseDTO.data = result;
+        return responseDTO;
+      });
   }
 
   @Put('/:id/:code')

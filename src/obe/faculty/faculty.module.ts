@@ -9,11 +9,13 @@ import {
   CourseManagement,
   CourseManagementSchema,
 } from '../courseManagement/schemas/courseManagement.schema';
+import { User, UserSchema } from '../user/schemas/user.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Faculty.name, schema: FacultySchema },
+      { name: User.name, schema: UserSchema },
       { name: PLO.name, schema: PLOSchema },
       { name: Course.name, schema: CourseSchema },
       { name: CourseManagement.name, schema: CourseManagementSchema },
