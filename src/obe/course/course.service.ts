@@ -325,15 +325,17 @@ export class CourseService {
     }
   }
 
-  async getExistsCourseName(
-    courseNo: string,
-    requestDTO: any,
-  ): Promise<String> {
+  async getExistsCourseData(courseNo: string, requestDTO: any): Promise<any> {
     try {
       const course = await this.courseManagementModel.findOne({
         courseNo,
       });
-      if (course) return course.courseName;
+      if (course && course.descTH)
+        return {
+          name: course.courseName,
+          descTH: course.descTH,
+          descEN: course.descEN,
+        };
       else {
         const courseInfo = await axios.get(
           `${process.env.BASE_CMU_API}course-template`,
@@ -346,8 +348,12 @@ export class CourseService {
         );
         if (courseInfo.data.length) {
           const data: CmuApiTqfCourseDTO = courseInfo.data[0];
-          return data.CourseTitleEng;
-        } else return '';
+          return {
+            name: data.CourseTitleEng,
+            descTH: data.CourseDescriptionTha,
+            descEN: data.CourseDescriptionEng,
+          };
+        } else return { name: '', descTH: '', descEN: '' };
       }
     } catch (error) {
       throw error;

@@ -272,13 +272,14 @@ export class TQF3Service {
       );
       let data: CmuApiTqfCourseDTO = courseInfo.data[0];
       data = { ...data, ...requestDTO };
-
+      const course = await this.courseModel.findOne({
+        year: requestDTO.academicYear,
+        semester: requestDTO.academicTerm,
+        courseNo: requestDTO.courseNo,
+      });
+      data.CourseDescriptionTha = course.descTH;
+      data.CourseDescriptionEng = course.descEN;
       if (!data.CourseID) {
-        const course = await this.courseModel.findOne({
-          year: requestDTO.academicYear,
-          semester: requestDTO.academicTerm,
-          courseNo: requestDTO.courseNo,
-        });
         data.AcademicYear = course.year.toString();
         data.AcademicTerm = course.semester;
         data.CourseID = course.courseNo;

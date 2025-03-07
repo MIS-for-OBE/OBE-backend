@@ -109,6 +109,12 @@ export class Course {
   @Prop({ required: true })
   courseName: string;
 
+  @Prop({ required: true })
+  descTH: string;
+
+  @Prop({ required: true })
+  descEN: string;
+
   @Prop({ required: true, enum: COURSE_TYPE })
   type: COURSE_TYPE;
 

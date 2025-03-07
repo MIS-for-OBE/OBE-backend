@@ -47,13 +47,13 @@ export class CourseController {
       });
   }
 
-  @Get('name/:courseNo')
-  async getExistCourseName(
+  @Get('data/:courseNo')
+  async getExistCourseData(
     @Param('courseNo') courseNo: string,
     @Query() requestDTO: any,
   ): Promise<ResponseDTO<any>> {
     return this.service
-      .getExistsCourseName(courseNo, requestDTO)
+      .getExistsCourseData(courseNo, requestDTO)
       .then((result) => {
         const responseDTO = new ResponseDTO<any>();
         responseDTO.data = result;

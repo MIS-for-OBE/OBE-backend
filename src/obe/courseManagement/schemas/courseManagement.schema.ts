@@ -62,6 +62,12 @@ export class CourseManagement {
   courseName: string;
 
   @Prop({ required: true })
+  descTH: string;
+
+  @Prop({ required: true })
+  descEN: string;
+
+  @Prop({ required: true })
   updatedYear: number;
 
   @Prop({ required: true })
