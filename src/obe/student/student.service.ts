@@ -83,7 +83,7 @@ export class StudentService {
         ]),
       );
       const ploList = await this.ploModel.find();
-
+      const curriculums: any[] = [];
       const formattedCourses = selectTerm?.map((e: any) => {
         const { course } = e;
         const { sections } = course;
@@ -149,7 +149,7 @@ export class StudentService {
         });
         const coursePloRequire = ploRequireMap
           .get(course.courseNo)
-          .ploRequire.filter(
+          .ploRequire.find(
             ({ curriculum }) => curriculum == section.curriculum,
           );
         const tqf3Part7 = tqf3.part7?.list.find(
@@ -171,6 +171,15 @@ export class StudentService {
             });
           });
         }
+        const findCur = curriculums.find(
+          ({ curriculum }) => curriculum == section.curriculum,
+        );
+        if (searchDTO.all && section.curriculum && plo.data && !findCur) {
+          curriculums.push({
+            curriculum: section.curriculum,
+            plo,
+          });
+        }
         return {
           id: course.id,
           year: course.year,
@@ -178,18 +187,56 @@ export class StudentService {
           courseNo: course.courseNo,
           courseName: course.courseName,
           type: course.type,
+          curriculum: section.curriculum,
           section,
           scores: userScores,
           clos,
           plo,
           plos,
+          requirePlo: coursePloRequire?.list,
         };
+      });
+
+      curriculums.forEach((cur) => {
+        const courseMatchCur = formattedCourses.filter(
+          ({ curriculum }) => curriculum == cur.curriculum,
+        );
+        cur.plos = cur.plo.data.map((item: any) => {
+          const list = courseMatchCur.filter(
+            ({ plos, requirePlo }) =>
+              requirePlo.find((plo) => plo == item.id) &&
+              plos.find(
+                ({ name, notMap }) => name == `PLO ${item.no}` && !notMap,
+              ),
+          );
+          const courses =
+            list.map(({ courseNo, courseName, section }) => ({
+              courseNo,
+              courseName,
+              topic: section.topic,
+            })) || [];
+          const score =
+            courses.length == 0
+              ? 0
+              : list
+                  .map(({ plos }) => {
+                    return plos.find((plo) => plo.no == item.no);
+                  })
+                  .reduce((a, { score }) => a + score, 0) / courses.length;
+          return {
+            ...item._doc,
+            name: `PLO ${item.no}`,
+            score: score,
+            courses,
+          };
+        });
       });
 
       const data = {
         year: searchDTO.year,
         semester: searchDTO.semester,
         courses: formattedCourses || [],
+        curriculums,
       };
 
       return data;
