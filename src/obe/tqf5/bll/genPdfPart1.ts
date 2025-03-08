@@ -54,6 +54,7 @@ export const buildPart1Content = (
     gradeTotals.F +
     gradeTotals.S +
     gradeTotals.U +
+    gradeTotals.W +
     gradeTotals.P;
 
   doc
@@ -73,7 +74,7 @@ export const buildPart1Content = (
   doc.x += 10;
   doc
     .font(fontNormal, 14)
-    .text(`${totalReg - gradeTotals.F - gradeTotals.U - gradeTotals.P} คน`)
+    .text(`${totalReg - gradeTotals.U - gradeTotals.P - gradeTotals.W} คน`)
     .moveDown(0.6);
   // 3
   doc.x -= 10;
@@ -94,7 +95,8 @@ export const buildPart1Content = (
 
   let rows = grades.map((grade) => {
     const percent = (
-      (gradeTotals[grade.replace('+', 'plus')] / totalReg) *
+      (gradeTotals[grade.replace('+', 'plus')] /
+        (totalReg - gradeTotals.U - gradeTotals.P - gradeTotals.W)) *
       100
     ).toFixed(2);
 
@@ -195,7 +197,7 @@ export const buildPart1Content = (
     });
   });
 
-  let temp = 645;
+  let temp = 730;
   let addIndexNewInstance = 0;
 
   let newTable = 0;
@@ -402,7 +404,10 @@ export const buildPart1Content = (
     .moveDown(0.6);
 
   doc.x += 12;
-  doc.font(fontNormal, 14).text(`${tqf5.abnormalScoreFactor}`).moveDown(0.6);
+  doc
+    .font(fontNormal, 14)
+    .text(`${tqf5.abnormalScoreFactor ? tqf5.abnormalScoreFactor : 'ไม่มี'}`)
+    .moveDown(0.6);
   doc.addPage();
   // 6
   doc
@@ -430,8 +435,12 @@ export const buildPart1Content = (
     .font(fontBold, 14)
     .text('7. การทวนสอบผลสัมฤทธิ์ของนักศึกษา (ให้อ้างอิงจาก มคอ. 2 และ 3)', {
       align: 'left',
-    });
+    })
+    .moveDown(0.6);
 
   doc.x += 12;
-  doc.font(fontNormal, 14).text(`${tqf5.reviewingSLO}`).moveDown(0.6);
+  doc
+    .font(fontNormal, 14)
+    .text(`${tqf5.reviewingSLO ? tqf5.reviewingSLO : 'ไม่มี'}`)
+    .moveDown(0.6);
 };
