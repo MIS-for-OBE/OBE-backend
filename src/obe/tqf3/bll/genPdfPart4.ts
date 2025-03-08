@@ -1,5 +1,6 @@
 import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import { Part4TQF3 } from '../schemas/tqf3.schema';
+import { log } from 'console';
 
 export const buildPart4Content = (
   doc: PDFKit.PDFDocument,
@@ -20,6 +21,7 @@ export const buildPart4Content = (
 
   //Table
   doc.font(fontBold).text('แผนการประเมินการเรียนรู้', 57, doc.y);
+
   buildTqf3Part4Table(doc, font, data);
 };
 
@@ -32,7 +34,7 @@ export const buildTqf3Part4Table = (
   },
   data: Part4TQF3,
 ) => {
-  const { fontNormal, fontBold, emoji } = font;
+  const { fontNormal, fontBold } = font;
   doc.moveDown(0.75);
 
   const headers = [
@@ -64,6 +66,7 @@ export const buildTqf3Part4Table = (
     const textHeight = doc.heightOfString(text, {
       width: columnWidth - 28,
     });
+
     return textHeight + 20;
   }
 
@@ -134,53 +137,117 @@ export const buildTqf3Part4Table = (
     });
   });
 
-  let temp = 645;
-  let addIndexNewInstance = 0;
+  function findMaxCharsForHeight(text, columnWidth, maxHeight) {
+    let bestFitLength = text.length;
 
-  let newTable = 0;
+    while (bestFitLength > 0) {
+      let testText = text.substring(0, bestFitLength);
+      let testHeight = calculateRowHeight(testText, columnWidth);
+
+      console.log('Checking length:', bestFitLength);
+      console.log('maxHeight:', maxHeight);
+      console.log('testHeight:', testHeight);
+
+      if (
+        (maxHeight - testHeight > 15 && testHeight < maxHeight) ||
+        (testHeight === maxHeight && testHeight < 35 && maxHeight < 35)
+      ) {
+        return bestFitLength; // Return the first valid length
+      }
+
+      bestFitLength -= bestFitLength > 20 ? 20 : 1;
+    }
+
+    return 0; // If no substring fits, return 0
+  }
+
+  let temp = 600;
+  let pageIndex = 0;
+  let addIndexNewInstance = 0;
+  let sumAllSubTable = 0;
+  let previousCloIndex = null;
+  let sumSubTable = 0;
+  let difSpace = 25;
+
   evalRow.forEach((e, i) => {
     if (e && typeof e.height === 'number') {
-      newTable += e.height;
+      sumAllSubTable += e.height;
 
-      // console.log(`CLO ${e.cloIndex}`, `order ${e.order}`, e.height);
-      // console.log(`newTable ${newTable}`);
-
-      if (newTable > temp) {
-        const indexToPop = rows.findIndex((row) => row[0] === e.clo);
-        let pageIndex =
-          Number(e.cloIndex) +
-          (e.order !== 0 ? 1 + addIndexNewInstance : addIndexNewInstance);
-        addPageIndex.push(pageIndex);
-        // console.log('pageIndex', pageIndex);
-
-        if (indexToPop !== -1) {
-          if (e.order !== 0) {
-            const poppedItem = rows.splice(indexToPop, 1)[0];
-
-            const newInstances = [
-              [
-                poppedItem[0],
-                poppedItem[1].slice(0, e.order),
-                poppedItem[2].slice(0, e.order),
-                poppedItem[3].slice(0, e.order),
-              ],
-              [
-                ' ',
-                poppedItem[1].slice(e.order),
-                poppedItem[2].slice(e.order),
-                poppedItem[3].slice(e.order),
-              ],
-            ];
-
-            temp = 755;
-            addIndexNewInstance++;
-
-            rows.splice(indexToPop, 0, ...newInstances);
-          }
-        } else {
-        }
-        newTable = e.height;
+      if (e.cloIndex !== previousCloIndex) {
+        sumSubTable = 0;
       }
+
+      sumSubTable += e.height;
+      const heightTextClo = calculateRowHeight(e.clo, columnWidth[0]);
+      let leftSpace = temp - (sumAllSubTable - e.height);
+      if (leftSpace < 0) leftSpace = leftSpace * -1;
+
+      // check
+      if (sumAllSubTable >= temp) {
+        const indexToPop = rows.findIndex((row) => row[0] === e.clo);
+        const isSeperateText = false;
+        // e !== 0 &&
+        // heightTextClo > leftSpace &&
+        // sumAllSubTable - e.height > leftSpace;
+
+        // pageIndex =
+        //   Number(e.cloIndex) +
+        //   (heightTextClo < leftSpace && e.order !== 0 ? 1 : 0);
+
+        addPageIndex.push(pageIndex);
+
+        let firstPart = e.clo;
+        let secondPart = '';
+
+        // if (isSeperateText) {
+        //   const maxHeight = leftSpace;
+
+        //   if (maxHeight < 0) maxHeight * -1;
+        //   const maxChar = findMaxCharsForHeight(
+        //     e.clo,
+        //     columnWidth[0],
+        //     maxHeight,
+        //   );
+        //   firstPart = e.clo.substring(0, maxChar);
+        //   secondPart = e.clo.substring(maxChar);
+
+        // if (indexToPop !== -1) {
+        //   if (heightTextClo < leftSpace + 40 && e.order !== 0) {
+        //     const poppedItem = rows.splice(indexToPop, 1)[0];
+
+        //     const newInstances = [
+        //       [
+        //         firstPart,
+
+        //         poppedItem[1].slice(0, e.order),
+
+        //         poppedItem[2].slice(0, e.order),
+
+        //         poppedItem[3].slice(0, e.order),
+        //       ],
+        //       [
+        //         secondPart || ' ',
+
+        //         poppedItem[1].slice(e.order),
+
+        //         poppedItem[2].slice(e.order),
+
+        //         poppedItem[3].slice(e.order),
+        //       ],
+        //     ];
+        //     addIndexNewInstance++;
+        //     rows.splice(indexToPop, 0, ...newInstances);
+        //   }
+        // }
+
+        temp = 690;
+        sumAllSubTable = e.height;
+        sumSubTable = e.height;
+      }
+
+      previousCloIndex = e.cloIndex;
+      difSpace = 35;
+      pageIndex = 0;
     }
   });
 
@@ -188,7 +255,15 @@ export const buildTqf3Part4Table = (
   cloHeight = [];
   findEachEvalRowHeight(rows, subRowHeight, cloHeight);
 
-  function drawSubTable(x, y, data, subTableWidth, col, cloIndex) {
+  function drawSubTable(
+    x,
+    y,
+    data,
+    subTableWidth,
+    col,
+    cloIndex,
+    height = false,
+  ) {
     const eachRowHeight: any[] = [];
     subRowHeight.map((h) => {
       if (h.clo === cloIndex) {
@@ -212,19 +287,20 @@ export const buildTqf3Part4Table = (
         subCellHeight = eachRowHeight[i].height;
       }
 
-      doc.rect(x, subTableY, subTableWidth, subCellHeight).stroke();
+      if (!height) {
+        doc.rect(x, subTableY, subTableWidth, subCellHeight).stroke();
 
-      doc.font(fontNormal).text(row, x + 12 + (col > 1 && 4), subTableY + 8, {
-        width: subTableWidth - 30,
-        align: col > 1 ? 'center' : 'left',
-      });
-
+        doc.font(fontNormal).text(row, x + 12 + (col > 1 && 4), subTableY + 8, {
+          width: subTableWidth - 30,
+          align: col > 1 ? 'center' : 'left',
+        });
+      }
       subTableY += subCellHeight;
     });
     return subTableY - y;
   }
 
-  function drawRow(y, row, isHeader = false, cloIndex = null) {
+  function drawRow(y, row, isHeader = false, cloIndex = null, height = false) {
     let rowHeight = 0;
 
     row.forEach((cell, i) => {
@@ -232,6 +308,7 @@ export const buildTqf3Part4Table = (
 
       if (i !== 0 && Array.isArray(cell) && !isHeader) {
         const subTableWidth = columnWidth[i];
+
         const subTableHeight = drawSubTable(
           tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 8,
           y,
@@ -239,6 +316,7 @@ export const buildTqf3Part4Table = (
           subTableWidth,
           i,
           cloIndex,
+          height,
         );
 
         rowHeight = Math.max(rowHeight, subTableHeight);
@@ -251,35 +329,39 @@ export const buildTqf3Part4Table = (
       }
     });
 
-    row.forEach((cell, i) => {
-      doc
-        .rect(
-          tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 8,
-          y,
-          columnWidth[i],
-          rowHeight,
-        )
-        .stroke();
+    if (!height) {
+      row.forEach((cell, i) => {
+        doc
+          .rect(
+            tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 8,
+            y,
+            columnWidth[i],
+            rowHeight,
+          )
+          .stroke();
 
-      doc.font(isHeader ? fontBold : fontNormal);
+        doc.font(isHeader ? fontBold : fontNormal);
 
-      if (i === 0 || !Array.isArray(cell) || isHeader) {
-        const lines = Array.isArray(cell) ? cell : [cell];
-        const lineHeight = doc.heightOfString(lines[0]);
+        if (i === 0 || !Array.isArray(cell) || isHeader) {
+          const lines = Array.isArray(cell) ? cell : [cell];
+          const lineHeight = doc.heightOfString(lines[0]);
 
-        lines.forEach((line, index) => {
-          doc.text(
-            line,
-            tableLeft + columnWidth.slice(0, i).reduce((a, b) => a + b, 0) + 18,
-            y + 10 + (isHeader ? index * lineHeight : 0),
-            {
-              width: columnWidth[i] - 20,
-              align: isHeader ? 'center' : 'left',
-            },
-          );
-        });
-      }
-    });
+          lines.forEach((line, index) => {
+            doc.text(
+              line,
+              tableLeft +
+                columnWidth.slice(0, i).reduce((a, b) => a + b, 0) +
+                18,
+              y + 10 + (isHeader ? index * lineHeight : 0),
+              {
+                width: columnWidth[i] - 20,
+                align: isHeader ? 'center' : 'left',
+              },
+            );
+          });
+        }
+      });
+    }
 
     return rowHeight;
   }
@@ -289,15 +371,20 @@ export const buildTqf3Part4Table = (
   }
 
   let currentY = tableTop + 63;
-
+  let maxY = 800;
   function drawTable() {
     rows.forEach((row, cloIndex) => {
-      if (addPageIndex.includes(cloIndex)) {
+      const rowHeight = drawRow(currentY, row, false, cloIndex, true);
+      // if (addPageIndex.includes(cloIndex)) {
+      //   console.log('addPageIndex', addPageIndex);
+      if (currentY + rowHeight > maxY) {
         doc.addPage();
         currentY = doc.y;
+        drawRow(currentY, row, false, cloIndex);
+      } else {
+        drawRow(currentY, row, false, cloIndex);
       }
 
-      const rowHeight = drawRow(currentY, row, false, cloIndex);
       currentY += rowHeight;
     });
 
