@@ -179,25 +179,26 @@ export const buildTqf3Part4Table = (
 
       sumSubTable += e.height;
       const heightTextClo = calculateRowHeight(e.clo, columnWidth[0]);
-      let leftSpace = temp - (sumAllSubTable - e.height);
+      let leftSpace = temp - (sumAllSubTable - sumSubTable - e.height);
       if (leftSpace < 0) leftSpace = leftSpace * -1;
+      console.log('leftSpace', leftSpace);
+      console.log('heightTextClo', heightTextClo);
 
       // check
       if (sumAllSubTable >= temp) {
         const indexToPop = rows.findIndex((row) => row[0] === e.clo);
-        const isSeperateText = false;
+
         // e !== 0 &&
         // heightTextClo > leftSpace &&
         // sumAllSubTable - e.height > leftSpace;
 
-        // pageIndex =
-        //   Number(e.cloIndex) +
-        //   (heightTextClo < leftSpace && e.order !== 0 ? 1 : 0);
+        pageIndex =
+          Number(e.cloIndex) +
+          (heightTextClo < leftSpace && e.order !== 0
+            ? 1 + addIndexNewInstance
+            : 0);
 
         addPageIndex.push(pageIndex);
-
-        let firstPart = e.clo;
-        let secondPart = '';
 
         // if (isSeperateText) {
         //   const maxHeight = leftSpace;
@@ -211,34 +212,34 @@ export const buildTqf3Part4Table = (
         //   firstPart = e.clo.substring(0, maxChar);
         //   secondPart = e.clo.substring(maxChar);
 
-        // if (indexToPop !== -1) {
-        //   if (heightTextClo < leftSpace + 40 && e.order !== 0) {
-        //     const poppedItem = rows.splice(indexToPop, 1)[0];
+        if (indexToPop !== -1) {
+          if (heightTextClo < leftSpace && e.order !== 0) {
+            const poppedItem = rows.splice(indexToPop, 1)[0];
 
-        //     const newInstances = [
-        //       [
-        //         firstPart,
+            const newInstances = [
+              [
+                e.clo,
 
-        //         poppedItem[1].slice(0, e.order),
+                poppedItem[1].slice(0, e.order),
 
-        //         poppedItem[2].slice(0, e.order),
+                poppedItem[2].slice(0, e.order),
 
-        //         poppedItem[3].slice(0, e.order),
-        //       ],
-        //       [
-        //         secondPart || ' ',
+                poppedItem[3].slice(0, e.order),
+              ],
+              [
+                ' ',
 
-        //         poppedItem[1].slice(e.order),
+                poppedItem[1].slice(e.order),
 
-        //         poppedItem[2].slice(e.order),
+                poppedItem[2].slice(e.order),
 
-        //         poppedItem[3].slice(e.order),
-        //       ],
-        //     ];
-        //     addIndexNewInstance++;
-        //     rows.splice(indexToPop, 0, ...newInstances);
-        //   }
-        // }
+                poppedItem[3].slice(e.order),
+              ],
+            ];
+            addIndexNewInstance++;
+            rows.splice(indexToPop, 0, ...newInstances);
+          }
+        }
 
         temp = 690;
         sumAllSubTable = e.height;
