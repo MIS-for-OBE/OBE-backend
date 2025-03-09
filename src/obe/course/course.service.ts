@@ -99,6 +99,8 @@ export class CourseService {
           );
           courses = courses.map((course) => {
             const coursePloRequire = ploRequireMap.get(course.courseNo);
+            sortData(course.sections, 'sectionTopic');
+            sortData(course.sections, 'isActive', 'boolean');
             if (!coursePloRequire) return course;
             if (course.type === COURSE_TYPE.SEL_TOPIC) {
               const updatedSections = course.sections.map((sec) => ({
@@ -130,6 +132,8 @@ export class CourseService {
           courses =
             courses
               .map((course) => {
+                sortData(course.sections, 'sectionTopic');
+                sortData(course.sections, 'isActive', 'boolean');
                 if (course.type == COURSE_TYPE.SEL_TOPIC) {
                   const filter = course.sections.filter((sec) => {
                     if (tqf3Filters.length && tqf5Filters.length) {
@@ -174,6 +178,10 @@ export class CourseService {
           const totalCount = courses.length;
           return { totalCount, courses };
         } else if (searchDTO.page == 1) {
+          courses.forEach((course) => {
+            sortData(course.sections, 'sectionTopic');
+            sortData(course.sections, 'isActive', 'boolean');
+          });
           const totalCount = await this.model.countDocuments(where);
           return { totalCount, courses };
         }
