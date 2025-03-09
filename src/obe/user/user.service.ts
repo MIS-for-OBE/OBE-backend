@@ -23,10 +23,10 @@ export class UserService {
   async termsOfService(id: string, body: { agree: boolean }): Promise<any> {
     try {
       if (!body.agree) {
-        const user = await this.model.findById(id);
-        if (user.role !== ROLE.STUDENT || !user.studentId) {
-          await this.model.findByIdAndDelete(id);
-        }
+        // const user = await this.model.findById(id);
+        // if (user.role !== ROLE.STUDENT || !user.studentId) {
+        //   await this.model.findByIdAndDelete(id);
+        // }
       } else {
         const user = await this.model.findByIdAndUpdate(
           id,
