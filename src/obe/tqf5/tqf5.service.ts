@@ -74,6 +74,13 @@ export class TQF5Service {
 
       tqf5Document[params.part] = { ...requestDTO };
 
+      if (params.part === 'part2' && tqf5Document.part3) {
+        await this.model.updateOne(
+          { _id: params.id },
+          { $unset: { part3: 1 } },
+        );
+      }
+
       tqf5Document.status =
         (tqf5Document.part3 || params.part === 'part3') &&
         !requestDTO.inProgress
@@ -82,7 +89,7 @@ export class TQF5Service {
 
       await tqf5Document.save({ validateModifiedOnly: true });
 
-      return tqf5Document;
+      return await this.model.findById(params.id);
     } catch (error) {
       throw error;
     }
