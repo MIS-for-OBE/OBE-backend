@@ -214,7 +214,7 @@ export const buildPart2Content = (
 
       function calculateRowHeight(text, columnWidth) {
         const textHeight = doc.heightOfString(text, {
-          width: columnWidth - 20,
+          width: columnWidth - 28,
         });
         return textHeight + 20;
       }

@@ -1,6 +1,5 @@
 import { CmuApiTqfCourseDTO } from 'src/common/cmu-api/cmu-api.dto';
 import { Part4TQF3 } from '../schemas/tqf3.schema';
-import { log } from 'console';
 
 export const buildPart4Content = (
   doc: PDFKit.PDFDocument,
@@ -144,10 +143,6 @@ export const buildTqf3Part4Table = (
       let testText = text.substring(0, bestFitLength);
       let testHeight = calculateRowHeight(testText, columnWidth);
 
-      console.log('Checking length:', bestFitLength);
-      console.log('maxHeight:', maxHeight);
-      console.log('testHeight:', testHeight);
-
       if (
         (maxHeight - testHeight > 15 && testHeight < maxHeight) ||
         (testHeight === maxHeight && testHeight < 35 && maxHeight < 35)
@@ -181,8 +176,6 @@ export const buildTqf3Part4Table = (
       const heightTextClo = calculateRowHeight(e.clo, columnWidth[0]);
       let leftSpace = temp - (sumAllSubTable - sumSubTable - e.height);
       if (leftSpace < 0) leftSpace = leftSpace * -1;
-      console.log('leftSpace', leftSpace);
-      console.log('heightTextClo', heightTextClo);
 
       // check
       if (sumAllSubTable >= temp) {
@@ -376,8 +369,7 @@ export const buildTqf3Part4Table = (
   function drawTable() {
     rows.forEach((row, cloIndex) => {
       const rowHeight = drawRow(currentY, row, false, cloIndex, true);
-      // if (addPageIndex.includes(cloIndex)) {
-      //   console.log('addPageIndex', addPageIndex);
+
       if (currentY + rowHeight > maxY) {
         doc.addPage();
         currentY = doc.y;
