@@ -37,9 +37,6 @@ export class Faculty {
   @Prop({ required: true })
   facultyEN: string;
 
-  @Prop({ required: true })
-  code: string;
-
   @Prop()
   department: Department[];
 
