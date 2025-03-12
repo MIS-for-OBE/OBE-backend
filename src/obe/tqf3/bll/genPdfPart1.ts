@@ -251,6 +251,8 @@ export const buildPart1Content = (
         .text(data.teachingLocation.out, doc.x + 18, doc.y + 2)
         .moveDown(0.6);
       doc.x -= 17;
+    } else {
+      doc.moveDown(0.6);
     }
     doc.x -= 12;
   }

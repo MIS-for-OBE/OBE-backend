@@ -36,15 +36,20 @@ export const buildPart2Content = (
     doc
       .font(fontNormal)
       .text(
-        `${data.CourseCodeTha} ${data.CourseID.slice(-3)} (${data.CourseID}) ${data.CourseTitleTha}`,
+        `${data.CourseCodeTha ?? ''} ${data.CourseID.slice(-3)} (${data.CourseID}) ${data.CourseTitleTha}`,
         {
           align: 'left',
           continued: true,
         },
       );
 
-    // doc.moveDown(0.85);
-    doc.text(data.Credit, doc.x, doc.y - 1, { align: 'right' });
+    if (data.Credit) {
+      doc.text(data.Credit, doc.x, doc.y - 1, { align: 'right' });
+    } else {
+      doc.moveDown(0.9);
+      doc.x -= 81;
+    }
+
     doc.moveDown(0.6);
   }
 
