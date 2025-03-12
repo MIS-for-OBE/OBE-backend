@@ -46,8 +46,8 @@ export const buildPart2Content = (
     if (data.Credit) {
       doc.text(data.Credit, doc.x, doc.y - 1, { align: 'right' });
     } else {
-      doc.moveDown(0.9);
-      doc.x -= 81;
+      doc.text('', doc.x, doc.y - 1, { align: 'right' });
+      doc.moveDown(0.8);
     }
 
     doc.moveDown(0.6);
