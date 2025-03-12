@@ -43,13 +43,13 @@ export const buildPart6Content = (
           {
             label:
               'การสะท้อนคิดจากพฤติกรรมของผู้เรียน \n(Student behavior reflection)',
-            labelTH: 'การสะท้อนคิดจากพฤติกรรมของผู้เรียน',
+            labelTH: 'การสะท้อนคิด จากพฤติกรรมของผู้เรียน',
           },
           {
             label:
               "ข้อเสนอแนะผ่านเวบบอร์ดที่อาจารย์ผู้สอนได้จัดทำเป็นช่องทางการสื่อสารกับนักศึกษา \n(Suggestions through the instructor's webboard for student communication.)",
             labelTH:
-              'ข้อเสนอแนะผ่านเวบบอร์ดที่อาจารย์ผู้สอนได้จัดทำเป็นช่องทางการสื่อสารกับนักศึกษา',
+              'ข้อเสนอแนะผ่านเวบบอร์ด ที่อาจารย์ผู้สอนได้จัดทำเป็นช่องทางการสื่อสารกับนักศึกษา',
           },
           { label: 'อื่นๆ (Other)', labelTH: 'อื่นๆ' },
         ],
@@ -166,19 +166,24 @@ export const buildPart6Content = (
       doc.moveDown(0.28);
 
       item.list.forEach((e, eIndex) => {
+        const isLabel =
+          e.labelTH ===
+          'การทวนสอบการให้คะแนนการตรวจผลงานของนักศึกษาโดยกรรมการวิชาการประจำภาควิชาและคณะ';
         const checkboxSymbol = setSymbol(
           data.data[index].detail.includes(e.label),
         );
 
         doc.x += 10.5;
 
-        doc.font(emoji).text(checkboxSymbol, doc.x, doc.y);
+        doc.font(emoji).text(checkboxSymbol, doc.x, doc.y - (isLabel && 4));
 
-        doc.font(fontNormal).text(e.labelTH, doc.x + 15, doc.y - 15.3, {
-          align: 'left',
-          lineGap: index === 3 && eIndex === 1 ? 6 : 0,
-          continued: false,
-        });
+        doc
+          .font(fontNormal)
+          .text(e.labelTH, doc.x + 15, doc.y - (isLabel ? 16.3 : 15.3), {
+            align: 'left',
+            lineGap: index === 3 && eIndex === 1 ? 6 : 0,
+            continued: false,
+          });
 
         doc.x -= 10.5;
 
@@ -188,11 +193,11 @@ export const buildPart6Content = (
       });
 
       if (data.data[index].detail.includes('อื่นๆ (Other)')) {
-        doc.font(fontNormal).text(data.data[index].other, doc.x + 15, doc.y, {
+        doc.font(fontNormal).text(data.data[index].other, doc.x + 26, doc.y, {
           align: 'left',
           continued: false,
         });
-        doc.x -= 15;
+        doc.x -= 26;
       }
       doc.moveDown(0.28);
 

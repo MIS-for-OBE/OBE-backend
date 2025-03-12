@@ -63,7 +63,7 @@ export const buildPart1Content = (
     doc
       .font(fontNormal)
       .text(
-        `${data.CourseCodeTha} ${data.CourseID ? data.CourseID.slice(-3) : ''} (${data.CourseID})`,
+        `${data.CourseCodeTha ?? ''} ${data.CourseID ? data.CourseID.slice(-3) : '-'} (${data.CourseID ?? '-'})`,
       )
       .moveDown(0.6);
 
@@ -198,7 +198,11 @@ export const buildPart1Content = (
     doc
       .font(fontNormal)
       .text(
-        `ภาคการศึกษาที่ ${data.AcademicTerm} ชั้นปีที่ ${data.studentYear.join(',')}`,
+        `ภาคการศึกษาที่ ${data.AcademicTerm} ชั้นปีที่ ${(
+          data.studentYear ?? []
+        )
+          .sort((a, b) => a - b)
+          .join(',')}`,
       )
       .moveDown(0.6);
     doc.x -= 12;
@@ -219,13 +223,12 @@ export const buildPart1Content = (
       );
     doc
       .font(fontNormal)
-      .text(`ในสถานที่ตั้งของมหาวิทยาลัยเชียงใหม่ `, doc.x + 5, doc.y + 2)
-      .moveDown(0.6);
+      .text(`ในสถานที่ตั้งของมหาวิทยาลัยเชียงใหม่ `, doc.x + 5, doc.y + 2);
 
     if (data.teachingLocation.in !== undefined) {
       doc
         .font(fontNormal)
-        .text(data.teachingLocation.in, doc.x + 17, doc.y + 2)
+        .text(data.teachingLocation.in, doc.x + 18, doc.y + 2)
         .moveDown(0.6);
       doc.x -= 17;
     }
@@ -234,18 +237,18 @@ export const buildPart1Content = (
       .font(emoji)
       .text(
         setSymbol(data.teachingLocation.out !== undefined),
-        doc.x,
+        doc.x - 1,
         doc.y - 2,
         { continued: true },
       );
     doc
       .font(fontNormal)
-      .text(`นอกสถานที่ตั้งของมหาวิทยาลัยเชียงใหม่ `, doc.x + 5, doc.y + 2)
-      .moveDown(0.6);
+      .text(`นอกสถานที่ตั้งของมหาวิทยาลัยเชียงใหม่ `, doc.x + 6, doc.y + 2);
+
     if (data.teachingLocation.out !== undefined) {
       doc
         .font(fontNormal)
-        .text(data.teachingLocation.out, doc.x + 17, doc.y + 2)
+        .text(data.teachingLocation.out, doc.x + 18, doc.y + 2)
         .moveDown(0.6);
       doc.x -= 17;
     }

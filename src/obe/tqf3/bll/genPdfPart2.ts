@@ -43,11 +43,8 @@ export const buildPart2Content = (
         },
       );
 
-    doc.moveDown(0.85);
-
-    doc.text(data.Credit, {
-      align: 'right',
-    });
+    // doc.moveDown(0.85);
+    doc.text(data.Credit, doc.x, doc.y - 1, { align: 'right' });
     doc.moveDown(0.6);
   }
 
@@ -159,7 +156,7 @@ export const buildPart2Content = (
       continued: true,
     });
 
-    doc.font(fontNormal).text(data.PreText, doc.x + 10, doc.y);
+    doc.font(fontNormal).text(data.PreText ?? '-', doc.x + 10, doc.y);
 
     doc.moveDown(0.85);
   }
