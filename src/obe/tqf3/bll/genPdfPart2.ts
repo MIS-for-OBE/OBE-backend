@@ -491,8 +491,6 @@ export const buildPart2Content = (
         rows.forEach((row) => {
           const rowHeight = drawRow(currentY, row, false, false, true);
           if (currentY + rowHeight > maxY) {
-            console.log(currentY + rowHeight);
-
             doc.addPage();
             currentY = doc.y;
             drawRow(currentY, row);

@@ -256,7 +256,7 @@ export class TQF3Service {
   }
 
   async generatePDF(
-    facultyCode: string,
+    facultyCode: string | null,
     requestDTO: GeneratePdfDTO,
   ): Promise<any> {
     try {
@@ -285,11 +285,11 @@ export class TQF3Service {
         data.CourseID = course.courseNo;
         data.CourseTitleTha = course.courseName;
         data.CourseTitleEng = course.courseName;
-        data.FacultyID = facultyCode;
+        if (facultyCode) data.FacultyID = facultyCode;
       }
-      if (!data.FacultyNameEng) {
+      if (!data.FacultyNameEng && data.FacultyID) {
         const faculty = await this.facultyModel.findOne({
-          facultyCode: facultyCode,
+          facultyCode: facultyCode ?? data.FacultyID,
         });
         data.FacultyNameEng = faculty?.facultyEN;
         data.FacultyNameTha = faculty?.facultyTH;

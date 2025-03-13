@@ -23,6 +23,13 @@ export class GeneratePdfDTO extends BaseDTO {
   })
   oneFile = false;
 
+  @IsBoolean()
+  @Transform((transformFn) => {
+    if (transformFn.value === 'true') return true;
+    else return false;
+  })
+  display = false;
+
   @IsOptional()
   @IsString()
   part1?: string;

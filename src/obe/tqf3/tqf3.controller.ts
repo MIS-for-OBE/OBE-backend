@@ -18,6 +18,7 @@ import { GeneratePdfDTO } from './dto/dto';
 import * as fs from 'fs';
 import * as archiver from 'archiver';
 import { join } from 'path';
+import { Public } from 'src/auth/metadata/public.metadata';
 
 @Controller('/tqf3')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -56,6 +57,7 @@ export class TQF3Controller {
     });
   }
 
+  @Public()
   @Get('pdf')
   async generatePDF(
     @Request() req,
@@ -64,14 +66,16 @@ export class TQF3Controller {
   ): Promise<void> {
     try {
       const files = await this.service.generatePDF(
-        req.user.facultyCode,
+        req?.user?.facultyCode,
         requestDTO,
       );
       if (files.length === 1) {
         const filePath = join(process.cwd(), files[0]);
         res.setHeader(
           'Content-disposition',
-          `attachment; filename="${files[0]}"`,
+          requestDTO.display
+            ? `inline; filename="${files[0]}"`
+            : `attachment; filename="${files[0]}"`,
         );
         res.setHeader('Content-type', 'application/pdf');
         res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
