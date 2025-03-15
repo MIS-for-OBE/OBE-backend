@@ -80,7 +80,7 @@ export class CourseService {
           .populate('TQF3');
         if (searchDTO.courseSyllabus) {
           coursesQuery = coursesQuery.select(
-            '-sections.sectionNo -sections.instructor -sections.coInstructors -sections.students -sections.assignments -sections.TQF5 -TQF5',
+            '-sections.instructor -sections.coInstructors -sections.students -sections.assignments -sections.TQF5 -TQF5',
           );
         } else {
           coursesQuery.populate('TQF5');
