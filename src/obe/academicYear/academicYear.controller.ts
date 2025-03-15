@@ -7,7 +7,6 @@ import {
   Post,
   Put,
   Query,
-  Request,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -15,12 +14,14 @@ import { ResponseDTO } from 'src/common/dto/response.dto';
 import { AcademicYearService } from './academicYear.service';
 import { AcademicYearSearchDTO } from './dto/search.dto';
 import { AcademicYear } from './schemas/academicYear.schema';
+import { Public } from 'src/auth/metadata/public.metadata';
 
 @Controller('/academic-year')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class AcademicYearController {
   constructor(private service: AcademicYearService) {}
 
+  @Public()
   @Get()
   async searchAcademicYear(
     @Query() searchDTO: AcademicYearSearchDTO,

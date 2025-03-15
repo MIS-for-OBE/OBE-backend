@@ -15,31 +15,34 @@ import { ResponseDTO } from 'src/common/dto/response.dto';
 import { CourseService } from './course.service';
 import { Course } from './schemas/course.schema';
 import { CourseSearchDTO } from './dto/search.dto';
+import { Public } from 'src/auth/metadata/public.metadata';
 
 @Controller('/course')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class CourseController {
   constructor(private service: CourseService) {}
 
+  @Public()
   @Get()
   async searchCourse(
     @Request() req,
     @Query() searchDTO: CourseSearchDTO,
   ): Promise<ResponseDTO<any>> {
-    return this.service.searchCourse(req.user, searchDTO).then((result) => {
+    return this.service.searchCourse(req?.user, searchDTO).then((result) => {
       const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
     });
   }
 
+  @Public()
   @Get('one')
   async searchOneCourse(
     @Request() req,
     @Query() searchDTO: CourseSearchDTO,
   ): Promise<ResponseDTO<Course>> {
     return this.service
-      .searchOneCourse(req.user.id, searchDTO)
+      .searchOneCourse(req?.user?.id, searchDTO)
       .then((result) => {
         const responseDTO = new ResponseDTO<Course>();
         responseDTO.data = result;

@@ -29,6 +29,13 @@ export class CourseSearchDTO extends SearchDTO {
   })
   manage = false;
 
+  @IsBoolean()
+  @Transform((transformFn) => {
+    if (transformFn.value === 'true') return true;
+    else return false;
+  })
+  courseSyllabus = false;
+
   @IsString()
   @Type(() => String)
   search = '';

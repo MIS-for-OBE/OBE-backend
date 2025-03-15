@@ -89,19 +89,23 @@ export class CourseManagementService {
       const where = {
         courseNo: searchDTO.courseNo,
       };
-      const course = await this.model.findOne(where).populate({
-        path: 'sections',
-        populate: [
-          {
-            path: 'instructor',
-            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-          },
-          {
-            path: 'coInstructors',
-            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-          },
-        ],
-      });
+      const query = this.model.findOne(where);
+      if (!searchDTO.courseSyllabus) {
+        query.populate({
+          path: 'sections',
+          populate: [
+            {
+              path: 'instructor',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+            {
+              path: 'coInstructors',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+          ],
+        });
+      }
+      const course = await query;
       course?.sections.sort((a, b) => a.sectionNo - b.sectionNo);
       await this.setIsActiveSections(where, [course]);
       return course || {};

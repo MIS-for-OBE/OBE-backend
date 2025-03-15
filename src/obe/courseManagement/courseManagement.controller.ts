@@ -18,6 +18,7 @@ import {
   CourseManagementDocument,
 } from './schemas/courseManagement.schema';
 import { CourseManagementSearchDTO } from './dto/search.dto';
+import { Public } from 'src/auth/metadata/public.metadata';
 
 @Controller('/course-management')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -35,6 +36,7 @@ export class CourseManagementController {
     });
   }
 
+  @Public()
   @Get('one')
   async searchOneCourseManagement(
     @Query() searchDTO: CourseManagementSearchDTO,

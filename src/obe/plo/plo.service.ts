@@ -21,7 +21,10 @@ export class PLOService {
 
   async searchPLO(facultyCode: string, searchDTO: any): Promise<any> {
     try {
-      const where: any = { facultyCode };
+      const where: any = {};
+      if (facultyCode) {
+        where.facultyCode = facultyCode;
+      }
       if (searchDTO.curriculum) {
         where.curriculum = { $in: searchDTO.curriculum };
       }

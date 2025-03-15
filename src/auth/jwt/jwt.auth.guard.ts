@@ -20,6 +20,11 @@ export class JWTAuthGuard extends AuthGuard('jwt_strategy') {
       context.getClass(),
     ]);
     if (isPublic) {
+      const request = context.switchToHttp().getRequest();
+      const token = request.headers['authorization'];
+      if (token) {
+        return super.canActivate(context);
+      }
       return true;
     }
     // for example, call super.logIn(request) to establish a session.

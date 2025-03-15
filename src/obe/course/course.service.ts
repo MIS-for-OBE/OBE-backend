@@ -37,16 +37,16 @@ export class CourseService {
 
   async searchCourse(authUser: any, searchDTO: CourseSearchDTO): Promise<any> {
     try {
-      if (searchDTO.manage) {
+      if (searchDTO.manage || searchDTO.courseSyllabus) {
         const where: any = { year: searchDTO.year };
         if (searchDTO.curriculumPlo) {
-          where['year'] = {
+          where.year = {
             $gt: parseInt(searchDTO.year) - 5,
             $lte: parseInt(searchDTO.year),
           };
         }
         if (searchDTO.semester) {
-          where['semester'] = searchDTO.semester;
+          where.semester = searchDTO.semester;
         }
         if (
           searchDTO.curriculum.length &&
@@ -57,26 +57,35 @@ export class CourseService {
         if (searchDTO.search?.length) {
           setWhereWithSearchCourse(where, searchDTO.search);
         }
+        let populateSections: any = {
+          path: 'sections',
+          populate: [{ path: 'TQF3' }],
+        };
+        if (!searchDTO.courseSyllabus) {
+          populateSections.populate = populateSections.populate.concat([
+            {
+              path: 'instructor',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+            {
+              path: 'coInstructors',
+              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+            },
+            { path: 'TQF5' },
+          ]);
+        }
         let coursesQuery = this.model
           .find(where)
-          .populate({
-            path: 'sections',
-            populate: [
-              {
-                path: 'instructor',
-                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-              },
-              {
-                path: 'coInstructors',
-                select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-              },
-              { path: 'TQF3' },
-              { path: 'TQF5' },
-            ],
-          })
-          .populate('TQF3')
-          .populate('TQF5')
-          .sort({ [searchDTO.orderBy]: searchDTO.orderType });
+          .populate(populateSections)
+          .populate('TQF3');
+        if (searchDTO.courseSyllabus) {
+          coursesQuery = coursesQuery.select(
+            '-sections.sectionNo -sections.instructor -sections.coInstructors -sections.students -sections.assignments -sections.TQF5 -TQF5',
+          );
+        } else {
+          coursesQuery.populate('TQF5');
+        }
+        coursesQuery.sort({ [searchDTO.orderBy]: searchDTO.orderType });
         if (
           !searchDTO.tqf3?.length &&
           !searchDTO.tqf5?.length &&
@@ -87,6 +96,70 @@ export class CourseService {
             .limit(searchDTO.limit);
         }
         let courses: any = await coursesQuery.exec();
+        let totalCount;
+        if (searchDTO.courseSyllabus) {
+          const coursesWithTQF3 = await this.model
+            .find(where)
+            .populate('TQF3')
+            .populate({
+              path: 'sections',
+              populate: { path: 'TQF3' },
+            });
+          const courseCount = coursesWithTQF3.filter(
+            (course) => course.TQF3?.status === TQF_STATUS.DONE,
+          ).length;
+          let sectionCount = 0;
+          coursesWithTQF3.forEach((course) => {
+            if (course.type == COURSE_TYPE.SEL_TOPIC) {
+              let topics: string[] = [];
+              course.sections?.forEach((sec) => {
+                if (
+                  !topics.includes(sec.topic) &&
+                  sec.TQF3?.status === TQF_STATUS.DONE
+                ) {
+                  topics.push(sec.topic);
+                  sectionCount++;
+                }
+              });
+            }
+          }, 0);
+          totalCount = courseCount + sectionCount;
+          let filteredCourses = [];
+          courses.forEach((course) => {
+            sortData(course.sections, 'sectionTopic');
+            sortData(course.sections, 'isActive', 'boolean');
+            if (course.TQF3?.status == TQF_STATUS.DONE) {
+              filteredCourses.push(course);
+            } else if (course.type == COURSE_TYPE.SEL_TOPIC) {
+              let topics: string[] = [];
+              course.sections.forEach((sec) => {
+                if (sec.TQF3?.status === TQF_STATUS.DONE) {
+                  const findCurExist = filteredCourses.find(
+                    (c) =>
+                      c.courseNo == course.courseNo &&
+                      c.sections[0].topic == sec.topic,
+                  );
+                  if (!topics.includes(sec.topic)) {
+                    topics.push(sec.topic);
+                    filteredCourses.push({
+                      ...course._doc,
+                      id: course._id,
+                      _id: undefined,
+                      sections: [sec],
+                    });
+                  } else if (
+                    !findCurExist.sections.find(
+                      (s) => s.curriculum == sec.curriculum,
+                    )
+                  ) {
+                    findCurExist.sections.push(sec);
+                  }
+                }
+              });
+            }
+          });
+          courses = filteredCourses;
+        }
         if (searchDTO.ploRequire) {
           const ploRequire = await this.courseManagementModel
             .find({
@@ -175,14 +248,16 @@ export class CourseService {
                 }
                 return true;
               }) || [];
-          const totalCount = courses.length;
+          totalCount = courses.length;
           return { totalCount, courses };
         } else if (searchDTO.page == 1) {
           courses.forEach((course) => {
             sortData(course.sections, 'sectionTopic');
             sortData(course.sections, 'isActive', 'boolean');
           });
-          const totalCount = await this.model.countDocuments(where);
+          if (!searchDTO.courseSyllabus) {
+            totalCount = await this.model.countDocuments(where);
+          }
           return { totalCount, courses };
         }
         return courses;
@@ -271,45 +346,56 @@ export class CourseService {
 
   async searchOneCourse(id: string, searchDTO: any): Promise<Course> {
     try {
-      const course = await this.model
+      let populateSections: any = {
+        path: 'sections',
+        populate: [{ path: 'TQF3' }],
+      };
+      if (!searchDTO.courseSyllabus) {
+        populateSections.populate = populateSections.populate.concat([
+          {
+            path: 'instructor',
+            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+          },
+          {
+            path: 'coInstructors',
+            select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
+          },
+          {
+            path: 'students',
+            populate: [
+              {
+                path: 'student',
+                select:
+                  'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
+              },
+            ],
+          },
+          { path: 'TQF5' },
+        ]);
+      }
+      let query = this.model
         .findOne({
           year: searchDTO.year,
           semester: searchDTO.semester,
           courseNo: searchDTO.courseNo,
         })
-        .populate({
-          path: 'sections',
-          populate: [
-            {
-              path: 'instructor',
-              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-            },
-            {
-              path: 'coInstructors',
-              select: 'firstNameEN lastNameEN firstNameTH lastNameTH email',
-            },
-            {
-              path: 'students',
-              populate: [
-                {
-                  path: 'student',
-                  select:
-                    'studentId firstNameEN lastNameEN firstNameTH lastNameTH email termsOfService',
-                },
-              ],
-            },
-            { path: 'TQF3' },
-            { path: 'TQF5' },
-          ],
-        })
-        .populate('TQF3')
-        .populate('TQF5');
+        .populate(populateSections)
+        .populate('TQF3');
+      if (searchDTO.courseSyllabus) {
+        query = query.select(
+          '-sections.instructor -sections.coInstructors -sections.students -sections.assignments -sections.TQF5 -TQF5',
+        );
+      } else {
+        query.populate('TQF5');
+      }
+      const course = await query;
       if (!course) {
         throw new NotFoundException('Course not found');
       }
       const topics = course.sections
         .map((sec: any) => {
           if (
+            searchDTO.courseSyllabus ||
             sec.instructor.id == id ||
             sec.coInstructors.some((coIns: any) => coIns.id == id)
           )
@@ -320,7 +406,7 @@ export class CourseService {
         (section: any) => !section.topic || topics.includes(section.topic),
       );
       course.sections.forEach((section) => {
-        section.students.sort(
+        section.students?.sort(
           (a, b) =>
             parseInt(a.student.studentId) - parseInt(b.student.studentId),
         );
