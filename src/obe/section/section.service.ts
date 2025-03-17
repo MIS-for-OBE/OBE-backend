@@ -157,6 +157,14 @@ export class SectionService {
     try {
       const { year, semester, course, sections } = requestDTO;
       let updateCourse = await this.courseModel.findById(course);
+      const oldStudentIds = new Set<string>();
+      updateCourse.sections.forEach((sec) => {
+        sec.students.forEach((student: any) =>
+          oldStudentIds.add(student.student._id),
+        );
+        sec.students = [];
+      });
+      await updateCourse.save();
       const updatePromises = sections.map(async (section: any) => {
         const { sectionNo, studentList } = section;
         const studentPromises = studentList.map(async (student: any) => {
@@ -197,6 +205,7 @@ export class SectionService {
             }
             await existsUser.save();
           }
+          oldStudentIds.delete(existsUser.id);
           return existsUser._id;
         });
         const studentIds = await Promise.all(studentPromises);
@@ -214,6 +223,10 @@ export class SectionService {
       });
       await Promise.all(updatePromises);
       await updateCourse.save();
+      await this.userModel.updateMany(
+        { _id: { $in: [...oldStudentIds] } },
+        { $pull: { 'enrollCourses.$[].courses': { course: updateCourse.id } } },
+      );
       const updateStudentList = await this.getUpdateStudentList(requestDTO);
       return updateStudentList;
     } catch (error) {
