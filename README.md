@@ -42,7 +42,14 @@ Start the app in watch mode for automatic restarts:
 
 ## Environment Variables
 
-Create a `.env` file and configure the following variables:
+Create a `.env` file in the root directory and configure the following variables:
+
+1. Create a new `.env` file:
+   ```bash
+   touch .env
+   ```
+
+2. Add the following content to `.env`:
    ```ini
    DATABASE_URL=postgres://user:password@localhost:5432/scoreobe
    PORT=3000
@@ -68,4 +75,3 @@ Check test coverage:
 
 ## Copyright
 © 2025 Computer Engineering, Chiang Mai University. All rights reserved.
-
