@@ -1,33 +1,71 @@
-# MIS for OBE
+# ScoreOBE+ Backend
+
+ScoreOBE+ is the backend service for the Information Management System for Outcome-Based Education (OBE). It provides APIs for score management, evaluation, and analytics.
 
 ## Installation
 
-```bash
-$ npm install
-```
+Ensure you have [Node.js](https://nodejs.org/) and [PostgreSQL](https://www.postgresql.org/) installed.
 
-## Running the app
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-repository-url.git
+   cd scoreobe-backend
+   ```
 
-```bash
-# development
-$ npm run start
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-# watch mode
-$ npm run start:dev
+## Running the App
 
-# production mode
-$ npm run start:prod
-```
+### Development Mode
+
+Start the development server:
+   ```bash
+   npm run start:dev
+   ```
+
+### Production Mode
+
+Run the server in production mode:
+   ```bash
+   npm run start:prod
+   ```
+
+### Watch Mode
+
+Start the app in watch mode for automatic restarts:
+   ```bash
+   npm run start
+   ```
+
+## Environment Variables
+
+Create a `.env` file and configure the following variables:
+   ```ini
+   DATABASE_URL=postgres://user:password@localhost:5432/scoreobe
+   PORT=3000
+   JWT_SECRET=your-secret-key
+   ```
 
 ## Test
 
-```bash
-# unit tests
-$ npm run test
+Run unit tests:
+   ```bash
+   npm run test
+   ```
 
-# e2e tests
-$ npm run test:e2e
+Run end-to-end tests:
+   ```bash
+   npm run test:e2e
+   ```
 
-# test coverage
-$ npm run test:cov
-```
+Check test coverage:
+   ```bash
+   npm run test:cov
+   ```
+
+## Copyright
+© 2025 Computer Engineering, Chiang Mai University. All rights reserved.
+
