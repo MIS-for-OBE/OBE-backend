@@ -190,9 +190,9 @@ export class StudentService {
           curriculum: section.curriculum,
           section,
           scores: userScores,
-          clos,
+          clos: clos || [],
           plo,
-          plos,
+          plos: plos || [],
           requirePlo: coursePloRequire?.list,
         };
       });
