@@ -6,19 +6,17 @@ import { join } from 'path';
 import { DocumentInterceptor } from './common/interceptor/repo.interceptor';
 import { json } from 'express';
 import { ErrorInterceptor } from './common/interceptor/error.interceptor';
-import { registerModels } from './database/database.config';
 
 async function bootstrap() {
   const app: NestExpressApplication = await NestFactory.create(AppModule);
   app.useGlobalInterceptors(new DocumentInterceptor(), new ErrorInterceptor());
-
-  // registerModels();
 
   app.setGlobalPrefix('api/v1');
   app.enableCors();
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.use(json({ limit: '50mb' }));
+  app.getHttpServer().timeout = 120000;
 
   // const setup = new DocumentBuilder()
   //   .setTitle('MIS for OBE API')
