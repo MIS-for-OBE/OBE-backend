@@ -392,19 +392,24 @@ export class CourseService {
       if (!course) {
         throw new NotFoundException('Course not found');
       }
-      const topics = course.sections
-        .map((sec: any) => {
-          if (
-            searchDTO.courseSyllabus ||
-            sec.instructor.id == id ||
-            sec.coInstructors.some((coIns: any) => coIns.id == id)
-          )
-            return sec.topic;
-        })
-        .filter((topic) => topic);
-      course.sections = course.sections.filter(
-        (section: any) => !section.topic || topics.includes(section.topic),
-      );
+      if (!searchDTO.courseSyllabus) {
+        const topics = course.sections
+          .map((sec: any) => {
+            if (
+              sec.instructor.id == id ||
+              sec.coInstructors.some((coIns: any) => coIns.id == id)
+            )
+              return sec.topic;
+          })
+          .filter((topic) => topic);
+        course.sections = course.sections.filter(
+          (section: any) => !section.topic || topics.includes(section.topic),
+        );
+      } else if (searchDTO.topic) {
+        course.sections = course.sections.filter(
+          (section: any) => section.topic == searchDTO.topic,
+        );
+      }
       course.sections.forEach((section) => {
         section.students?.sort(
           (a, b) =>
