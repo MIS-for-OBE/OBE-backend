@@ -112,8 +112,10 @@ export class TQF5Service {
           date,
           {},
           {
-            ...tqf5.part1.list.find(
-              ({ curriculum }) => curriculum == requestDTO.curriculum,
+            ...tqf5.part1.list.find(({ curriculum }) =>
+              requestDTO.curriculum == '-'
+                ? !curriculum
+                : curriculum == requestDTO.curriculum,
             )._doc,
           },
           { ...this.tqf3Service.populateTqf3Part4(tqf3) },
