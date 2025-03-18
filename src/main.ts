@@ -16,18 +16,29 @@ async function bootstrap() {
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.use(json({ limit: '50mb' }));
-  app.getHttpServer().timeout = 120000;
 
-  // const setup = new DocumentBuilder()
-  //   .setTitle('MIS for OBE API')
-  //   // .setDescription('description')
-  //   .setVersion('1.0')
-  //   .build();
-  // const document = SwaggerModule.createDocument(app, setup);
-  // SwaggerModule.setup('', app, document, {
-  //   customSiteTitle: 'MIS for OBE API',
-  //   customfavIcon: '../cmu-logo.png',
-  // });
+  const setup = new DocumentBuilder()
+    .setTitle('ScoreOBE+ API')
+    .setDescription('description')
+    .setVersion('1.0')
+    .addServer(`${process.env.BASE_URL}/api/v1`)
+    .addBearerAuth(
+      {
+        bearerFormat: 'Bearer',
+        scheme: 'Bearer',
+        type: 'http',
+        in: 'Header',
+      },
+      'bearerAuth',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, setup);
+  SwaggerModule.setup('', app, document, {
+    customfavIcon: '../score-logo.png',
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   const port = parseInt(process.env.PORT);
   await app.listen(port);
