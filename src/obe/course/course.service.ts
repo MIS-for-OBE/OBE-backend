@@ -431,31 +431,33 @@ export class CourseService {
           (section: any) => section.topic == searchDTO.topic,
         );
       }
-      if (course.type != COURSE_TYPE.SEL_TOPIC) {
-        (course.TQF5 as any)._doc.oldRecommendation =
-          oldRecomment?.TQF5?.part1?.list.map((item) => ({
-            curriculum: item.curriculum,
-            abnormalScoreFactor: item.abnormalScoreFactor,
-            reviewingSLO: item.reviewingSLO,
-          })) || [];
-      }
-      course.sections.forEach((section) => {
-        if (section.topic) {
-          const findTQF5 = oldRecomment?.sections.find(
-            (sec) => sec.topic == section.topic,
-          )?.TQF5;
-          (section.TQF5 as any)._doc.oldRecommendation =
-            findTQF5?.part1?.list.map((item) => ({
+      if (!searchDTO.courseSyllabus) {
+        if (course.type != COURSE_TYPE.SEL_TOPIC) {
+          (course.TQF5 as any)._doc.oldRecommendation =
+            oldRecomment?.TQF5?.part1?.list.map((item) => ({
               curriculum: item.curriculum,
               abnormalScoreFactor: item.abnormalScoreFactor,
               reviewingSLO: item.reviewingSLO,
             })) || [];
         }
-        section.students?.sort(
-          (a, b) =>
-            parseInt(a.student.studentId) - parseInt(b.student.studentId),
-        );
-      });
+        course.sections.forEach((section) => {
+          if (section.topic) {
+            const findTQF5 = oldRecomment?.sections.find(
+              (sec) => sec.topic == section.topic,
+            )?.TQF5;
+            (section.TQF5 as any)._doc.oldRecommendation =
+              findTQF5?.part1?.list.map((item) => ({
+                curriculum: item.curriculum,
+                abnormalScoreFactor: item.abnormalScoreFactor,
+                reviewingSLO: item.reviewingSLO,
+              })) || [];
+          }
+          section.students?.sort(
+            (a, b) =>
+              parseInt(a.student.studentId) - parseInt(b.student.studentId),
+          );
+        });
+      }
       sortData(course.sections, 'sectionTopic');
       sortData(course.sections, 'isActive', 'boolean');
       return course;
