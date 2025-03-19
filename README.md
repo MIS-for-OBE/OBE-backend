@@ -13,6 +13,10 @@ Ensure you have [Node.js](https://nodejs.org/) installed.
    npm install
    ```
 
+## Environment Variables
+
+Create a `.env` file in the root directory and configure it based on `.env.example`
+
 ## Running the App
 
 ### Development Mode
@@ -47,10 +51,6 @@ Build the Docker container:
    ```bash
    docker compose up --build -d
    ```
-
-## Environment Variables
-
-Create a `.env` file in the root directory and configure it based on `.env.example`
 
 ## Copyright
 © 2025 Computer Engineering, Chiang Mai University. All rights reserved.
