@@ -34,7 +34,9 @@ export class FacultyService {
               $in: res.curriculum.map(({ code }) => code),
             },
           })
-          .select('sections.curriculum'),
+          .populate('sections.TQF3')
+          .populate('TQF3')
+          .select('sections.curriculum sections.TQF3 TQF3'),
         this.courseManagementModel
           .find({
             ['sections.curriculum']: {
@@ -51,9 +53,36 @@ export class FacultyService {
           sections.flatMap((section) => section.curriculum).filter(Boolean),
         ),
       ]);
+      const allCurriculumEditPlo = new Set([
+        ...course.flatMap(({ TQF3, sections }) => [
+          ...(TQF3?.part7?.list
+            .filter((cur) => cur.data.every((plo) => plo.plos.length > 0))
+            .map((cur) => cur.curriculum) || []),
+          ...(sections.flatMap(
+            (section) =>
+              section.TQF3?.part7?.list
+                .filter((cur) => cur.data.every((plo) => plo.plos.length > 0))
+                .map((cur) => cur.curriculum) || [],
+          ) || []),
+        ]),
+        ...courseManagement.flatMap(({ ploRequire, sections }) => [
+          ...(ploRequire
+            ?.filter((plo) => Array.isArray(plo.list) && plo.list.length > 0)
+            .map((plo) => plo.curriculum) || []),
+          ...(sections.flatMap(
+            (section) =>
+              section.ploRequire
+                ?.filter(
+                  (plo) => Array.isArray(plo.list) && plo.list.length > 0,
+                )
+                .map((plo) => plo.curriculum) || [],
+          ) || []),
+        ]),
+      ]);
 
       res.curriculum.forEach((cur) => {
         cur.disable = allCurriculumCodes.has(cur.code);
+        cur.disableEditPlo = allCurriculumEditPlo.has(cur.code);
       });
 
       return res;
