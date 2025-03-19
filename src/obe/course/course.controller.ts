@@ -16,7 +16,9 @@ import { CourseService } from './course.service';
 import { Course } from './schemas/course.schema';
 import { CourseSearchDTO } from './dto/search.dto';
 import { Public } from 'src/auth/metadata/public.metadata';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Course')
 @Controller('/course')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class CourseController {
@@ -40,7 +42,7 @@ export class CourseController {
   async searchOneCourse(
     @Request() req,
     @Query() searchDTO: CourseSearchDTO,
-  ): Promise<ResponseDTO<Course>> {
+  ): Promise<ResponseDTO<any>> {
     return this.service
       .searchOneCourse(req?.user?.id, searchDTO)
       .then((result) => {

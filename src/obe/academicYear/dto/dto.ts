@@ -8,7 +8,7 @@ export class AcademicYearDTO extends BaseDTO {
   @ApiProperty({
     description: 'year of academic',
     type: Number,
-    example: 2024,
+    example: 2567,
   })
   year: number;
 

@@ -344,7 +344,7 @@ export class CourseService {
     }
   }
 
-  async searchOneCourse(id: string, searchDTO: any): Promise<Course> {
+  async searchOneCourse(id: string, searchDTO: any): Promise<any> {
     try {
       let populateSections: any = {
         path: 'sections',
@@ -392,10 +392,31 @@ export class CourseService {
       if (!course) {
         throw new NotFoundException('Course not found');
       }
+      let oldRecomment: any;
       if (!searchDTO.courseSyllabus) {
+        oldRecomment = await this.model
+          .find({
+            courseNo: searchDTO.courseNo,
+            $or: [
+              { year: { $lt: searchDTO.year } },
+              { year: searchDTO.year, semester: { $lt: searchDTO.semester } },
+            ],
+          })
+          .populate({
+            path: 'sections',
+            populate: [{ path: 'TQF5' }],
+          })
+          .populate('TQF5')
+          .select(
+            '-sections.instructor -sections.coInstructors -sections.students -sections.assignments -sections.TQF3 -TQF3',
+          )
+          .sort({ year: 'desc', semester: 'desc' })
+          .limit(1);
+        oldRecomment = oldRecomment.length > 0 ? oldRecomment[0] : null;
         const topics = course.sections
           .map((sec: any) => {
             if (
+              searchDTO.curAdmin ||
               sec.instructor.id == id ||
               sec.coInstructors.some((coIns: any) => coIns.id == id)
             )
@@ -410,7 +431,26 @@ export class CourseService {
           (section: any) => section.topic == searchDTO.topic,
         );
       }
+      if (course.type != COURSE_TYPE.SEL_TOPIC) {
+        (course.TQF5 as any)._doc.oldRecommendation =
+          oldRecomment?.TQF5?.part1?.list.map((item) => ({
+            curriculum: item.curriculum,
+            abnormalScoreFactor: item.abnormalScoreFactor,
+            reviewingSLO: item.reviewingSLO,
+          })) || [];
+      }
       course.sections.forEach((section) => {
+        if (section.topic) {
+          const findTQF5 = oldRecomment?.sections.find(
+            (sec) => sec.topic == section.topic,
+          )?.TQF5;
+          (section.TQF5 as any)._doc.oldRecommendation =
+            findTQF5?.part1?.list.map((item) => ({
+              curriculum: item.curriculum,
+              abnormalScoreFactor: item.abnormalScoreFactor,
+              reviewingSLO: item.reviewingSLO,
+            })) || [];
+        }
         section.students?.sort(
           (a, b) =>
             parseInt(a.student.studentId) - parseInt(b.student.studentId),

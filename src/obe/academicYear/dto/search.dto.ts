@@ -1,20 +1,19 @@
-import { IsBoolean, IsNumber } from 'class-validator';
+import { IsBoolean } from 'class-validator';
 import { SearchDTO } from 'src/common/dto/search.dto';
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class AcademicYearSearchDTO extends SearchDTO {
-  @IsNumber()
-  @Type(() => Number)
-  year = 2567;
-
-  @IsNumber()
-  @Type(() => Number)
-  semester = 1;
-
   @IsBoolean()
   @Transform((transformFn) => {
     if (transformFn.value === 'true') return true;
     else return false;
+  })
+  @ApiProperty({
+    description:
+      'Set to true to retrieve all academic years for management purposes',
+    type: Boolean,
+    example: true,
   })
   manage = false;
 }
