@@ -41,6 +41,13 @@ Start the app in watch mode for automatic restarts:
    npm run start:prod
    ```
 
+## Deployment
+
+Build the Docker container:
+   ```bash
+   docker compose up --build -d
+   ```
+
 ## Environment Variables
 
 Create a `.env` file in the root directory and configure it based on `.env.example`
