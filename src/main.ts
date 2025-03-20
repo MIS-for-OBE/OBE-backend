@@ -23,7 +23,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, setup);
-  SwaggerModule.setup('', app, document, {
+  SwaggerModule.setup('/api/', app, document, {
     customfavIcon: '../score-logo.png',
     swaggerOptions: {
       supportedSubmitMethods: [],
