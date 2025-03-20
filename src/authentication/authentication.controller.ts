@@ -10,6 +10,7 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @ApiTags('Authentication')
 @ApiExtraModels(ResponseDTO, TokenDTO)
@@ -28,6 +29,7 @@ export class AuthenticationController {
         { $ref: getSchemaPath(ResponseDTO) },
         {
           properties: {
+            message: { type: 'string', example: TEXT_ENUM.Success },
             data: { $ref: getSchemaPath(TokenDTO) },
           },
         },
