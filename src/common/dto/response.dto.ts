@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsObject, IsNumber } from 'class-validator';
+import { IsString, IsObject } from 'class-validator';
 import { TEXT_ENUM } from '../enum/text.enum';
 
 export class ResponseDTO<T> {

@@ -4,13 +4,15 @@ import { LoginDTO, TokenDTO } from './dto/dto';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Public } from 'src/auth/metadata/public.metadata';
 import {
+  ApiBadRequestResponse,
   ApiExtraModels,
+  ApiForbiddenResponse,
+  ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { TEXT_ENUM } from 'src/common/enum/text.enum';
+import { DESCRIPTION, TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @ApiTags('Authentication')
 @ApiExtraModels(ResponseDTO, TokenDTO)
@@ -21,9 +23,8 @@ export class AuthenticationController {
   @Public()
   @Post('login')
   @ApiOperation({ summary: 'User login using CMU Account' })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully logged in',
+  @ApiOkResponse({
+    description: DESCRIPTION.SUCCESS,
     schema: {
       allOf: [
         { $ref: getSchemaPath(ResponseDTO) },
@@ -36,12 +37,10 @@ export class AuthenticationController {
       ],
     },
   })
-  @ApiResponse({
-    status: 400,
+  @ApiBadRequestResponse({
     description: 'Invalid authorization code or redirect URI',
   })
-  @ApiResponse({
-    status: 403,
+  @ApiForbiddenResponse({
     description: 'Your CMU account does not have permission for this website',
   })
   async login(@Body() body: LoginDTO): Promise<ResponseDTO<TokenDTO>> {
