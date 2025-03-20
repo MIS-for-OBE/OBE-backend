@@ -2,6 +2,7 @@ name: project_obe
 
 services:
   backend:
+    container_name: obe-backend
     build:
       context: ./
       dockerfile: Dockerfile
@@ -19,6 +20,7 @@ services:
       NODE_OPTIONS: '--max-old-space-size=4096'
 
   mongodb:
+    container_name: obe-mongodb
     image: mongo
     restart: always
     environment:
