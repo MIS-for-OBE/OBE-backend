@@ -28,7 +28,7 @@ async function bootstrap() {
       supportedSubmitMethods: [],
     },
     customSiteTitle: 'ScoreOBE+ API',
-    customfavIcon: '../scoreOBElogoFill.png',
+    customfavIcon: '/scoreOBElogoFill.png',
     customCss: `
       @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Noto+Emoji:wght@300..700&display=swap');
       
@@ -43,7 +43,7 @@ async function bootstrap() {
         gap: 10px;
       }
       .topbar-wrapper {
-        content: url("../scoreOBElogobold.png");
+        content: url("/scoreOBElogobold.png");
         width: 28px;
         height: auto;
       }
