@@ -61,6 +61,7 @@ async function bootstrap() {
       }
       .swagger-ui .topbar {
         background-color: #fafafa;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
       }
     `,
     },
