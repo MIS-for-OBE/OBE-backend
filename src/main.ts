@@ -32,7 +32,7 @@ async function bootstrap() {
         supportedSubmitMethods: [],
       },
       customSiteTitle: 'ScoreOBE+ API',
-      customfavIcon: '../scoreOBElogoFill.png',
+      customfavIcon: '/public/scoreOBElogoFill.png',
       customCss: `
       @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Noto+Emoji:wght@300..700&display=swap');
       
