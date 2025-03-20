@@ -14,7 +14,9 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   app.enableCors();
 
-  app.useStaticAssets(join(__dirname, '..', 'public'), { prefix: '/public/' });
+  app.useStaticAssets(join(__dirname, '..', 'src', 'assets'), {
+    prefix: '/assets/',
+  });
   app.use(json({ limit: '50mb' }));
 
   const setup = new DocumentBuilder()
@@ -32,7 +34,7 @@ async function bootstrap() {
         supportedSubmitMethods: [],
       },
       customSiteTitle: 'ScoreOBE+ API',
-      customfavIcon: '/public/scoreOBElogoFill.png',
+      customfavIcon: '/assets/images/scoreOBElogoFill.png',
       customCss: `
       @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Noto+Emoji:wght@300..700&display=swap');
       
@@ -47,18 +49,17 @@ async function bootstrap() {
         gap: 10px;
       }
       .topbar-wrapper {
-        content: url('/public/scoreOBElogobold.png');
+        content: url('/assets/images/scoreOBElogobold.png');
         width: 28px;
         height: auto;
       }
-      .topbar-wrapper svg { visibility: hidden; }
       .topbar .wrapper::after {
         content: "ScoreOBE+";
         font-size: 16px;
         font-weight: 600;
         color: transparent;
         background-clip: text;
-        background-image: linear-gradient(to right, #4285f4, #ec407a, #a06ee1, #fb8c00);
+        background-image: linear-gradient(to right, #4285f4, #a06ee1, #ec407a, #fb8c00);
       }
       .swagger-ui .topbar {
         background-color: #fafafa;
