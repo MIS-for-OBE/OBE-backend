@@ -23,13 +23,17 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, setup);
-  SwaggerModule.setup('/api/', app, document, {
-    swaggerOptions: {
-      supportedSubmitMethods: [],
-    },
-    customSiteTitle: 'ScoreOBE+ API',
-    customfavIcon: '/scoreOBElogoFill.png',
-    customCss: `
+  SwaggerModule.setup(
+    '/api/finalproject/mad/640/610/638666672',
+    app,
+    document,
+    {
+      swaggerOptions: {
+        supportedSubmitMethods: [],
+      },
+      customSiteTitle: 'ScoreOBE+ API',
+      customfavIcon: '/scoreOBElogoFill.png',
+      customCss: `
       @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Noto+Emoji:wght@300..700&display=swap');
       
       body, .swagger-ui {
@@ -47,6 +51,7 @@ async function bootstrap() {
         width: 28px;
         height: auto;
       }
+      .topbar-wrapper svg { visibility: hidden; }
       .topbar .wrapper::after {
         content: "ScoreOBE+";
         font-size: 16px;
@@ -59,7 +64,8 @@ async function bootstrap() {
         background-color: #fafafa;
       }
     `,
-  });
+    },
+  );
 
   const port = parseInt(process.env.PORT);
   await app.listen(port);
