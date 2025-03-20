@@ -60,6 +60,8 @@ async function bootstrap() {
         background-image: linear-gradient(to right, #4285f4, #a06ee1, #ec407a, #fb8c00);
       }
       .swagger-ui .topbar {
+        position: sticky;
+        top: 0;
         background-color: #fafafa;
         box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
       }
