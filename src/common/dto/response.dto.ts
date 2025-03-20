@@ -13,17 +13,8 @@ export class ResponseDTO<T> {
 
   @IsObject()
   @ApiProperty({
-    description: 'data list',
+    description: 'data',
     type: Object,
-    example: {},
   })
   data: T;
-
-  @IsNumber()
-  @ApiProperty({
-    description: 'Total items',
-    type: Number,
-    example: 10,
-  })
-  totalItems: number;
 }

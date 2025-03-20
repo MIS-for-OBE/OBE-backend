@@ -19,7 +19,9 @@ import {
 } from './schemas/courseManagement.schema';
 import { CourseManagementSearchDTO } from './dto/search.dto';
 import { Public } from 'src/auth/metadata/public.metadata';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Course Management')
 @Controller('/course-management')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class CourseManagementController {

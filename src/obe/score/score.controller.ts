@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  Param,
   Post,
   Put,
   Query,
@@ -13,13 +12,15 @@ import { ScoreService } from './score.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Section } from '../course/schemas/course.schema';
 import { Public } from 'src/auth/metadata/public.metadata';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Score')
 @Controller('/score')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class ScoreController {
   constructor(private service: ScoreService) {}
 
-  @Public()
+  // @Public()
   @Post()
   async uploadScore(@Body() requestDTO: any): Promise<ResponseDTO<Section[]>> {
     return this.service.uploadScore(requestDTO).then((result) => {

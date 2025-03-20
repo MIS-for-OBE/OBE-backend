@@ -16,7 +16,9 @@ import { ResponseDTO } from 'src/common/dto/response.dto';
 import { PLO } from './schemas/plo.schema';
 import { PLOSearchDTO } from './dto/search.dto';
 import { Public } from 'src/auth/metadata/public.metadata';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('PLO')
 @Controller('/plo')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class PLOController {

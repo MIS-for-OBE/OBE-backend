@@ -11,7 +11,9 @@ import {
 import { StudentService } from './student.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { EnrollCourseSearchDTO } from './dto/search.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Student')
 @Controller('/student')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class StudentController {

@@ -19,7 +19,9 @@ import { GeneratePdfDTO } from './dto/dto';
 import * as fs from 'fs';
 import * as archiver from 'archiver';
 import { join } from 'path';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('TQF5')
 @Controller('/tqf5')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class TQF5Controller {

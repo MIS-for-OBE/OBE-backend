@@ -11,7 +11,9 @@ import {
 import { UserService } from './user.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { User } from './schemas/user.schema';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('User')
 @Controller('/user')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class UserController {

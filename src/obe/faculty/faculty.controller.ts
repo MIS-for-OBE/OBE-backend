@@ -14,7 +14,9 @@ import {
 import { FacultyService } from './faculty.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Curriculum, Faculty } from './schemas/faculty.schema';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Faculty')
 @Controller('/faculty')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class FacultyController {

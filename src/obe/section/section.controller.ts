@@ -12,7 +12,9 @@ import {
 import { SectionService } from './section.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Section } from '../course/schemas/course.schema';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Section')
 @Controller('/section')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class SectionController {

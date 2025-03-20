@@ -15,7 +15,9 @@ import { AcademicYearService } from './academicYear.service';
 import { AcademicYearSearchDTO } from './dto/search.dto';
 import { AcademicYear } from './schemas/academicYear.schema';
 import { Public } from 'src/auth/metadata/public.metadata';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Academic Year')
 @Controller('/academic-year')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class AcademicYearController {
