@@ -14,8 +14,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   app.enableCors();
 
-  app.useStaticAssets(join(__dirname, '..', 'src', 'assets'), {
-    prefix: '/assets/',
+  app.useStaticAssets(join(__dirname, '..', 'public'), {
+    prefix: '/public/',
   });
   app.use(json({ limit: '50mb' }));
 
@@ -34,7 +34,7 @@ async function bootstrap() {
         supportedSubmitMethods: [],
       },
       customSiteTitle: 'ScoreOBE+ API',
-      customfavIcon: '/assets/images/scoreOBElogoFill.png',
+      customfavIcon: '/public/scoreOBElogoFill.png',
       customCss: `
       @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Noto+Emoji:wght@300..700&display=swap');
       
@@ -49,7 +49,7 @@ async function bootstrap() {
         gap: 10px;
       }
       .topbar-wrapper {
-        content: url('/assets/images/scoreOBElogobold.png');
+        content: url('/public/scoreOBElogobold.png');
         width: 28px;
         height: auto;
       }
