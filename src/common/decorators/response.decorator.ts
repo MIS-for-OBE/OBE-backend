@@ -1,6 +1,7 @@
-import { ApiOkResponse, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { DESCRIPTION, TEXT_ENUM } from '../enum/text.enum';
-import { applyDecorators } from '@nestjs/common';
+import { applyDecorators, HttpStatus } from '@nestjs/common';
+import { ERROR_ENUM } from '../enum/error.enum';
 
 /**
  * Custom decorator for success responses.
@@ -9,19 +10,33 @@ import { applyDecorators } from '@nestjs/common';
  */
 export function ApiSuccessResponse(
   model: any,
+  examples?: any[],
   exampleMessage = TEXT_ENUM.Success,
 ) {
-  return applyDecorators(
-    ApiOkResponse({
-      description: DESCRIPTION.SUCCESS,
-      schema: {
-        properties: {
-          message: { type: 'string', example: exampleMessage },
-          data: { $ref: getSchemaPath(model) },
+  return ApiResponse({
+    status: HttpStatus.OK,
+    description: DESCRIPTION.SUCCESS,
+    content: {
+      'application/json': {
+        schema: {
+          properties: {
+            message: { type: 'string', example: exampleMessage },
+            data: { $ref: getSchemaPath(model) },
+          },
         },
+        examples: examples?.reduce((acc, msg) => {
+          acc[`${msg.option}`] = {
+            summary: msg.option,
+            value: {
+              message: exampleMessage,
+              data: msg.data,
+            },
+          };
+          return acc;
+        }, {}),
       },
-    }),
-  );
+    },
+  });
 }
 
 /**
@@ -35,43 +50,64 @@ export function ApiErrorResponse(
   statusCode: number,
   description: string,
   errorType: string,
-  exampleMessages: string[],
+  exampleMessages: { option: string; message: string }[] | string,
 ) {
   return ApiResponse({
     status: statusCode,
     description,
-    // schema: {
-    //   properties: {
-    //     message: {
-    //       description:
-    //         'The error message providing additional details about the error.',
-    //       type: 'string',
-    //     },
-    //     error: {
-    //       description:
-    //         'The error type or category (e.g., Bad Request, Forbidden).',
-    //       type: 'string',
-    //     },
-    //     statusCode: {
-    //       description: 'The HTTP status code associated with the error.',
-    //       type: 'number',
-    //     },
-    //   },
-    // },
     content: {
       'application/json': {
-        examples: exampleMessages.reduce((acc, msg, index) => {
-          acc[`example${index + 1}`] = {
-            summary: `Example ${index + 1}`,
-            value: {
-              message: msg,
-              error: errorType,
-              statusCode: statusCode,
+        schema: {
+          properties: {
+            message: {
+              description:
+                'The error message providing additional details about the error.',
+              type: 'string',
             },
-          };
-          return acc;
-        }, {}),
+            error: {
+              description:
+                'The error type or category (e.g., Bad Request, Forbidden).',
+              type: 'string',
+            },
+            statusCode: {
+              description: 'The HTTP status code associated with the error.',
+              type: 'number',
+            },
+          },
+        },
+        ...(typeof exampleMessages == 'string'
+          ? {
+              example: {
+                message: exampleMessages,
+                error: errorType,
+                statusCode: statusCode,
+              },
+            }
+          : {
+              examples: exampleMessages.reduce((acc, { option, message }) => {
+                acc[`${option}`] = {
+                  summary: `${option}`,
+                  value: {
+                    message,
+                    error: errorType,
+                    statusCode: statusCode,
+                  },
+                };
+                return acc;
+              }, {}),
+            }),
       },
     },
   });
 }
+
+export const ApiUnauthorizedErrorResponse = () => {
+  return applyDecorators(
+    ApiErrorResponse(
+      HttpStatus.UNAUTHORIZED,
+      DESCRIPTION.UNAUTHORIZED,
+      ERROR_ENUM.UNAUTHORIZED,
+      ERROR_ENUM.UNAUTHORIZED,
+    ),
+  );
+};

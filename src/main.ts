@@ -14,7 +14,9 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   app.enableCors();
 
-  app.useStaticAssets(join(__dirname, '..', 'public'), { prefix: '/api/public/' });
+  app.useStaticAssets(join(__dirname, '..', 'public'), {
+    prefix: '/api/public/',
+  });
   app.use(json({ limit: '50mb' }));
 
   const setup = new DocumentBuilder()

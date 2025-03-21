@@ -77,20 +77,7 @@ export class CmuEntraIDBasicInfoDTO extends BaseDTO {
 export class TokenDTO extends BaseDTO {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({
-    description: 'User Info',
-    type: User,
-    example: {
-      id: 'qwetyopsdfyguiop',
-      email: 'john_doe@cmu.ac.th',
-      firstNameEN: 'JOHN',
-      lastNameEN: 'DOE',
-      studentId: '690610696',
-      role: 'Student',
-      facultyCode: '06',
-      termsOfService: true,
-    },
-  })
+  @ApiProperty({ description: 'User Info', type: User })
   user: User;
 
   @IsString()

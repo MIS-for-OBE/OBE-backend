@@ -26,16 +26,19 @@ export class AuthenticationController {
     DESCRIPTION.BAD_REQUEST,
     ERROR_ENUM.BAD_REQUEST,
     [
-      'Invalid redirect uri',
-      'Cannot get EntraID access token',
-      'Cannot get CMU basic info',
+      { option: 'Invalid input', message: 'Invalid redirect uri' },
+      {
+        option: 'Error get access token',
+        message: 'Cannot get EntraID access token',
+      },
+      { option: 'Error get basic info', message: 'Cannot get CMU basic info' },
     ],
   )
   @ApiErrorResponse(
     HttpStatus.FORBIDDEN,
     DESCRIPTION.FORBIDDEN,
     ERROR_ENUM.FORBIDDEN,
-    ['Your CMU account does not have permission for this website'],
+    'Your CMU account does not have permission for this website',
   )
   async login(@Body() body: LoginDTO): Promise<ResponseDTO<TokenDTO>> {
     return this.authenticationService.login(body).then((result) => {
