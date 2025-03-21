@@ -61,7 +61,12 @@ export class UserService {
     }
   }
 
-  async updateCurrAdmin(data: any): Promise<User> {
+  async updateCurrAdmin(data: {
+    id: string;
+    email: string;
+    role: ROLE;
+    curriculums: string[];
+  }): Promise<User> {
     try {
       let res;
       if (data.id) {
@@ -73,14 +78,16 @@ export class UserService {
           data.curriculums,
         );
       }
-
       return res;
     } catch (error) {
       throw error;
     }
   }
 
-  async updateAdmin(id: string, data: any): Promise<any> {
+  async updateAdmin(
+    id: string,
+    data: { id: string; curriculums: string[] },
+  ): Promise<any> {
     try {
       const user = await this.updateUserById(
         id,
@@ -88,7 +95,6 @@ export class UserService {
         data.curriculums,
       );
       const newAdmin = await this.updateUserById(data.id, ROLE.ADMIN, []);
-
       return { user, newAdmin };
     } catch (error) {
       throw error;

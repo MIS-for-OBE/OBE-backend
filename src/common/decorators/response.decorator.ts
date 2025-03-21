@@ -9,8 +9,8 @@ import { ERROR_ENUM } from '../enum/error.enum';
  * @param exampleMessage An optional example message.
  */
 export function ApiSuccessResponse(
-  model: any,
-  examples?: any[],
+  model: string | Function | null,
+  examples?: any[] | Object,
   exampleMessage = TEXT_ENUM.Success,
 ) {
   return ApiResponse({
@@ -18,22 +18,28 @@ export function ApiSuccessResponse(
     description: DESCRIPTION.SUCCESS,
     content: {
       'application/json': {
-        schema: {
-          properties: {
-            message: { type: 'string', example: exampleMessage },
-            data: { $ref: getSchemaPath(model) },
-          },
-        },
-        examples: examples?.reduce((acc, msg) => {
-          acc[`${msg.option}`] = {
-            summary: msg.option,
-            value: {
-              message: exampleMessage,
-              data: msg.data,
+        ...(model && {
+          schema: {
+            properties: {
+              message: { type: 'string', example: exampleMessage },
+              data: { $ref: getSchemaPath(model) },
             },
-          };
-          return acc;
-        }, {}),
+          },
+        }),
+        ...(!(examples as any)?.length
+          ? { example: { message: exampleMessage, data: examples } }
+          : {
+              examples: (examples as any[])?.reduce((acc, msg) => {
+                acc[`${msg.option}`] = {
+                  summary: msg.option,
+                  value: {
+                    message: exampleMessage,
+                    data: msg.data,
+                  },
+                };
+                return acc;
+              }, {}),
+            }),
       },
     },
   });

@@ -134,6 +134,7 @@ export const exampleEnrollCourses = [
 ];
 
 export const exampleStudent = {
+  id: 'xxxxxxxxxxxxxxxx34cd',
   studentId: '640610xxx',
   firstNameTH: 'สมชาย',
   lastNameTH: 'ใจดี',
@@ -147,6 +148,7 @@ export const exampleStudent = {
 };
 
 export const exampleCurriculumAdmin = {
+  id: 'xxxxxxxxxxxxxxxx34ce',
   firstNameTH: 'สมชาย',
   lastNameTH: 'ใจดี',
   firstNameEN: 'Somchai',
@@ -159,12 +161,39 @@ export const exampleCurriculumAdmin = {
 };
 
 export const exampleAdmin = {
-  firstNameTH: 'สมชาย',
-  lastNameTH: 'ใจดี',
-  firstNameEN: 'Somchai',
-  lastNameEN: 'Jaidee',
-  email: 'somchai_j@cmu.ac.th',
+  id: 'xxxxxxxxxxxxxxxx34cf',
+  firstNameTH: 'เทส',
+  lastNameTH: 'เทส',
+  firstNameEN: 'Test',
+  lastNameEN: 'Test',
+  email: 'test_t@cmu.ac.th',
   facultyCode: '06',
   role: ROLE.ADMIN,
   termsOfService: true,
 };
+
+export const exampleInstructorList = [
+  {
+    id: 'xxxxxxxxxxxxxxxxx34ce',
+    firstNameTH: 'สมชาย',
+    lastNameTH: 'ใจดี',
+    firstNameEN: 'Somchai',
+    lastNameEN: 'Jaidee',
+    email: 'somchai_j@cmu.ac.th',
+    facultyCode: '06',
+    role: ROLE.CURRICULUM_ADMIN,
+    curriculums: ['CPE-2563', 'ISNE-2566'],
+    termsOfService: true,
+  },
+  {
+    id: 'xxxxxxxxxxxxxxxxx34ce',
+    firstNameTH: 'เทส',
+    lastNameTH: 'เทส',
+    firstNameEN: 'Test',
+    lastNameEN: 'Test',
+    email: 'test_t@cmu.ac.th',
+    facultyCode: '06',
+    role: ROLE.ADMIN,
+    termsOfService: true,
+  },
+];
