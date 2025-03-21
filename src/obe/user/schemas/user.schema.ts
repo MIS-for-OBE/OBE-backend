@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
-import { exampleEnrollCourses } from 'src/common/example-response/example.response';
 import { Course } from 'src/obe/course/schemas/course.schema';
 
 @Schema()
@@ -17,7 +16,12 @@ export class EnrollCourse {
 
   @ApiProperty({
     description: 'Courses enrolled in the semester',
-    example: exampleEnrollCourses,
+    type: [
+      {
+        course: { type: String, example: 'xxxxxxxxxxxxxxxxc948' },
+        section: { type: Number, example: 1 },
+      },
+    ],
   })
   @Prop({
     type: [

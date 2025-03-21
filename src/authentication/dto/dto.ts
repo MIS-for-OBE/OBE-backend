@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { BaseDTO } from 'src/common/dto/base.dto';
 import { CMU_ENTRAID_ROLE } from 'src/common/enum/role.enum';
+import { exampleInstructor } from 'src/common/example-response/example.response';
 import { User } from 'src/obe/user/schemas/user.schema';
 
 export class LoginDTO extends BaseDTO {
@@ -76,12 +77,14 @@ export class CmuEntraIDBasicInfoDTO extends BaseDTO {
 
 export class TokenDTO extends BaseDTO {
   @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ description: 'User Info', type: User })
+  @ApiProperty({
+    description: 'User Info',
+    type: User,
+    example: exampleInstructor,
+  })
   user: User;
 
   @IsString()
-  @IsNotEmpty()
   @ApiProperty({
     description: 'access token',
     type: String,

@@ -25,6 +25,7 @@ import { ROLE } from 'src/common/enum/role.enum';
 import {
   exampleAdmin,
   exampleCurriculumAdmin,
+  exampleInstructor,
   exampleInstructorList,
   exampleStudent,
 } from 'src/common/example-response/example.response';
@@ -40,6 +41,7 @@ export class UserController {
   @ApiUnauthorizedErrorResponse()
   @ApiSuccessResponse(User, [
     { option: ROLE.STUDENT, data: exampleStudent },
+    { option: ROLE.INSTRUCTOR, data: exampleInstructor },
     { option: ROLE.CURRICULUM_ADMIN, data: exampleCurriculumAdmin },
     { option: ROLE.ADMIN, data: exampleAdmin },
   ])

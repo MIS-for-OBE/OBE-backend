@@ -26,20 +26,21 @@ export function ApiSuccessResponse(
             },
           },
         }),
-        ...(!(examples as any)?.length
-          ? { example: { message: exampleMessage, data: examples } }
-          : {
-              examples: (examples as any[])?.reduce((acc, msg) => {
-                acc[`${msg.option}`] = {
-                  summary: msg.option,
-                  value: {
-                    message: exampleMessage,
-                    data: msg.data,
-                  },
-                };
-                return acc;
-              }, {}),
-            }),
+        ...(examples &&
+          (!(examples as any)?.length
+            ? { example: { message: exampleMessage, data: examples } }
+            : {
+                examples: (examples as any[])?.reduce((acc, msg) => {
+                  acc[`${msg.option}`] = {
+                    summary: msg.option,
+                    value: {
+                      message: exampleMessage,
+                      data: msg.data,
+                    },
+                  };
+                  return acc;
+                }, {}),
+              })),
       },
     },
   });
