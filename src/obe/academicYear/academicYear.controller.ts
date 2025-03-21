@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -15,7 +16,15 @@ import { AcademicYearService } from './academicYear.service';
 import { AcademicYearSearchDTO } from './dto/search.dto';
 import { AcademicYear } from './schemas/academicYear.schema';
 import { Public } from 'src/auth/metadata/public.metadata';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiErrorResponse,
+  ApiSuccessResponse,
+  ApiUnauthorizedErrorResponse,
+} from 'src/common/decorators/response.decorator';
+import { exampleAcademicYearList } from 'src/common/example-response/example.response';
+import { DESCRIPTION, TEXT_ENUM } from 'src/common/enum/text.enum';
+import { ERROR_ENUM } from 'src/common/enum/error.enum';
 
 @ApiTags('Academic Year')
 @Controller('/academic-year')
@@ -25,6 +34,8 @@ export class AcademicYearController {
 
   @Public()
   @Get()
+  @ApiOperation({ summary: 'Search for academic years based on management' })
+  @ApiSuccessResponse(AcademicYear, { data: exampleAcademicYearList })
   async searchAcademicYear(
     @Query() searchDTO: AcademicYearSearchDTO,
   ): Promise<ResponseDTO<AcademicYear[]>> {
@@ -36,6 +47,9 @@ export class AcademicYearController {
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a new academic year' })
+  @ApiSuccessResponse(AcademicYear)
+  @ApiUnauthorizedErrorResponse()
   async createAcademicYear(
     @Body() requestDTO: AcademicYear,
   ): Promise<ResponseDTO<AcademicYear>> {
@@ -47,6 +61,14 @@ export class AcademicYearController {
   }
 
   @Put('/:id')
+  @ApiOperation({ summary: 'Activate an academic year by its ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'The ID of the academic year to be updated',
+  })
+  @ApiSuccessResponse(AcademicYear)
+  @ApiUnauthorizedErrorResponse()
   async activeAcademicYear(
     @Param('id') id: string,
   ): Promise<ResponseDTO<AcademicYear>> {
@@ -58,11 +80,23 @@ export class AcademicYearController {
   }
 
   @Delete('/:id')
-  async deleteAcademicYear(
-    @Param('id') id: string,
-  ): Promise<ResponseDTO<AcademicYear>> {
+  @ApiOperation({ summary: 'Delete an academic year by its ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'The ID of the academic year to be deleted',
+  })
+  @ApiSuccessResponse(null, { message: TEXT_ENUM.Success })
+  @ApiUnauthorizedErrorResponse()
+  @ApiErrorResponse(
+    HttpStatus.NOT_FOUND,
+    DESCRIPTION.NOT_FOUND,
+    ERROR_ENUM.NOT_FOUND,
+    'AcademicYear not found',
+  )
+  async deleteAcademicYear(@Param('id') id: string): Promise<ResponseDTO<any>> {
     return this.service.deleteAcademicYear(id).then((result) => {
-      const responseDTO = new ResponseDTO<AcademicYear>();
+      const responseDTO = new ResponseDTO<any>();
       responseDTO.data = result;
       return responseDTO;
     });

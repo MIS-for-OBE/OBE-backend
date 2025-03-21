@@ -62,7 +62,6 @@ export class FacultyController {
   @ApiParam({
     name: 'id',
     required: true,
-    example: 'xxxxxxxxxxxxxxxx2d70',
     description: 'The ID of the faculty where the curriculum will be created',
   })
   @ApiUnauthorizedErrorResponse()
@@ -94,7 +93,6 @@ export class FacultyController {
   @ApiParam({
     name: 'id',
     required: true,
-    example: 'xxxxxxxxxxxxxxxx2d70',
     description: 'The ID of the faculty that contains the curriculum',
   })
   @ApiParam({
@@ -129,7 +127,6 @@ export class FacultyController {
   @ApiParam({
     name: 'id',
     required: true,
-    example: 'ENG',
     description: 'The ID of the faculty that contains the curriculum',
   })
   @ApiParam({

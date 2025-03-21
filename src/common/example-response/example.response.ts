@@ -1,6 +1,21 @@
 import { PLO } from 'src/obe/plo/schemas/plo.schema';
 import { ROLE } from '../enum/role.enum';
 
+export const exampleAcademicYearList = [
+  {
+      "year": 2567,
+      "semester": 2,
+      "isActive": true,
+      "id": "xxxxxxxxxxxxxxxx810e"
+  },
+  {
+      "year": 2567,
+      "semester": 1,
+      "isActive": false,
+      "id": "xxxxxxxxxxxxxxxxa45c"
+  }
+]
+
 export const exampleStudent = {
   id: 'xxxxxxxxxxxxxxxx34cc',
   studentId: '640610xxx',

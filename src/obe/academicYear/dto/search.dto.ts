@@ -11,9 +11,10 @@ export class AcademicYearSearchDTO extends SearchDTO {
   })
   @ApiProperty({
     description:
-      'Set to true to retrieve all academic years for management purposes',
+      'if true to get all academic years for management purposes else to get academic years since active term.',
     type: Boolean,
-    example: true,
+    example: false,
+    required: false,
   })
   manage = false;
 }

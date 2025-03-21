@@ -8,6 +8,7 @@ import { CourseManagement } from '../courseManagement/schemas/courseManagement.s
 import { COURSE_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
 import { TQF5 } from '../tqf5/schemas/tqf5.schema';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
+import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @Injectable()
 export class AcademicYearService {
@@ -136,13 +137,13 @@ export class AcademicYearService {
     }
   }
 
-  async deleteAcademicYear(id: string): Promise<AcademicYear> {
+  async deleteAcademicYear(id: string): Promise<any> {
     try {
       const res = await this.model.findByIdAndDelete(id);
       if (!res) {
-        throw new NotFoundException('AcademicYear not found.');
+        throw new NotFoundException('AcademicYear not found');
       }
-      return res;
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
