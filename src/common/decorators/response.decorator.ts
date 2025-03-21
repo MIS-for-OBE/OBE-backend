@@ -1,7 +1,6 @@
 import { ApiOkResponse, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { DESCRIPTION, TEXT_ENUM } from '../enum/text.enum';
 import { applyDecorators } from '@nestjs/common';
-import { ResponseDTO } from '../dto/response.dto';
 
 /**
  * Custom decorator for success responses.
@@ -16,15 +15,10 @@ export function ApiSuccessResponse(
     ApiOkResponse({
       description: DESCRIPTION.SUCCESS,
       schema: {
-        allOf: [
-          { $ref: getSchemaPath(ResponseDTO) },
-          {
-            properties: {
-              message: { type: 'string', example: exampleMessage },
-              data: { $ref: getSchemaPath(model) },
-            },
-          },
-        ],
+        properties: {
+          message: { type: 'string', example: exampleMessage },
+          data: { $ref: getSchemaPath(model) },
+        },
       },
     }),
   );
@@ -41,30 +35,42 @@ export function ApiErrorResponse(
   statusCode: number,
   description: string,
   errorType: string,
-  exampleMessage: string,
+  exampleMessages: string[],
 ) {
   return ApiResponse({
     status: statusCode,
     description,
-    schema: {
-      properties: {
-        message: {
-          description:
-            'The error message providing additional details about the error.',
-          type: 'string',
-          example: exampleMessage,
-        },
-        error: {
-          description:
-            'The error type or category (e.g., Bad Request, Forbidden).',
-          type: 'string',
-          example: errorType,
-        },
-        statusCode: {
-          description: 'The HTTP status code associated with the error.',
-          type: 'number',
-          example: statusCode,
-        },
+    // schema: {
+    //   properties: {
+    //     message: {
+    //       description:
+    //         'The error message providing additional details about the error.',
+    //       type: 'string',
+    //     },
+    //     error: {
+    //       description:
+    //         'The error type or category (e.g., Bad Request, Forbidden).',
+    //       type: 'string',
+    //     },
+    //     statusCode: {
+    //       description: 'The HTTP status code associated with the error.',
+    //       type: 'number',
+    //     },
+    //   },
+    // },
+    content: {
+      'application/json': {
+        examples: exampleMessages.reduce((acc, msg, index) => {
+          acc[`example${index + 1}`] = {
+            summary: `Example ${index + 1}`,
+            value: {
+              message: msg,
+              error: errorType,
+              statusCode: statusCode,
+            },
+          };
+          return acc;
+        }, {}),
       },
     },
   });

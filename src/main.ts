@@ -23,6 +23,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, setup);
+  delete document.components?.schemas?.['ResponseDTO'];
   SwaggerModule.setup(
     '/api/finalproject/mad/640/610/638666672',
     app,
@@ -62,6 +63,7 @@ async function bootstrap() {
       .swagger-ui .topbar {
         position: sticky;
         top: 0;
+        z-index: 1000;
         background-color: #fafafa;
         box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 4px 0px;
       }
