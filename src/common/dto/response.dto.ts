@@ -5,7 +5,7 @@ import { TEXT_ENUM } from '../enum/text.enum';
 export class ResponseDTO<T> {
   @IsString()
   @ApiProperty({
-    description: 'message of actions',
+    description: 'Message of the action',
     type: String,
     example: 'any message such as success',
   })
@@ -13,7 +13,7 @@ export class ResponseDTO<T> {
 
   @IsObject()
   @ApiProperty({
-    description: 'data',
+    description: 'Response data',
     type: Object,
   })
   data: T;

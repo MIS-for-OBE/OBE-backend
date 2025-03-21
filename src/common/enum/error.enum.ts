@@ -1,3 +1,7 @@
 export enum ERROR_ENUM {
-  NOT_FOUND = 'NOT FOUND',
+  BAD_REQUEST = 'Bad Request',
+  UNAUTHORIZED = 'Unauthorized',
+  FORBIDDEN = 'Forbidden',
+  NOT_FOUND = 'Not Found',
+  SERVER_ERROR = 'Internal Server Error',
 }

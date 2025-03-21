@@ -1,18 +1,15 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { LoginDTO, TokenDTO } from './dto/dto';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Public } from 'src/auth/metadata/public.metadata';
+import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { DESCRIPTION } from 'src/common/enum/text.enum';
+import { ERROR_ENUM } from 'src/common/enum/error.enum';
 import {
-  ApiBadRequestResponse,
-  ApiExtraModels,
-  ApiForbiddenResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-  getSchemaPath,
-} from '@nestjs/swagger';
-import { DESCRIPTION, TEXT_ENUM } from 'src/common/enum/text.enum';
+  ApiErrorResponse,
+  ApiSuccessResponse,
+} from 'src/common/decorators/response.decorator';
 
 @ApiTags('Authentication')
 @ApiExtraModels(ResponseDTO, TokenDTO)
@@ -23,26 +20,19 @@ export class AuthenticationController {
   @Public()
   @Post('login')
   @ApiOperation({ summary: 'User login using CMU Account' })
-  @ApiOkResponse({
-    description: DESCRIPTION.SUCCESS,
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ResponseDTO) },
-        {
-          properties: {
-            message: { type: 'string', example: TEXT_ENUM.Success },
-            data: { $ref: getSchemaPath(TokenDTO) },
-          },
-        },
-      ],
-    },
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid authorization code or redirect URI',
-  })
-  @ApiForbiddenResponse({
-    description: 'Your CMU account does not have permission for this website',
-  })
+  @ApiSuccessResponse(TokenDTO)
+  @ApiErrorResponse(
+    HttpStatus.BAD_REQUEST,
+    DESCRIPTION.BAD_REQUEST,
+    ERROR_ENUM.BAD_REQUEST,
+    'Cannot get EntraID access token',
+  )
+  @ApiErrorResponse(
+    HttpStatus.FORBIDDEN,
+    DESCRIPTION.FORBIDDEN,
+    ERROR_ENUM.FORBIDDEN,
+    'Your CMU account does not have permission for this website.',
+  )
   async login(@Body() body: LoginDTO): Promise<ResponseDTO<TokenDTO>> {
     return this.authenticationService.login(body).then((result) => {
       const responseDTO = new ResponseDTO<TokenDTO>();
