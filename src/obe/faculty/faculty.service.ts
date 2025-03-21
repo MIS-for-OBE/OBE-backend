@@ -20,7 +20,7 @@ export class FacultyService {
     private readonly courseManagementModel: Model<CourseManagement>,
   ) {}
 
-  async getFaculty(facultyCode: string): Promise<any> {
+  async getFaculty(facultyCode: string): Promise<Faculty> {
     try {
       const res: any = await this.model.findOne({ facultyCode: facultyCode });
       if (!res) {
@@ -114,7 +114,7 @@ export class FacultyService {
         { _id: requestDTO.plo },
         { $push: { curriculum: requestDTO.code } },
       );
-      return TEXT_ENUM.Success;
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
@@ -150,7 +150,7 @@ export class FacultyService {
         { _id: requestDTO.plo },
         { $push: { curriculum: requestDTO.code } },
       );
-      return TEXT_ENUM.Success;
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
@@ -176,7 +176,7 @@ export class FacultyService {
           { $pull: { curriculum: code } },
         ),
       ]);
-      return TEXT_ENUM.Success;
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }

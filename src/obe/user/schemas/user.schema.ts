@@ -100,7 +100,7 @@ export class User {
   termsOfService?: boolean;
 
   @ApiProperty({
-    type: () => [EnrollCourse],
+    type: [EnrollCourse],
     description: 'Enrolled courses (only for students)',
     required: false,
   })

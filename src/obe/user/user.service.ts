@@ -4,6 +4,7 @@ import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { ROLE } from 'src/common/enum/role.enum';
 import { AuthService } from 'src/auth/auth.service';
+import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @Injectable()
 export class UserService {
@@ -37,7 +38,7 @@ export class UserService {
         dataRs.user = user;
         return dataRs;
       }
-      return { message: 'ok' };
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }

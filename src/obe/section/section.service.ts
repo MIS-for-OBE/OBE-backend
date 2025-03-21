@@ -12,6 +12,7 @@ import { ROLE } from 'src/common/enum/role.enum';
 import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
 import { TQF5 } from '../tqf5/schemas/tqf5.schema';
+import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @Injectable()
 export class SectionService {
@@ -112,7 +113,7 @@ export class SectionService {
         { $set: { 'sections.$.isActive': requestDTO.isActive } },
         { new: true },
       );
-      return { message: 'ok' };
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
@@ -147,7 +148,7 @@ export class SectionService {
           ]);
         }
       }
-      return { message: 'ok' };
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }

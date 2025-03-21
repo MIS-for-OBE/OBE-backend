@@ -29,6 +29,7 @@ import {
   exampleInstructorList,
   exampleStudent,
 } from 'src/common/example-response/example.response';
+import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @ApiTags('User')
 @Controller('/user')
@@ -61,7 +62,7 @@ export class UserController {
     schema: { properties: { agree: { example: true } } },
   })
   @ApiUnauthorizedErrorResponse()
-  @ApiSuccessResponse(null, { message: 'ok' })
+  @ApiSuccessResponse(null, { message: TEXT_ENUM.Success })
   async termsOfService(
     @Request() req,
     @Body() body: { agree: boolean },
