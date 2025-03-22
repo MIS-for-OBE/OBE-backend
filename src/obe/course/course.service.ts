@@ -525,7 +525,7 @@ export class CourseService {
           });
         }
       }
-      return TEXT_ENUM.Success;
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
@@ -698,7 +698,7 @@ export class CourseService {
     }
   }
 
-  async deleteCourse(id: string): Promise<Course> {
+  async deleteCourse(id: string): Promise<any> {
     try {
       const deleteCourse = await this.model.findByIdAndDelete(id);
       if (!deleteCourse) {
@@ -730,13 +730,13 @@ export class CourseService {
           courseNo: deleteCourse.courseNo,
         });
       }
-      return deleteCourse;
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
   }
 
-  async leaveCourse(userId: string, id: string): Promise<Course> {
+  async leaveCourse(userId: string, id: string): Promise<any> {
     try {
       const leaveCourse = await this.model.findByIdAndUpdate(
         id,
@@ -750,7 +750,7 @@ export class CourseService {
         { courseNo: leaveCourse.courseNo },
         { $pull: { 'sections.$[].coInstructors': userId } },
       );
-      return leaveCourse;
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }

@@ -9,7 +9,7 @@ import {
 import { StudentService } from './student.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { EnrollCourseSearchDTO } from './dto/search.dto';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   ApiSuccessResponse,
   ApiUnauthorizedErrorResponse,
