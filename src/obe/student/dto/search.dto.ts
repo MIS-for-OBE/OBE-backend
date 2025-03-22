@@ -13,7 +13,7 @@ export class EnrollCourseSearchDTO extends SearchDTO {
   @Transform((transformFn) => {
     return parseInt(transformFn.value);
   })
-  year;
+  year: number;
 
   @IsOptional()
   @IsNumber()
@@ -24,7 +24,7 @@ export class EnrollCourseSearchDTO extends SearchDTO {
   @Transform((transformFn) => {
     return parseInt(transformFn.value);
   })
-  semester;
+  semester: number;
 
   @IsBoolean()
   @ApiProperty({
@@ -35,5 +35,5 @@ export class EnrollCourseSearchDTO extends SearchDTO {
     if (transformFn.value === 'true') return true;
     else return false;
   })
-  all = false;
+  all: boolean = false;
 }

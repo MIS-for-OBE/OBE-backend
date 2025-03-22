@@ -9,7 +9,7 @@ import {
 import { StudentService } from './student.service';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { EnrollCourseSearchDTO } from './dto/search.dto';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
   ApiSuccessResponse,
   ApiUnauthorizedErrorResponse,
@@ -28,22 +28,11 @@ export class StudentController {
 
   @Get()
   @ApiOperation({ summary: 'Get student enroll courses' })
-  @ApiBody({
-    description:
-      "Search criteria for the student's enrolled courses (can be filtered by year and semester, or fetch all enroll courses)",
-    required: true,
-    type: EnrollCourseSearchDTO,
-    examples: {
-      'One Semester': { value: { year: 2567, semester: 1 } },
-      'All Enroll Courses': { value: { all: true } },
-    },
-  })
   @ApiUnauthorizedErrorResponse()
   @ApiSuccessResponse(Course, [
     { option: 'One Semester', data: exampleEnrollCourses },
     { option: 'All Enroll Courses', data: exampleAllEnrollCourses },
   ])
-
   async getEnrollCourses(
     @Request() req,
     @Query() searchDTO: EnrollCourseSearchDTO,
