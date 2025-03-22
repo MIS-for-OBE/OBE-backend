@@ -1,6 +1,5 @@
 import { PLO } from 'src/obe/plo/schemas/plo.schema';
 import { ROLE } from '../enum/role.enum';
-import { TQF_STATUS } from '../enum/type.enum';
 
 export const exampleAcademicYearList = [
   {
@@ -543,19 +542,19 @@ export const exampleTqf3P7 = {
       data: [
         {
           clo: '67857fcc432717f4e5036f73',
-          plos: ['672c4430d40f44d6b1846b4e', '672c4430d40f44d6b1846b50'],
+          plos: ['xxxxxxxxxxxxxxxx6b4e', 'xxxxxxxxxxxxxxxx6b50'],
         },
         {
           clo: '67857fcc432717f4e5036f74',
-          plos: ['672c4430d40f44d6b1846b4f', '672c4430d40f44d6b1846b53'],
+          plos: ['xxxxxxxxxxxxxxxx6b4f', 'xxxxxxxxxxxxxxxx6b53'],
         },
         {
           clo: '67857fcc432717f4e5036f75',
-          plos: ['672c4430d40f44d6b1846b4e'],
+          plos: ['xxxxxxxxxxxxxxxx6b4e'],
         },
         {
           clo: '67857fcc432717f4e5036f76',
-          plos: ['672c4430d40f44d6b1846b52'],
+          plos: ['xxxxxxxxxxxxxxxx6b52'],
         },
       ],
     },
@@ -904,4 +903,27 @@ export const exampleTqf5P3 = {
     },
   ],
   updatedAt: '2025-03-22T04:33:38.349Z',
+};
+
+export const examplePLONo1 = {
+  no: 1,
+  descTH: 'คำอธิบายภาษาไทย',
+  descEN: 'Description in English',
+  id: 'xxxxxxxxxxxxxxxx6b4d',
+};
+export const examplePLONo2 = {
+  no: 2,
+  descTH: 'คำอธิบายภาษาไทย 2',
+  descEN: 'Description in English 2',
+  id: 'xxxxxxxxxxxxxxxx6b4e',
+};
+export const exampleDataPLO = [examplePLONo1, examplePLONo2];
+export const exampleAddPlo = {
+  name: 'PLO ISNE 1/67',
+  facultyCode: '06',
+  curriculum: ['ISNE-2566'],
+  criteriaTH: 'เกณฑ์ภาษาไทย',
+  criteriaEN: 'Criteria in English',
+  data: exampleDataPLO,
+  id: 'xxxxxxxxxxxxxxxxbde6',
 };

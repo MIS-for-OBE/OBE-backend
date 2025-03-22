@@ -2,6 +2,7 @@ import { ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { DESCRIPTION, TEXT_ENUM } from '../enum/text.enum';
 import { applyDecorators, HttpStatus } from '@nestjs/common';
 import { ERROR_ENUM } from '../enum/error.enum';
+import { isObject } from 'lodash';
 
 /**
  * Custom decorator for success responses.
@@ -46,6 +47,8 @@ export function ApiSuccessResponse(
   });
 }
 
+type ErrorRes = { option: string; message: string }[];
+
 /**
  * Custom decorator for error responses.
  * @param statusCode HTTP status code
@@ -57,31 +60,33 @@ export function ApiErrorResponse(
   statusCode: number,
   description: string,
   errorType: string,
-  exampleMessages: { option: string; message: string }[] | string,
+  exampleMessages: ErrorRes | Object | string,
 ) {
   return ApiResponse({
     status: statusCode,
     description,
     content: {
       'application/json': {
-        schema: {
-          properties: {
-            message: {
-              description:
-                'The error message providing additional details about the error.',
-              type: 'string',
-            },
-            error: {
-              description:
-                'The error type or category (e.g., Bad Request, Forbidden).',
-              type: 'string',
-            },
-            statusCode: {
-              description: 'The HTTP status code associated with the error.',
-              type: 'number',
+        ...(!isObject(exampleMessages) && {
+          schema: {
+            properties: {
+              message: {
+                description:
+                  'The error message providing additional details about the error.',
+                type: 'string',
+              },
+              error: {
+                description:
+                  'The error type or category (e.g., Bad Request, Forbidden).',
+                type: 'string',
+              },
+              statusCode: {
+                description: 'The HTTP status code associated with the error.',
+                type: 'number',
+              },
             },
           },
-        },
+        }),
         ...(typeof exampleMessages == 'string'
           ? {
               example: {
@@ -90,19 +95,24 @@ export function ApiErrorResponse(
                 statusCode: statusCode,
               },
             }
-          : {
-              examples: exampleMessages.reduce((acc, { option, message }) => {
-                acc[`${option}`] = {
-                  summary: `${option}`,
-                  value: {
-                    message,
-                    error: errorType,
-                    statusCode: statusCode,
+          : isObject(exampleMessages)
+            ? { example: exampleMessages }
+            : {
+                examples: (exampleMessages as ErrorRes).reduce(
+                  (acc, { option, message }) => {
+                    acc[`${option}`] = {
+                      summary: `${option}`,
+                      value: {
+                        message,
+                        error: errorType,
+                        statusCode: statusCode,
+                      },
+                    };
+                    return acc;
                   },
-                };
-                return acc;
-              }, {}),
-            }),
+                  {},
+                ),
+              }),
       },
     },
   });

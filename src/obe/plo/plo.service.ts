@@ -3,12 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PLO } from './schemas/plo.schema';
+import { PLO, PLONo } from './schemas/plo.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
 import { Course } from '../course/schemas/course.schema';
 import { CourseManagement } from '../courseManagement/schemas/courseManagement.schema';
+import { PLOSearchDTO } from './dto/search.dto';
 
 @Injectable()
 export class PLOService {
@@ -19,7 +20,10 @@ export class PLOService {
     private readonly courseManagementModel: Model<CourseManagement>,
   ) {}
 
-  async searchPLO(facultyCode: string, searchDTO: any): Promise<any> {
+  async searchPLO(
+    facultyCode: string,
+    searchDTO: { curriculum: string[] },
+  ): Promise<any> {
     try {
       const where: any = {};
       if (facultyCode) {
@@ -100,7 +104,7 @@ export class PLOService {
     }
   }
 
-  async checkCanCreatePLO(requestDTO: any): Promise<any> {
+  async checkCanCreatePLO(requestDTO: { name: string }): Promise<any> {
     try {
       const existPLO = await this.model.findOne({ name: requestDTO.name });
       if (existPLO) {
@@ -109,7 +113,7 @@ export class PLOService {
           message: `${existPLO.name} already exist.`,
         });
       }
-      return TEXT_ENUM.Success;
+      return { massage: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
@@ -123,13 +127,14 @@ export class PLOService {
     }
   }
 
-  async createPLONo(id: string, requestDTO: any): Promise<PLO> {
+  async createPLONo(id: string, requestDTO: PLONo): Promise<PLO> {
     try {
-      const updatePLO = await this.model.findByIdAndUpdate(
+      const updatePLO: any = await this.model.findByIdAndUpdate(
         id,
         { $push: { data: requestDTO } },
         { new: true },
       );
+      updatePLO._doc.canEdit = true;
       return updatePLO;
     } catch (error) {
       throw error;
@@ -148,7 +153,7 @@ export class PLOService {
         arrayFilters.push({ [`elem${index}._id`]: item.id });
       });
 
-      const updatePLO = await this.model.findOneAndUpdate(
+      const updatePLO: any = await this.model.findOneAndUpdate(
         { _id: id },
         { $set: updateFields },
         { arrayFilters, new: true },
@@ -156,28 +161,28 @@ export class PLOService {
       if (updatePLO && updatePLO.data) {
         updatePLO.data.sort((a, b) => a.no - b.no);
       }
-
+      updatePLO._doc.canEdit = true;
       return updatePLO;
     } catch (error) {
       throw error;
     }
   }
 
-  async deletePLO(id: string): Promise<PLO> {
+  async deletePLO(id: string): Promise<any> {
     try {
       const deletePLO = await this.model.findByIdAndDelete(id);
       if (!deletePLO) {
         throw new NotFoundException('PLO Collection not found');
       }
-      return deletePLO;
+      return { massage: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
   }
 
-  async deletePLONo(id: string, requestDTO: any): Promise<PLO> {
+  async deletePLONo(id: string, requestDTO: { id: string }): Promise<PLO> {
     try {
-      const updatePLO = await this.model.findByIdAndUpdate(
+      const updatePLO: any = await this.model.findByIdAndUpdate(
         id,
         { $pull: { data: { _id: requestDTO.id } } },
         { new: true },
@@ -185,6 +190,7 @@ export class PLOService {
       if (!updatePLO) {
         throw new NotFoundException('PLO Collection not found');
       }
+      updatePLO._doc.canEdit = true;
       return updatePLO;
     } catch (error) {
       throw error;
