@@ -43,9 +43,7 @@ export class Curriculum {
   @ApiProperty({ example: 'CPE-2563', description: 'The curriculum code' })
   @Prop({ required: true })
   code: string;
-}
 
-export class CurriculumWithDisable extends Curriculum {
   @ApiProperty({
     example: false,
     description: 'for check can edit, delete curriculum',
@@ -88,7 +86,7 @@ export class Faculty {
 
   @ApiProperty({
     description: 'List of curriculums',
-    type: [CurriculumWithDisable],
+    type: [Curriculum],
   })
   @Prop()
   curriculum: Curriculum[];
