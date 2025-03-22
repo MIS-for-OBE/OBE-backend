@@ -22,7 +22,7 @@ import {
   ApiSuccessResponse,
   ApiUnauthorizedErrorResponse,
 } from 'src/common/decorators/response.decorator';
-import { exampleAcademicYearList } from 'src/common/example-response/example.response';
+import { exampleAcademicYearList } from 'src/common/example/example';
 import { DESCRIPTION, TEXT_ENUM } from 'src/common/enum/text.enum';
 import { ERROR_ENUM } from 'src/common/enum/error.enum';
 
@@ -35,7 +35,7 @@ export class AcademicYearController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Search for academic years based on management' })
-  @ApiSuccessResponse(AcademicYear, { data: exampleAcademicYearList })
+  @ApiSuccessResponse(AcademicYear, exampleAcademicYearList)
   async searchAcademicYear(
     @Query() searchDTO: AcademicYearSearchDTO,
   ): Promise<ResponseDTO<AcademicYear[]>> {

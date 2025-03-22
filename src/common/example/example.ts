@@ -54,7 +54,6 @@ export const exampleStudent = {
     },
   ],
 };
-
 export const exampleInstructor = {
   id: 'xxxxxxxxxxxxxxxx34cd',
   firstNameTH: 'สมชาย',
@@ -66,7 +65,6 @@ export const exampleInstructor = {
   role: ROLE.INSTRUCTOR,
   termsOfService: true,
 };
-
 export const exampleCurriculumAdmin = {
   id: 'xxxxxxxxxxxxxxxx34ce',
   firstNameTH: 'มานะ',
@@ -79,7 +77,6 @@ export const exampleCurriculumAdmin = {
   curriculums: ['CPE-2563', 'ISNE-2566'],
   termsOfService: true,
 };
-
 export const exampleAdmin = {
   id: 'xxxxxxxxxxxxxxxx34cf',
   firstNameTH: 'วิชาญ',
@@ -91,7 +88,6 @@ export const exampleAdmin = {
   role: ROLE.ADMIN,
   termsOfService: true,
 };
-
 export const exampleInstructorList = [
   exampleInstructor,
   exampleCurriculumAdmin,
@@ -204,13 +200,11 @@ const exampleEnrollCourse = {
   ],
   requirePlo: ['xxxxxxxxxxxxxxxx6b4e', 'xxxxxxxxxxxxxxxx6b4f'],
 };
-
 export const exampleEnrollCourses = {
   year: 2567,
   semester: 2,
   courses: [{ course: exampleEnrollCourse }],
 };
-
 export const exampleAllEnrollCourses = {
   courses: [exampleEnrollCourse],
   curriculums: [
@@ -927,3 +921,99 @@ export const exampleAddPlo = {
   data: exampleDataPLO,
   id: 'xxxxxxxxxxxxxxxxbde6',
 };
+
+export const exampleUploadScore = {
+  year: 2567,
+  semester: 2,
+  course: 'xxxxxxxxxxxxxxxxd58f',
+  sections: [
+    {
+      sectionNo: 1,
+      students: [
+        {
+          student: 'xxxxxxxxxxxxxxxx6a80',
+          studentId: 640610001,
+          firstNameEN: 'พัชรินทร์',
+          lastNameEN: 'ทวีสุข',
+          scores: [
+            {
+              assignmentName: 'Final',
+              questions: [
+                { name: '1', score: 0.32 },
+                { name: '2', score: 1.61 },
+              ],
+            },
+          ],
+        },
+      ],
+      assignments: [
+        {
+          name: 'Final',
+          questions: [
+            { name: '1', desc: 'Security', fullScore: 10 },
+            { name: '2', fullScore: 5 },
+          ],
+        },
+      ],
+    },
+  ],
+};
+const exampleAssign = (name: string, publish: boolean = false) => ({
+  name: name,
+  isPublish: publish,
+  questions: [
+    { name: '1', desc: 'Security', fullScore: 10 },
+    { name: '2', fullScore: 5 },
+  ],
+  createdAt: '2025-03-22T07:20:00.285Z',
+});
+const exampleScore = (name: string, questions?: any[]) => ({
+  assignmentName: name,
+  questions: questions ?? [
+    { name: '1', score: 0.32 },
+    { name: '2', score: 1.61 },
+  ],
+});
+
+export const exampleResUploadScore = (
+  name: string,
+  publish: boolean = false,
+  del: boolean = false,
+  questions?: any[],
+) => [
+  {
+    sectionNo: 1,
+    ...(!publish && {
+      addFirstTime: true,
+      isActive: true,
+      instructor: 'xxxxxxxxxxxxxxxx5366',
+      coInstructors: [],
+      students: [
+        {
+          student: {
+            id: 'xxxxxxxxxxxxxxxx34cc',
+            studentId: '640610001',
+            firstNameTH: 'พัชรินทร์',
+            lastNameTH: 'ทวีสุข',
+            firstNameEN: 'Patcharin',
+            lastNameEN: 'Taveesuk',
+            email: 'patcharin_t@cmu.ac.th',
+          },
+          scores: del ? [] : [exampleScore(name, questions)],
+        },
+      ],
+    }),
+    assignments: del ? [] : [exampleAssign(name, publish)],
+    id: 'xxxxxxxxxxxxxxxx522a',
+  },
+];
+
+export const exampleResSectionAssign = (
+  name: string,
+  publish: boolean = false,
+  del: boolean = false,
+  questions?: any[],
+) => ({
+  sections: exampleResUploadScore(name, publish, del, questions),
+  id: 'xxxxxxxxxxxxxxxx6483',
+});

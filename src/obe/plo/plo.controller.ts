@@ -38,7 +38,7 @@ import {
   exampleAddPlo,
   exampleDataPLO,
   examplePLONo2,
-} from 'src/common/example-response/example.response';
+} from 'src/common/example/example';
 
 @ApiTags('PLO')
 @Controller('/plo')
@@ -171,7 +171,7 @@ export class PLOController {
     required: true,
     schema: { example: examplePLONo2 },
   })
-  @ApiSuccessResponse(PLO, { data: exampleAddPlo })
+  @ApiSuccessResponse(PLO, exampleAddPlo)
   @ApiUnauthorizedErrorResponse()
   async createPLONo(
     @Param('id') id: string,
@@ -195,7 +195,7 @@ export class PLOController {
       example: { data: exampleDataPLO },
     },
   })
-  @ApiSuccessResponse(PLO, { data: exampleAddPlo })
+  @ApiSuccessResponse(PLO, exampleAddPlo)
   @ApiUnauthorizedErrorResponse()
   async updatePLO(
     @Param('id') id: string,

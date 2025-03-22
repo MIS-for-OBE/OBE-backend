@@ -15,7 +15,7 @@ import {
   exampleTqf3P5,
   exampleTqf3P6,
   exampleTqf3P7,
-} from 'src/common/example-response/example.response';
+} from 'src/common/example/example';
 import { PLONo } from 'src/obe/plo/schemas/plo.schema';
 
 @Schema()

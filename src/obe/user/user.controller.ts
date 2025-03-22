@@ -28,7 +28,7 @@ import {
   exampleInstructor,
   exampleInstructorList,
   exampleStudent,
-} from 'src/common/example-response/example.response';
+} from 'src/common/example/example';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
 
 @ApiTags('User')
@@ -92,7 +92,7 @@ export class UserController {
   @Get('instructor')
   @ApiOperation({ summary: 'Get list of instructors' })
   @ApiUnauthorizedErrorResponse()
-  @ApiSuccessResponse(User, { data: exampleInstructorList })
+  @ApiSuccessResponse(User, exampleInstructorList)
   async getInstructor(): Promise<ResponseDTO<User[]>> {
     return this.service.getInstructor().then((result) => {
       const responseDTO = new ResponseDTO<User[]>();
@@ -149,7 +149,8 @@ export class UserController {
     },
   })
   @ApiSuccessResponse(User, {
-    data: { user: exampleCurriculumAdmin, newAdmin: exampleAdmin },
+    user: exampleCurriculumAdmin,
+    newAdmin: exampleAdmin,
   })
   @ApiUnauthorizedErrorResponse()
   async updateAdmin(

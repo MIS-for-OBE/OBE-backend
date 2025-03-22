@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { BaseDTO } from 'src/common/dto/base.dto';
 import { CMU_ENTRAID_ROLE } from 'src/common/enum/role.enum';
-import { exampleInstructor } from 'src/common/example-response/example.response';
+import { exampleInstructor } from 'src/common/example/example';
 import { User } from 'src/obe/user/schemas/user.schema';
 
 export class LoginDTO extends BaseDTO {

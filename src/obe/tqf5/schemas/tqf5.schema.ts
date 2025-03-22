@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { METHOD_TQF5, TQF_STATUS } from 'src/common/enum/type.enum';
-import { exampleTqf5P1, exampleTqf5P2, exampleTqf5P3 } from 'src/common/example-response/example.response';
+import { exampleTqf5P1, exampleTqf5P2, exampleTqf5P3 } from 'src/common/example/example';
 import { CLO, Eval } from 'src/obe/tqf3/schemas/tqf3.schema';
 
 @Schema()

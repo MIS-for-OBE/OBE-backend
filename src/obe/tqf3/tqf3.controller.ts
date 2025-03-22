@@ -35,7 +35,7 @@ import {
 } from 'src/common/decorators/response.decorator';
 import { DESCRIPTION } from 'src/common/enum/text.enum';
 import { ERROR_ENUM } from 'src/common/enum/error.enum';
-import { exampleCourseReuseTQF3 } from 'src/common/example-response/example.response';
+import { exampleCourseReuseTQF3 } from 'src/common/example/example';
 
 @ApiTags('TQF3')
 @Controller('/tqf3')
@@ -48,7 +48,7 @@ export class TQF3Controller {
   @ApiOperation({
     summary: 'Get reused TQF3 for courses based on the search criteria',
   })
-  @ApiSuccessResponse(null, { data: exampleCourseReuseTQF3 })
+  @ApiSuccessResponse(null, exampleCourseReuseTQF3)
   @ApiUnauthorizedErrorResponse()
   async getCourseReuseTQF3(
     @Query() searchDTO: any,

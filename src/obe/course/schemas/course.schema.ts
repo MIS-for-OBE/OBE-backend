@@ -98,7 +98,7 @@ export class Section {
   @Prop({ required: true, default: true })
   isActive: boolean;
 
-  // @ApiProperty({ type: User, description: 'Instructor of the section' })
+  @ApiProperty({ type: User, description: 'Instructor of the section' })
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   instructor: User;
 
@@ -110,7 +110,7 @@ export class Section {
   coInstructors: User[];
 
   @ApiProperty({
-    // type: [{ student: User, scores: [Score] }],
+    type: [{ student: { type: User }, scores: { type: [Score] } }],
     description: 'Students of the section',
   })
   @Prop({
@@ -138,11 +138,11 @@ export class Section {
   @Prop()
   topic: string;
 
-  // @ApiProperty({ type: TQF3, description: 'TQF3' })
+  @ApiProperty({ type: TQF3, description: 'TQF3' })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF3' })
   TQF3: TQF3;
 
-  // @ApiProperty({ type: TQF5, description: 'TQF5' })
+  @ApiProperty({ type: TQF5, description: 'TQF5' })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF5' })
   TQF5: TQF5;
 }
@@ -203,11 +203,11 @@ export class Course {
   @Prop()
   addFirstTime: boolean;
 
-  // @ApiProperty({ type: TQF3, description: 'TQF3' })
+  @ApiProperty({ type: TQF3, description: 'TQF3' })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF3' })
   TQF3: TQF3;
 
-  // @ApiProperty({ type: TQF5, description: 'TQF5' })
+  @ApiProperty({ type: TQF5, description: 'TQF5' })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF5' })
   TQF5: TQF5;
 }

@@ -1,22 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Course } from '../course/schemas/course.schema';
+import { Course, Section } from '../course/schemas/course.schema';
 import { User } from '../user/schemas/user.schema';
-import { TQF3 } from '../tqf3/schemas/tqf3.schema';
-import { TQF5 } from '../tqf5/schemas/tqf5.schema';
 import { ROLE } from 'src/common/enum/role.enum';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ScoreService {
   constructor(
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
-    @InjectModel(TQF3.name) private readonly tqf3Model: Model<TQF3>,
-    @InjectModel(TQF5.name) private readonly tqf5Model: Model<TQF5>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async uploadScore(requestDTO: any): Promise<any> {
+  async uploadScore(requestDTO: any): Promise<Section[]> {
     try {
       const { year, semester, course, sections } = requestDTO;
       let updateCourse = await this.courseModel.findById(course);
@@ -124,7 +122,58 @@ export class ScoreService {
     }
   }
 
-  async updateAssignment(requestDTO: any): Promise<any> {
+  // async uploadScore(requestDTO: any, jobId: string): Promise<any> {
+  //   try {
+  //     const { year, semester, course, sections } = requestDTO;
+  //     let updateCourse = await this.courseModel.findById(course);
+
+  //     let totalStudents = sections.reduce(
+  //       (sum, sec) => sum + sec.students.length,
+  //       0,
+  //     );
+  //     let processed = 0;
+
+  //     for (const section of sections) {
+  //       for (const student of section.students) {
+  //         let existsUser = await this.userModel.findOne({
+  //           studentId: student.studentId,
+  //         });
+
+  //         if (!existsUser) {
+  //           existsUser = await this.userModel.create({
+  //             ...student,
+  //             role: ROLE.STUDENT,
+  //             enrollCourses: [
+  //               {
+  //                 year,
+  //                 semester,
+  //                 courses: [{ course, section: section.sectionNo }],
+  //               },
+  //             ],
+  //           });
+  //         }
+
+  //         processed++;
+  //         const progress = Math.round((processed / totalStudents) * 100);
+
+  //         // Emit progress event
+  //         this.eventEmitter.emit(`progress.${jobId}`, { jobId, progress });
+  //       }
+  //     }
+
+  //     await updateCourse.save();
+  //     return updateCourse.sections;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
+  async updateAssignment(requestDTO: {
+    course: string;
+    sectionNo: number;
+    oldName: string;
+    name: string;
+  }): Promise<any> {
     try {
       const arrayFilters: any[] = [];
       if (requestDTO.sectionNo) {

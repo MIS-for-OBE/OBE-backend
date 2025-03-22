@@ -40,7 +40,7 @@ import { METHOD_TQF5, TQF_STATUS } from 'src/common/enum/type.enum';
 import {
   exampleAssignmentsMap,
   exampleTqf5P1,
-} from 'src/common/example-response/example.response';
+} from 'src/common/example/example';
 
 @ApiTags('TQF5')
 @Controller('/tqf5')
@@ -57,11 +57,9 @@ export class TQF5Controller {
     schema: { example: { method: METHOD_TQF5.SCORE_OBE } },
   })
   @ApiSuccessResponse(TQF5, {
-    data: {
-      id: 'xxxxxxxxxxxxxxxx6f73',
-      status: TQF_STATUS.IN_PROGRESS,
-      part1: exampleTqf5P1,
-    },
+    id: 'xxxxxxxxxxxxxxxx6f73',
+    status: TQF_STATUS.IN_PROGRESS,
+    part1: exampleTqf5P1,
   })
   @ApiUnauthorizedErrorResponse()
   @ApiErrorResponse(
@@ -89,12 +87,10 @@ export class TQF5Controller {
     schema: { example: { assignments: exampleAssignmentsMap } },
   })
   @ApiSuccessResponse(TQF5, {
-    data: {
-      id: 'xxxxxxxxxxxxxxxx6f73',
-      status: TQF_STATUS.IN_PROGRESS,
-      part1: exampleTqf5P1,
-      assignments: exampleAssignmentsMap,
-    },
+    id: 'xxxxxxxxxxxxxxxx6f73',
+    status: TQF_STATUS.IN_PROGRESS,
+    part1: exampleTqf5P1,
+    assignments: exampleAssignmentsMap,
   })
   @ApiUnauthorizedErrorResponse()
   @ApiErrorResponse(

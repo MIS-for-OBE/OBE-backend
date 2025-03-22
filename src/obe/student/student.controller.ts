@@ -17,7 +17,7 @@ import {
 import {
   exampleAllEnrollCourses,
   exampleEnrollCourses,
-} from 'src/common/example-response/example.response';
+} from 'src/common/example/example';
 import { Course } from '../course/schemas/course.schema';
 
 @ApiTags('Student')
