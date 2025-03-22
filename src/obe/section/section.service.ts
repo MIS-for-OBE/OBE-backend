@@ -13,6 +13,7 @@ import { COURSE_TYPE } from 'src/common/enum/type.enum';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
 import { TQF5 } from '../tqf5/schemas/tqf5.schema';
 import { TEXT_ENUM } from 'src/common/enum/text.enum';
+import { DeleteSectionDTO, DeleteStudentDTO } from './dto/dto';
 
 @Injectable()
 export class SectionService {
@@ -85,7 +86,7 @@ export class SectionService {
           ),
         ]);
       }
-      const course = await this.courseModel.findOneAndUpdate(
+      await this.courseModel.findOneAndUpdate(
         {
           year: requestDTO.year,
           semester: requestDTO.semester,
@@ -97,13 +98,17 @@ export class SectionService {
           new: true,
         },
       );
-      return course;
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
   }
 
-  async updateSectionActive(requestDTO: any): Promise<any> {
+  async updateSectionActive(requestDTO: {
+    courseId: string;
+    sectionNo: number;
+    isActive: boolean;
+  }): Promise<any> {
     try {
       await this.courseModel.updateOne(
         {
@@ -119,18 +124,18 @@ export class SectionService {
     }
   }
 
-  async deleteSection(id: string, requestDTO: any): Promise<any> {
+  async deleteSection(id: string, searchDTO: DeleteSectionDTO): Promise<any> {
     try {
       const updateCourse = await this.courseManagementModel.findOneAndUpdate(
-        { courseNo: requestDTO.courseNo },
-        { $pull: { sections: { sectionNo: requestDTO.sectionNo } } },
+        { courseNo: searchDTO.courseNo },
+        { $pull: { sections: { sectionNo: searchDTO.sectionNo } } },
         { new: true },
       );
       if (!updateCourse) {
         throw new NotFoundException('Course not found');
       }
       const update = await this.courseModel.findByIdAndUpdate(
-        requestDTO.courseId,
+        searchDTO.courseId,
         {
           $pull: { sections: { _id: id } },
         },
@@ -362,7 +367,7 @@ export class SectionService {
     }
   }
 
-  async deleteStudent(requestDTO: any): Promise<Section[]> {
+  async deleteStudent(requestDTO: DeleteStudentDTO): Promise<Section[]> {
     try {
       await Promise.all([
         this.courseModel.findByIdAndUpdate(

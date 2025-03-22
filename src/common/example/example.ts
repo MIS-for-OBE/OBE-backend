@@ -1,5 +1,6 @@
 import { PLO } from 'src/obe/plo/schemas/plo.schema';
 import { ROLE } from '../enum/role.enum';
+import { COURSE_TYPE } from '../enum/type.enum';
 
 export const exampleAcademicYearList = [
   {
@@ -16,44 +17,46 @@ export const exampleAcademicYearList = [
   },
 ];
 
-export const exampleStudent = {
+export const exampleStudent = (enrollCourse: boolean = false) => ({
   id: 'xxxxxxxxxxxxxxxx34cc',
-  studentId: '640610xxx',
+  studentId: '640610001',
   firstNameTH: 'พัชรินทร์',
   lastNameTH: 'ทวีสุข',
   firstNameEN: 'Patcharin',
   lastNameEN: 'Taveesuk',
   email: 'patcharin_t@cmu.ac.th',
-  facultyCode: '06',
-  role: ROLE.STUDENT,
-  termsOfService: true,
-  enrollCourses: [
-    {
-      year: 2567,
-      semester: 1,
-      courses: [
-        {
-          course: 'xxxxxxxxxxxxxxxx4438',
-          section: 3,
-        },
-      ],
-    },
-    {
-      year: 2567,
-      semester: 2,
-      courses: [
-        {
-          course: 'xxxxxxxxxxxxxxxxc948',
-          section: 1,
-        },
-        {
-          course: 'xxxxxxxxxxxxxxxx2d70',
-          section: 8,
-        },
-      ],
-    },
-  ],
-};
+  ...(enrollCourse && {
+    facultyCode: '06',
+    role: ROLE.STUDENT,
+    termsOfService: true,
+    enrollCourses: [
+      {
+        year: 2567,
+        semester: 1,
+        courses: [
+          {
+            course: 'xxxxxxxxxxxxxxxx4438',
+            section: 3,
+          },
+        ],
+      },
+      {
+        year: 2567,
+        semester: 2,
+        courses: [
+          {
+            course: 'xxxxxxxxxxxxxxxxc948',
+            section: 1,
+          },
+          {
+            course: 'xxxxxxxxxxxxxxxx2d70',
+            section: 8,
+          },
+        ],
+      },
+    ],
+  }),
+});
 export const exampleInstructor = {
   id: 'xxxxxxxxxxxxxxxx34cd',
   firstNameTH: 'สมชาย',
@@ -931,7 +934,7 @@ export const exampleUploadScore = {
       sectionNo: 1,
       students: [
         {
-          student: 'xxxxxxxxxxxxxxxx6a80',
+          student: 'xxxxxxxxxxxxxxxx34cc',
           studentId: 640610001,
           firstNameEN: 'พัชรินทร์',
           lastNameEN: 'ทวีสุข',
@@ -974,7 +977,6 @@ const exampleScore = (name: string, questions?: any[]) => ({
     { name: '2', score: 1.61 },
   ],
 });
-
 export const exampleResUploadScore = (
   name: string,
   publish: boolean = false,
@@ -990,15 +992,7 @@ export const exampleResUploadScore = (
       coInstructors: [],
       students: [
         {
-          student: {
-            id: 'xxxxxxxxxxxxxxxx34cc',
-            studentId: '640610001',
-            firstNameTH: 'พัชรินทร์',
-            lastNameTH: 'ทวีสุข',
-            firstNameEN: 'Patcharin',
-            lastNameEN: 'Taveesuk',
-            email: 'patcharin_t@cmu.ac.th',
-          },
+          student: exampleStudent(),
           scores: del ? [] : [exampleScore(name, questions)],
         },
       ],
@@ -1007,7 +1001,6 @@ export const exampleResUploadScore = (
     id: 'xxxxxxxxxxxxxxxx522a',
   },
 ];
-
 export const exampleResSectionAssign = (
   name: string,
   publish: boolean = false,
@@ -1017,3 +1010,56 @@ export const exampleResSectionAssign = (
   sections: exampleResUploadScore(name, publish, del, questions),
   id: 'xxxxxxxxxxxxxxxx6483',
 });
+
+export const exampleUploadStdList = {
+  year: 2567,
+  semester: 2,
+  course: 'xxxxxxxxxxxxxxxx6483',
+  sections: [
+    {
+      sectionNo: 1,
+      studentList: [
+        {
+          studentId: 640610001,
+          firstNameTH: 'พัชรินทร์',
+          lastNameTH: 'ทวีสุข',
+        },
+      ],
+    },
+  ],
+};
+
+export const exampleAddEditStudent = (
+  sec: number,
+  edit: boolean = false,
+  res: boolean = false,
+) => ({
+  ...(!res && {
+    year: 2567,
+    semester: 2,
+    course: 'xxxxxxxxxxxxxxxx6483',
+    sectionNo: sec,
+  }),
+  ...(edit && { oldSectionNo: 1 }),
+  ...((edit || res) && { student: 'xxxxxxxxxxxxxxxx9b72' }),
+  studentId: '640610003',
+  email: 'test@cmu.ac.th',
+  firstNameTH: 'ชื่อ',
+  lastNameTH: 'นามสกุล',
+});
+
+export const exampleUpdateSection = {
+  courseId: 'xxxxxxxxxxxxxxxx6483',
+  oldSectionNo: 1,
+  courseNo: '261999',
+  type: COURSE_TYPE.GENERAL,
+  isActive: true,
+  data: {
+    sectionNo: 3,
+    semester: [2],
+    curriculum: 'CPE-2563',
+    isActive: true,
+  },
+  year: 2567,
+  semester: 2,
+};

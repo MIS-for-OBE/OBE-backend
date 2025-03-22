@@ -186,7 +186,7 @@ export class PLOController {
 
   @Put('/:id')
   @ApiOperation({ summary: 'Update an existing PLO' })
-  @ApiParam({ name: 'id', description: 'ID of PLO to updated.' })
+  @ApiParam({ name: 'id', description: 'ID of PLO to be updated.' })
   @ApiBody({
     schema: {
       properties: {
@@ -210,7 +210,7 @@ export class PLOController {
 
   @Delete('/:id')
   @ApiOperation({ summary: 'Delete a PLO' })
-  @ApiParam({ name: 'id', description: 'ID of PLO to deleted.' })
+  @ApiParam({ name: 'id', description: 'ID of PLO to be deleted.' })
   @ApiSuccessResponse(null, { message: TEXT_ENUM.Success })
   @ApiUnauthorizedErrorResponse()
   @ApiErrorResponse(
@@ -229,8 +229,8 @@ export class PLOController {
 
   @Delete('/:id/no')
   @ApiOperation({ summary: 'Delete a PLONo from a PLO' })
-  @ApiParam({ name: 'id', description: 'ID of PLO to deleted.' })
-  @ApiQuery({ name: 'id', description: 'ID of PLONo to deleted.' })
+  @ApiParam({ name: 'id', description: 'ID of PLO to be deleted.' })
+  @ApiQuery({ name: 'id', description: 'ID of PLONo to be deleted.' })
   @ApiSuccessResponse(PLO)
   @ApiUnauthorizedErrorResponse()
   @ApiErrorResponse(

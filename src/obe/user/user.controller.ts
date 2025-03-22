@@ -41,7 +41,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get user info' })
   @ApiUnauthorizedErrorResponse()
   @ApiSuccessResponse(User, [
-    { option: ROLE.STUDENT, data: exampleStudent },
+    { option: ROLE.STUDENT, data: exampleStudent(true) },
     { option: ROLE.INSTRUCTOR, data: exampleInstructor },
     { option: ROLE.CURRICULUM_ADMIN, data: exampleCurriculumAdmin },
     { option: ROLE.ADMIN, data: exampleAdmin },

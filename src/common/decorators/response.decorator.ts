@@ -28,9 +28,8 @@ export function ApiSuccessResponse(
           },
         }),
         ...(examples &&
-          (!(examples as any)?.length
-            ? { example: { message: exampleMessage, data: examples } }
-            : {
+          ((examples as any[])?.length && (examples as any[])?.[0].option
+            ? {
                 examples: (examples as any[])?.reduce((acc, msg) => {
                   acc[`${msg.option}`] = {
                     summary: msg.option,
@@ -41,7 +40,8 @@ export function ApiSuccessResponse(
                   };
                   return acc;
                 }, {}),
-              })),
+              }
+            : { example: { message: exampleMessage, data: examples } })),
       },
     },
   });
