@@ -11,7 +11,7 @@ export class ScoreService {
   constructor(
     @InjectModel(Course.name) private readonly courseModel: Model<Course>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
-    private readonly eventEmitter: EventEmitter2,
+    // private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async uploadScore(requestDTO: any): Promise<Section[]> {
