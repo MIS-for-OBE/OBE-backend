@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { METHOD_TQF5, TQF_STATUS } from 'src/common/enum/type.enum';
+import { exampleTqf5P1, exampleTqf5P2, exampleTqf5P3 } from 'src/common/example-response/example.response';
 import { CLO, Eval } from 'src/obe/tqf3/schemas/tqf3.schema';
 
 @Schema()
@@ -194,12 +196,30 @@ export type TQF5Document = HydratedDocument<TQF5>;
   timestamps: { createdAt: false, updatedAt: true },
 })
 export class TQF5 {
+  @ApiProperty({
+    description: 'TQF5 document status',
+    enum: TQF_STATUS,
+    example: TQF_STATUS.DONE,
+  })
   @Prop({ required: true, enum: TQF_STATUS })
   status: TQF_STATUS;
 
+  @ApiProperty({
+    description: 'Method for generating TQF5 Part 2 & 3',
+    enum: METHOD_TQF5,
+    example: METHOD_TQF5.SCORE_OBE,
+  })
   @Prop({ enum: TQF_STATUS })
   method?: METHOD_TQF5;
 
+  @ApiProperty({
+    description: `Assignment mapping (Only applicable if method = ${METHOD_TQF5.SCORE_OBE})`,
+    type: Array,
+    example: [
+      { eval: 'Midterm', assignment: ['1', '3'] },
+      { eval: 'Final', assignment: ['2'] },
+    ],
+  })
   @Prop({
     type: [
       {
@@ -211,12 +231,30 @@ export class TQF5 {
   })
   assignmentsMap?: { eval: string; assignment: string[] }[];
 
+  @ApiProperty({
+    description: 'Part 1 details',
+    type: Object,
+    required: false,
+    example: exampleTqf5P1,
+  })
   @Prop({ type: Part1Schema, _id: false })
   part1?: Part1;
 
+  @ApiProperty({
+    description: 'Part 2 details',
+    type: Object,
+    required: false,
+    example: exampleTqf5P2,
+  })
   @Prop({ type: Part2Schema, _id: false })
   part2?: Part2;
 
+  @ApiProperty({
+    description: 'Part 3 details',
+    type: Object,
+    required: false,
+    example: exampleTqf5P3,
+  })
   @Prop({ type: Part3Schema, _id: false })
   part3?: Part3;
 }

@@ -336,3 +336,572 @@ export const exampleCourseReuseTQF3 = [
     id: 'xxxxxxxxxxxxxxxxa8a4',
   },
 ];
+
+export const exampleTqf3P1 = {
+  curriculum: 'สำหรับหลายหลักสูตร',
+  courseType: ['General Education'],
+  studentYear: [3, 4, 5, 6],
+  mainInstructor: 'สมชาย ใจดี',
+  instructors: ['สมชาย ใจดี', 'มานะ ปิติ'],
+  teachingLocation: { in: '' },
+  consultHoursWk: 1,
+  updatedAt: '2025-01-13T21:02:56.724Z',
+};
+export const exampleTqf3P2 = {
+  teachingMethod: ['Lecture'],
+  clo: [
+    {
+      no: 1,
+      descTH: 'CLO 1',
+      descEN: 'CLO 1',
+      learningMethod: ['บรรยาย (Lecture)'],
+      id: '67857fcc432717f4e5036f73',
+    },
+    {
+      no: 2,
+      descTH: 'CLO 2',
+      descEN: 'CLO 2',
+      learningMethod: ['บรรยาย (Lecture)'],
+      id: '67857fcc432717f4e5036f74',
+    },
+    {
+      no: 3,
+      descTH: 'CLO 3',
+      descEN: 'CLO 3',
+      learningMethod: ['บรรยาย (Lecture)'],
+      id: '67857fcc432717f4e5036f75',
+    },
+    {
+      no: 4,
+      descTH: 'CLO 4',
+      descEN: 'CLO 4',
+      learningMethod: ['บรรยาย (Lecture)'],
+      id: '67857fcc432717f4e5036f76',
+    },
+  ],
+  schedule: [
+    {
+      weekNo: 1,
+      topic: 'content 1',
+      lecHour: 3,
+      labHour: 0,
+      id: '67c8230842bec769db7da62c',
+    },
+    {
+      weekNo: 2,
+      topic: 'content 2',
+      lecHour: 3,
+      labHour: 0,
+      id: '67c8230842bec769db7da62d',
+    },
+    {
+      weekNo: 3,
+      topic: 'content 3',
+      lecHour: 3,
+      labHour: 0,
+      id: '67c8230842bec769db7da62e',
+    },
+    {
+      weekNo: 4,
+      topic: 'content 4',
+      lecHour: 3,
+      labHour: 0,
+      id: '67c8230842bec769db7da62f',
+    },
+    {
+      weekNo: 5,
+      topic: 'content 5',
+      lecHour: 3,
+      labHour: 0,
+      id: '67c8230842bec769db7da630',
+    },
+  ],
+  evaluate: 'A-F',
+  updatedAt: '2025-03-05T10:10:16.032Z',
+};
+export const exampleTqf3P3 = {
+  eval: [
+    {
+      no: 1,
+      topicTH: 'สอบกาลางภาค',
+      topicEN: 'midterm',
+      desc: '',
+      percent: 50,
+      id: '67858041432717f4e5036f83',
+    },
+    {
+      no: 2,
+      topicTH: 'สอบปลายภาค',
+      topicEN: 'final',
+      desc: '',
+      percent: 50,
+      id: '67858041432717f4e5036f84',
+    },
+  ],
+  gradingPolicy:
+    'แบบอิงเกณฑ์และอิงกลุ่ม (Criterion and Norm-Referenced Grading)',
+  updatedAt: '2025-01-13T21:10:52.569Z',
+};
+export const exampleTqf3P4 = {
+  data: [
+    {
+      clo: '67857fcc432717f4e5036f73',
+      percent: 20,
+      evals: [
+        {
+          eval: '67858041432717f4e5036f84',
+          evalWeek: ['1'],
+          percent: 20,
+          id: '67d6bf8f995077c787ad9add',
+        },
+      ],
+    },
+    {
+      clo: '67857fcc432717f4e5036f74',
+      percent: 15,
+      evals: [
+        {
+          eval: '67858041432717f4e5036f83',
+          evalWeek: ['1', '2'],
+          percent: 15,
+          id: '67d6bf8f995077c787ad9ade',
+        },
+      ],
+    },
+    {
+      clo: '67857fcc432717f4e5036f75',
+      percent: 40,
+      evals: [
+        {
+          eval: '67858041432717f4e5036f84',
+          evalWeek: ['3'],
+          percent: 5,
+          id: '67d6bf8f995077c787ad9adf',
+        },
+        {
+          eval: '67858041432717f4e5036f83',
+          evalWeek: ['3', '4'],
+          percent: 35,
+          id: '67d6bf8f995077c787ad9ae0',
+        },
+      ],
+    },
+    {
+      clo: '67857fcc432717f4e5036f76',
+      percent: 25,
+      evals: [
+        {
+          eval: '67858041432717f4e5036f84',
+          evalWeek: ['5'],
+          percent: 25,
+          id: '67d6bf8f995077c787ad9ae1',
+        },
+      ],
+    },
+  ],
+  updatedAt: '2025-03-16T12:09:51.092Z',
+};
+export const exampleTqf3P5 = {
+  mainRef: '',
+  recDoc: '',
+  updatedAt: '2025-01-13T21:07:13.706Z',
+};
+export const exampleTqf3P6 = {
+  data: [
+    {
+      topic: 'กลยุทธ์การประเมินประสิทธิผลของกระบวนวิชาโดยนักศึกษา',
+      detail: ['ไม่มี (None)'],
+      other: '',
+    },
+    {
+      topic: 'กลยุทธ์การประเมินการสอน',
+      detail: ['ไม่มี (None)'],
+      other: '',
+    },
+    {
+      topic: 'กลไกการปรับปรับปรุงการสอบ',
+      detail: ['ไม่มี (None)'],
+      other: '',
+    },
+    {
+      topic: 'กระบวนการทวนสอบมาตรฐานผลสัมฤทธิ์กระบวนวิชาของนักศึกษา',
+      detail: ['ไม่มี (None)'],
+      other: '',
+    },
+    {
+      topic: 'การดำเนินการทบทวนและการวางแผนปรับปรุงประสิทธิผลของกระบวนวิชา',
+      detail: ['ไม่มี (None)'],
+      other: '',
+    },
+  ],
+  updatedAt: '2025-01-13T21:07:26.742Z',
+};
+export const exampleTqf3P7 = {
+  list: [
+    {
+      curriculum: 'CPE-2563',
+      data: [
+        {
+          clo: '67857fcc432717f4e5036f73',
+          plos: ['672c4430d40f44d6b1846b4e', '672c4430d40f44d6b1846b50'],
+        },
+        {
+          clo: '67857fcc432717f4e5036f74',
+          plos: ['672c4430d40f44d6b1846b4f', '672c4430d40f44d6b1846b53'],
+        },
+        {
+          clo: '67857fcc432717f4e5036f75',
+          plos: ['672c4430d40f44d6b1846b4e'],
+        },
+        {
+          clo: '67857fcc432717f4e5036f76',
+          plos: ['672c4430d40f44d6b1846b52'],
+        },
+      ],
+    },
+  ],
+  updatedAt: '2025-03-05T10:10:41.909Z',
+};
+
+export const exampleTqf5P1 = {
+  list: [
+    {
+      curriculum: null,
+      courseEval: [
+        {
+          sectionNo: 1,
+          A: 0,
+          Bplus: 0,
+          B: 0,
+          Cplus: 0,
+          C: 0,
+          Dplus: 0,
+          D: 0,
+          F: 0,
+          W: 0,
+          S: 333,
+          U: 0,
+          P: 0,
+        },
+        {
+          sectionNo: 2,
+          A: 0,
+          Bplus: 0,
+          B: 0,
+          Cplus: 0,
+          C: 0,
+          Dplus: 0,
+          D: 0,
+          F: 0,
+          W: 0,
+          S: 211,
+          U: 0,
+          P: 0,
+        },
+        {
+          sectionNo: 3,
+          A: 0,
+          Bplus: 0,
+          B: 0,
+          Cplus: 0,
+          C: 0,
+          Dplus: 0,
+          D: 0,
+          F: 0,
+          W: 0,
+          S: 10,
+          U: 0,
+          P: 0,
+        },
+        {
+          sectionNo: 801,
+          A: 0,
+          Bplus: 0,
+          B: 0,
+          Cplus: 0,
+          C: 0,
+          Dplus: 0,
+          D: 0,
+          F: 0,
+          W: 0,
+          S: 116,
+          U: 0,
+          P: 0,
+        },
+        {
+          sectionNo: 802,
+          A: 0,
+          Bplus: 0,
+          B: 0,
+          Cplus: 0,
+          C: 0,
+          Dplus: 0,
+          D: 0,
+          F: 0,
+          W: 0,
+          S: 2,
+          U: 0,
+          P: 0,
+        },
+      ],
+      gradingCriteria: {
+        A: '',
+        Bplus: '',
+        B: '',
+        Cplus: '',
+        C: '',
+        Dplus: '',
+        D: '',
+        F: '',
+        W: '-',
+        S: '64',
+        U: '63.99',
+      },
+      abnormalScoreFactor: '',
+      reviewingSLO: '',
+    },
+  ],
+  updatedAt: '2025-03-16T04:13:26.579Z',
+};
+export const exampleAssignmentsMap = [
+  {
+    eval: 'Module 1: Skill Development through Experiences',
+    assignment: ['Module1'],
+  },
+  {
+    eval: 'Module 2: Shaping Your Professional Profile Through Continuous Learning',
+    assignment: ['Module2'],
+  },
+  {
+    eval: '03. Mapping Your Engineering Career Path  ',
+    assignment: ['Module3'],
+  },
+];
+export const exampleTqf5P2 = {
+  data: [
+    {
+      clo: '67d589dd44027b2c162f37da',
+      assignments: [
+        {
+          eval: '67d58a8f44027b2c162f37f1',
+          questions: ['Module1-Module#1'],
+        },
+      ],
+    },
+    {
+      clo: '67d589dd44027b2c162f37db',
+      assignments: [
+        {
+          eval: '67d58a8f44027b2c162f37f2',
+          questions: [
+            'Module2-1',
+            'Module2-2',
+            'Module2-3',
+            'Module2-4',
+            'Module2-5',
+            'Module2-6',
+          ],
+        },
+      ],
+    },
+    {
+      clo: '67d589dd44027b2c162f37dc',
+      assignments: [
+        {
+          eval: '67d58a8f44027b2c162f37f3',
+          questions: ['Module3-1'],
+        },
+      ],
+    },
+  ],
+  updatedAt: '2025-03-16T05:05:28.225Z',
+};
+export const exampleTqf5P3 = {
+  data: [
+    {
+      clo: '67d589dd44027b2c162f37da',
+      assess: [
+        {
+          eval: '67d58a8f44027b2c162f37f1',
+          sheet: ['Module1'],
+          percent: 30,
+          fullScore: 31,
+          range0: 6.4,
+          range1: 12,
+          range2: 18,
+          range3: 24,
+          _id: '67de3da2b692599ecd9e0a1b',
+        },
+      ],
+      sections: [
+        {
+          sectionNo: 1,
+          score0: 87,
+          score1: 162,
+          score2: 59,
+          score3: 18,
+          score4: 7,
+        },
+        {
+          sectionNo: 2,
+          score0: 61,
+          score1: 107,
+          score2: 38,
+          score3: 2,
+          score4: 3,
+        },
+        {
+          sectionNo: 3,
+          score0: 10,
+          score1: 0,
+          score2: 0,
+          score3: 0,
+          score4: 0,
+        },
+        {
+          sectionNo: 801,
+          score0: 38,
+          score1: 49,
+          score2: 21,
+          score3: 3,
+          score4: 5,
+        },
+        {
+          sectionNo: 802,
+          score0: 2,
+          score1: 0,
+          score2: 0,
+          score3: 0,
+          score4: 0,
+        },
+      ],
+      score: 1.02,
+    },
+    {
+      clo: '67d589dd44027b2c162f37db',
+      assess: [
+        {
+          eval: '67d58a8f44027b2c162f37f2',
+          sheet: [
+            'Module2',
+            'Module2',
+            'Module2',
+            'Module2',
+            'Module2',
+            'Module2',
+          ],
+          percent: 40,
+          fullScore: 32,
+          range0: 6.4,
+          range1: 12.8,
+          range2: 19.200000000000003,
+          range3: 25.6,
+          _id: '67de3da2b692599ecd9e0a1c',
+        },
+      ],
+      sections: [
+        {
+          sectionNo: 1,
+          score0: 13,
+          score1: 2,
+          score2: 1,
+          score3: 6,
+          score4: 311,
+        },
+        {
+          sectionNo: 2,
+          score0: 15,
+          score1: 0,
+          score2: 0,
+          score3: 6,
+          score4: 190,
+        },
+        {
+          sectionNo: 3,
+          score0: 10,
+          score1: 0,
+          score2: 0,
+          score3: 0,
+          score4: 0,
+        },
+        {
+          sectionNo: 801,
+          score0: 2,
+          score1: 3,
+          score2: 2,
+          score3: 7,
+          score4: 102,
+        },
+        {
+          sectionNo: 802,
+          score0: 2,
+          score1: 0,
+          score2: 0,
+          score3: 0,
+          score4: 0,
+        },
+      ],
+      score: 3.69,
+    },
+    {
+      clo: '67d589dd44027b2c162f37dc',
+      assess: [
+        {
+          eval: '67d58a8f44027b2c162f37f3',
+          sheet: ['Module3'],
+          percent: 30,
+          fullScore: 30,
+          range0: 6,
+          range1: 12,
+          range2: 18,
+          range3: 24,
+          _id: '67de3da2b692599ecd9e0a1d',
+        },
+      ],
+      sections: [
+        {
+          sectionNo: 1,
+          score0: 8,
+          score1: 2,
+          score2: 0,
+          score3: 12,
+          score4: 311,
+        },
+        {
+          sectionNo: 2,
+          score0: 10,
+          score1: 3,
+          score2: 0,
+          score3: 13,
+          score4: 185,
+        },
+        {
+          sectionNo: 3,
+          score0: 10,
+          score1: 0,
+          score2: 0,
+          score3: 0,
+          score4: 0,
+        },
+        {
+          sectionNo: 801,
+          score0: 1,
+          score1: 2,
+          score2: 0,
+          score3: 7,
+          score4: 106,
+        },
+        {
+          sectionNo: 802,
+          score0: 2,
+          score1: 0,
+          score2: 0,
+          score3: 0,
+          score4: 0,
+        },
+      ],
+      score: 3.74,
+    },
+  ],
+  updatedAt: '2025-03-22T04:33:38.349Z',
+};

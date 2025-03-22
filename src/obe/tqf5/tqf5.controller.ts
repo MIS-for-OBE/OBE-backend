@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -19,18 +20,59 @@ import { GeneratePdfDTO } from './dto/dto';
 import * as fs from 'fs';
 import * as archiver from 'archiver';
 import { join } from 'path';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  ApiSuccessResponse,
+  ApiUnauthorizedErrorResponse,
+  ApiErrorResponse,
+} from 'src/common/decorators/response.decorator';
+import { ERROR_ENUM } from 'src/common/enum/error.enum';
+import { DESCRIPTION } from 'src/common/enum/text.enum';
+import { METHOD_TQF5, TQF_STATUS } from 'src/common/enum/type.enum';
+import {
+  exampleAssignmentsMap,
+  exampleTqf5P1,
+} from 'src/common/example-response/example.response';
 
 @ApiTags('TQF5')
 @Controller('/tqf5')
+@ApiExtraModels(TQF5)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class TQF5Controller {
   constructor(private service: TQF5Service) {}
 
   @Post('/:id/change-method')
+  @ApiOperation({ summary: 'Change the method of a TQF5 document' })
+  @ApiParam({ name: 'id', required: true, description: 'TQF5 document ID' })
+  @ApiBody({
+    description: 'Method of a TQF5 document',
+    schema: { example: { method: METHOD_TQF5.SCORE_OBE } },
+  })
+  @ApiSuccessResponse(TQF5, {
+    data: {
+      id: 'xxxxxxxxxxxxxxxx6f73',
+      status: TQF_STATUS.IN_PROGRESS,
+      part1: exampleTqf5P1,
+    },
+  })
+  @ApiUnauthorizedErrorResponse()
+  @ApiErrorResponse(
+    HttpStatus.NOT_FOUND,
+    DESCRIPTION.NOT_FOUND,
+    ERROR_ENUM.NOT_FOUND,
+    'TQF5 not found',
+  )
   async changeMethod(
     @Param() params: { id: string },
-    @Body() requestDTO: any,
+    @Body() requestDTO: { method: METHOD_TQF5 },
   ): Promise<ResponseDTO<TQF5>> {
     return this.service.changeMethod(params, requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<TQF5>();
@@ -40,6 +82,27 @@ export class TQF5Controller {
   }
 
   @Post('/:id/mapping-assignment')
+  @ApiOperation({ summary: 'Map assignments to a TQF5 document' })
+  @ApiParam({ name: 'id', required: true, description: 'TQF5 document ID' })
+  @ApiBody({
+    description: 'Request DTO containing assignment mappings',
+    schema: { example: { assignments: exampleAssignmentsMap } },
+  })
+  @ApiSuccessResponse(TQF5, {
+    data: {
+      id: 'xxxxxxxxxxxxxxxx6f73',
+      status: TQF_STATUS.IN_PROGRESS,
+      part1: exampleTqf5P1,
+      assignments: exampleAssignmentsMap,
+    },
+  })
+  @ApiUnauthorizedErrorResponse()
+  @ApiErrorResponse(
+    HttpStatus.NOT_FOUND,
+    DESCRIPTION.NOT_FOUND,
+    ERROR_ENUM.NOT_FOUND,
+    'TQF5 not found',
+  )
   async mappingAssignments(
     @Param() params: { id: string },
     @Body() requestDTO: any,
@@ -54,6 +117,25 @@ export class TQF5Controller {
   }
 
   @Put('/:id/:part')
+  @ApiOperation({ summary: 'Save data for a specific part of TQF5' })
+  @ApiQuery({
+    name: 'id',
+    description: 'ID of the TQF5',
+    required: true,
+  })
+  @ApiQuery({
+    name: 'part',
+    description: 'Part of the TQF5 that want to save',
+    required: true,
+  })
+  @ApiSuccessResponse(TQF5)
+  @ApiUnauthorizedErrorResponse()
+  @ApiErrorResponse(
+    HttpStatus.NOT_FOUND,
+    DESCRIPTION.NOT_FOUND,
+    ERROR_ENUM.NOT_FOUND,
+    'TQF5 not found',
+  )
   async saveEachPart(
     @Param() params: { id: string; part: string },
     @Body() requestDTO: any,
@@ -66,6 +148,8 @@ export class TQF5Controller {
   }
 
   @Get('pdf')
+  @ApiOperation({ summary: 'Generate PDF for TQF5 data' })
+  @ApiOkResponse({ description: 'Get PDF TQF5' })
   async generatePDF(
     @Request() req,
     @Res() res: Response,

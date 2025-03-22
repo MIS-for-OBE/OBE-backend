@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { TQF5 } from './schemas/tqf5.schema';
 import { Model } from 'mongoose';
-import { TQF_STATUS } from 'src/common/enum/type.enum';
+import { METHOD_TQF5, TQF_STATUS } from 'src/common/enum/type.enum';
 import { GeneratePdfDTO } from './dto/dto';
 import * as moment from 'moment';
 import * as fs from 'fs';
@@ -20,7 +20,10 @@ export class TQF5Service {
     private readonly generatePdfBLL: GeneratePdfTqf5BLL,
   ) {}
 
-  async changeMethod(params: { id: string }, requestDTO: any): Promise<TQF5> {
+  async changeMethod(
+    params: { id: string },
+    requestDTO: { method: METHOD_TQF5 },
+  ): Promise<TQF5> {
     try {
       const tqf5Document = await this.model.findByIdAndUpdate(
         params.id,
@@ -32,7 +35,7 @@ export class TQF5Service {
         { new: true },
       );
       if (!tqf5Document) {
-        throw new NotFoundException('TQF5 not found.');
+        throw new NotFoundException('TQF5 not found');
       }
       return tqf5Document;
     } catch (error) {
@@ -54,7 +57,7 @@ export class TQF5Service {
         { new: true },
       );
       if (!tqf5Document) {
-        throw new NotFoundException('TQF5 not found.');
+        throw new NotFoundException('TQF5 not found');
       }
       return tqf5Document.assignmentsMap;
     } catch (error) {
@@ -69,7 +72,7 @@ export class TQF5Service {
     try {
       const tqf5Document = await this.model.findById(params.id);
       if (!tqf5Document) {
-        throw new NotFoundException('TQF5 not found.');
+        throw new NotFoundException('TQF5 not found');
       }
 
       tqf5Document[params.part] = { ...requestDTO };
