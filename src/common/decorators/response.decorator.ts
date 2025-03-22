@@ -95,9 +95,9 @@ export function ApiErrorResponse(
                 statusCode: statusCode,
               },
             }
-          : isObject(exampleMessages)
-            ? { example: exampleMessages }
-            : {
+          : (exampleMessages as ErrorRes)?.length &&
+              (exampleMessages as ErrorRes)?.[0].option
+            ? {
                 examples: (exampleMessages as ErrorRes).reduce(
                   (acc, { option, message }) => {
                     acc[`${option}`] = {
@@ -112,7 +112,8 @@ export function ApiErrorResponse(
                   },
                   {},
                 ),
-              }),
+              }
+            : { example: exampleMessages }),
       },
     },
   });

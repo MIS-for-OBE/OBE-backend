@@ -42,8 +42,8 @@ export class UserController {
   @ApiUnauthorizedErrorResponse()
   @ApiSuccessResponse(User, [
     { option: ROLE.STUDENT, data: exampleStudent(true) },
-    { option: ROLE.INSTRUCTOR, data: exampleInstructor },
-    { option: ROLE.CURRICULUM_ADMIN, data: exampleCurriculumAdmin },
+    { option: ROLE.INSTRUCTOR, data: exampleInstructor(true) },
+    { option: ROLE.CURRICULUM_ADMIN, data: exampleCurriculumAdmin(true) },
     { option: ROLE.ADMIN, data: exampleAdmin },
   ])
   async getUserInfo(@Request() req): Promise<ResponseDTO<User>> {

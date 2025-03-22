@@ -6,10 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {
-  CourseManagement,
-  CourseManagementDocument,
-} from './schemas/courseManagement.schema';
+import { CourseManagement } from './schemas/courseManagement.schema';
 import { User } from '../user/schemas/user.schema';
 import { COURSE_TYPE, TQF_STATUS } from 'src/common/enum/type.enum';
 import {
@@ -23,6 +20,7 @@ import { TEXT_ENUM } from 'src/common/enum/text.enum';
 import { ROLE } from 'src/common/enum/role.enum';
 import { TQF3 } from '../tqf3/schemas/tqf3.schema';
 import { TQF5 } from '../tqf5/schemas/tqf5.schema';
+import { DeleteCourseManagementDTO, DeleteSectionManagementDTO } from './dto/dto';
 
 @Injectable()
 export class CourseManagementService {
@@ -84,7 +82,10 @@ export class CourseManagementService {
     }
   }
 
-  async searchOneCourseManagement(searchDTO: any): Promise<any> {
+  async searchOneCourseManagement(searchDTO: {
+    courseNo: string;
+    courseSyllabus: boolean;
+  }): Promise<any> {
     try {
       const where = {
         courseNo: searchDTO.courseNo,
@@ -141,7 +142,7 @@ export class CourseManagementService {
   }
 
   async createCourseManagement(
-    requestDTO: CourseManagementDocument,
+    requestDTO: CourseManagement,
   ): Promise<CourseManagement> {
     try {
       return await this.model.create(requestDTO);
@@ -174,7 +175,7 @@ export class CourseManagementService {
           });
         }
       }
-      return TEXT_ENUM.Success;
+      return { message: TEXT_ENUM.Success };
     } catch (error) {
       throw error;
     }
@@ -493,7 +494,10 @@ export class CourseManagementService {
     }
   }
 
-  async deleteCourseManagement(id: string, requestDTO: any): Promise<any> {
+  async deleteCourseManagement(
+    id: string,
+    requestDTO: DeleteCourseManagementDTO,
+  ): Promise<any> {
     try {
       const course = await this.model.findByIdAndDelete(id);
       if (!course) {
@@ -532,7 +536,10 @@ export class CourseManagementService {
     }
   }
 
-  async deleteSectionManagement(params: any, requestDTO: any): Promise<any> {
+  async deleteSectionManagement(
+    params: any,
+    requestDTO: DeleteSectionManagementDTO,
+  ): Promise<any> {
     try {
       const updateCourse = await this.model.findByIdAndUpdate(
         params.id,

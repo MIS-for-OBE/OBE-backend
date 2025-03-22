@@ -5,6 +5,11 @@ import { User } from 'src/obe/user/schemas/user.schema';
 import { TQF3 } from 'src/obe/tqf3/schemas/tqf3.schema';
 import { TQF5 } from 'src/obe/tqf5/schemas/tqf5.schema';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  exampleAdmin,
+  exampleInstructor,
+  exampleStudent,
+} from 'src/common/example/example';
 
 @Schema()
 export class Score {
@@ -83,7 +88,7 @@ export class Section {
   @Prop({ required: true })
   sectionNo: number;
 
-  @ApiProperty({ example: 'CPE-2563', description: 'Curriculum information' })
+  @ApiProperty({ example: 'CPE-2563', description: 'Curriculum' })
   @Prop()
   curriculum: string;
 
@@ -98,19 +103,29 @@ export class Section {
   @Prop({ required: true, default: true })
   isActive: boolean;
 
-  @ApiProperty({ type: User, description: 'Instructor of the section' })
+  @ApiProperty({
+    type: User,
+    description: 'Instructor of the section',
+    example: exampleAdmin,
+  })
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   instructor: User;
 
   @ApiProperty({
     type: [User],
     description: 'Co-instructors of the section',
+    example: [exampleInstructor()],
   })
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   coInstructors: User[];
 
   @ApiProperty({
-    type: [{ student: { type: User }, scores: { type: [Score] } }],
+    type: [
+      {
+        student: { type: User, example: exampleStudent() },
+        scores: { type: [Score] },
+      },
+    ],
     description: 'Students of the section',
   })
   @Prop({
@@ -134,15 +149,26 @@ export class Section {
   @ApiProperty({
     description: 'Topic for the section',
     required: false,
+    example: null,
   })
   @Prop()
   topic: string;
 
-  @ApiProperty({ type: TQF3, description: 'TQF3' })
+  @ApiProperty({
+    type: TQF3,
+    description: 'TQF3',
+    required: false,
+    example: null,
+  })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF3' })
   TQF3: TQF3;
 
-  @ApiProperty({ type: TQF5, description: 'TQF5' })
+  @ApiProperty({
+    type: TQF5,
+    description: 'TQF5',
+    required: false,
+    example: null,
+  })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF5' })
   TQF5: TQF5;
 }
@@ -203,11 +229,11 @@ export class Course {
   @Prop()
   addFirstTime: boolean;
 
-  @ApiProperty({ type: TQF3, description: 'TQF3' })
+  @ApiProperty({ type: TQF3, description: 'TQF3', required: false })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF3' })
   TQF3: TQF3;
 
-  @ApiProperty({ type: TQF5, description: 'TQF5' })
+  @ApiProperty({ type: TQF5, description: 'TQF5', required: false })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'TQF5' })
   TQF5: TQF5;
 }

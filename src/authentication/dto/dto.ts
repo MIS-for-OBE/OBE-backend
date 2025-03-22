@@ -80,7 +80,7 @@ export class TokenDTO extends BaseDTO {
   @ApiProperty({
     description: 'User Info',
     type: User,
-    example: exampleInstructor,
+    example: exampleInstructor(true),
   })
   user: User;
 

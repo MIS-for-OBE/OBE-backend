@@ -1,19 +1,24 @@
-import { IsArray, IsBoolean, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 import { SearchDTO } from 'src/common/dto/search.dto';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CourseManagementSearchDTO extends SearchDTO {
-  @IsBoolean()
-  @Transform((transformFn) => {
-    if (transformFn.value === 'true') return true;
-    else return false;
+  @ApiProperty({
+    description: 'Search query string for course management',
+    required:false,
+    default: '',
   })
-  isPloMapping = false;
-
   @IsString()
   @Type(() => String)
-  search = '';
+  search: string = '';
 
+  @ApiProperty({
+    description:
+      'List of curriculum identifiers for filtering course management',
+    type: [String],
+    default: [],
+  })
   @IsArray()
   @Type(() => String)
   curriculum: string[] = [];

@@ -57,31 +57,33 @@ export const exampleStudent = (enrollCourse: boolean = false) => ({
     ],
   }),
 });
-export const exampleInstructor = (createCourse: boolean = false) => ({
+export const exampleInstructor = (resUser: boolean = false) => ({
   id: 'xxxxxxxxxxxxxxxx34cd',
   firstNameTH: 'สมชาย',
   lastNameTH: 'ใจดี',
   firstNameEN: 'Somchai',
   lastNameEN: 'Jaidee',
   email: 'somchai_j@cmu.ac.th',
-  ...(!createCourse && {
+  ...(resUser && {
     facultyCode: '06',
     role: ROLE.INSTRUCTOR,
     termsOfService: true,
   }),
 });
-export const exampleCurriculumAdmin = {
+export const exampleCurriculumAdmin = (resUser: boolean = false) => ({
   id: 'xxxxxxxxxxxxxxxx34ce',
   firstNameTH: 'มานะ',
   lastNameTH: 'ปิติ',
   firstNameEN: 'Mana',
   lastNameEN: 'Piti',
   email: 'mana_p@cmu.ac.th',
-  facultyCode: '06',
-  role: ROLE.CURRICULUM_ADMIN,
-  curriculums: ['CPE-2563', 'ISNE-2566'],
-  termsOfService: true,
-};
+  ...(resUser && {
+    facultyCode: '06',
+    role: ROLE.CURRICULUM_ADMIN,
+    curriculums: ['CPE-2563', 'ISNE-2566'],
+    termsOfService: true,
+  }),
+});
 export const exampleAdmin = {
   id: 'xxxxxxxxxxxxxxxx34cf',
   firstNameTH: 'วิชาญ',
@@ -94,8 +96,8 @@ export const exampleAdmin = {
   termsOfService: true,
 };
 export const exampleInstructorList = [
-  exampleInstructor,
-  exampleCurriculumAdmin,
+  exampleInstructor(),
+  exampleCurriculumAdmin(),
   exampleAdmin,
 ];
 
@@ -133,7 +135,7 @@ export const exampleResCreateCourse = {
       curriculum: 'CPE-2563',
       addFirstTime: true,
       isActive: true,
-      instructor: exampleInstructor(true),
+      instructor: exampleInstructor(),
       coInstructors: [],
       students: [],
       assignments: [],
@@ -152,13 +154,69 @@ export const exampleResCreateCourse = {
   id: 'xxxxxxxxxxxxxxxx9756',
 };
 
+export const exampleCreateCourseManagement = {
+  updatedYear: 2567,
+  updatedSemester: 2,
+  type: COURSE_TYPE.GENERAL,
+  courseNo: '261999',
+  courseName: 'Course CPE Mock',
+  sections: [{ curriculum: 'CPE-2563', sectionNo: 1 }],
+};
+export const exampleResCreateCourseManagement = {
+  updatedYear: 2567,
+  updatedSemester: 2,
+  courseNo: '261999',
+  courseName: 'Course CPE Mock',
+  type: COURSE_TYPE.GENERAL,
+  sections: [
+    {
+      sectionNo: 1,
+      curriculum: 'CPE-2563',
+      semester: [],
+      coInstructors: [],
+      isActive: true,
+      ploRequire: [],
+      id: 'xxxxxxxxxxxxxxxx82cb',
+    },
+  ],
+  ploRequire: [],
+  createdAt: '2025-03-22T13:54:36.540Z',
+  updatedAt: '2025-03-22T13:54:36.540Z',
+  id: 'xxxxxxxxxxxxxxxx82ca',
+};
+
+export const exampleMapPLO = [
+  {
+    id: 'xxxxxxxxxxxxxxxx82cb',
+    courseNo: '261999',
+    type: COURSE_TYPE.GENERAL,
+    ploRequire: [
+      {
+        plo: 'xxxxxxxxxxxxxxxxbde6',
+        curriculum: 'CPE-2563',
+        list: ['xxxxxxxxxxxxxxxx6b4d', 'xxxxxxxxxxxxxxxx6b51'],
+      },
+    ],
+  },
+];
+
+export const exampleEditCourseManagement = {
+  oldCourseNo: '261999',
+  courseNo: '261999',
+  courseName: 'CPE XXX',
+  descTH: 'เทส เทส',
+  descEN: 'test test',
+  year: 2567,
+  semester: 2,
+};
+
 const exampleEnrollCourse = {
   id: 'xxxxxxxxxxxxxxxx2d70',
   year: 2567,
   semester: 2,
   courseNo: '261999',
   courseName: 'Course CPE Mock',
-  type: 'General Education',
+  type: COURSE_TYPE.GENERAL,
   curriculum: 'CPE-2563',
   section: {
     sectionNo: 640,
