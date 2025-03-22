@@ -16,10 +16,11 @@ import { CourseService } from './course.service';
 import { Course } from './schemas/course.schema';
 import { CourseSearchDTO } from './dto/search.dto';
 import { Public } from 'src/auth/metadata/public.metadata';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Course')
 @Controller('/course')
+@ApiExtraModels(Course)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class CourseController {
   constructor(private service: CourseService) {}

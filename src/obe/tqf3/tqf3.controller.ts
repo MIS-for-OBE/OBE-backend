@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Param,
   Put,
   Query,
@@ -19,15 +20,36 @@ import * as fs from 'fs';
 import * as archiver from 'archiver';
 import { join } from 'path';
 import { Public } from 'src/auth/metadata/public.metadata';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  ApiErrorResponse,
+  ApiSuccessResponse,
+  ApiUnauthorizedErrorResponse,
+} from 'src/common/decorators/response.decorator';
+import { DESCRIPTION } from 'src/common/enum/text.enum';
+import { ERROR_ENUM } from 'src/common/enum/error.enum';
+import { exampleCourseReuseTQF3 } from 'src/common/example-response/example.response';
 
 @ApiTags('TQF3')
 @Controller('/tqf3')
+@ApiExtraModels(TQF3)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class TQF3Controller {
   constructor(private service: TQF3Service) {}
 
   @Get('reuse')
+  @ApiOperation({
+    summary: 'Get reused TQF3 for courses based on the search criteria',
+  })
+  @ApiSuccessResponse(null, { data: exampleCourseReuseTQF3 })
+  @ApiUnauthorizedErrorResponse()
   async getCourseReuseTQF3(
     @Query() searchDTO: any,
   ): Promise<ResponseDTO<any[]>> {
@@ -39,7 +61,22 @@ export class TQF3Controller {
   }
 
   @Put('reuse')
-  async reuseTQF3(@Body() requestDTO: any): Promise<ResponseDTO<TQF3>> {
+  @ApiOperation({ summary: 'Reuse TQF3 for a specific course' })
+  @ApiBody({
+    description: 'ID of the TQF3 that want to reuse and want to save',
+    required: true,
+    schema: {
+      properties: {
+        reuseId: { example: 'xxxxxxxxxxxxxxxx60f7' },
+        id: { example: 'xxxxxxxxxxxxxxxx60f8' },
+      },
+    },
+  })
+  @ApiSuccessResponse(TQF3)
+  @ApiUnauthorizedErrorResponse()
+  async reuseTQF3(
+    @Body() requestDTO: { reuseId: string; id: string },
+  ): Promise<ResponseDTO<TQF3>> {
     return this.service.reuseTQF3(requestDTO).then((result) => {
       const responseDTO = new ResponseDTO<TQF3>();
       responseDTO.data = result;
@@ -48,6 +85,25 @@ export class TQF3Controller {
   }
 
   @Put('/:id/:part')
+  @ApiOperation({ summary: 'Save data for a specific part of TQF3' })
+  @ApiQuery({
+    name: 'id',
+    description: 'ID of the TQF3',
+    required: true,
+  })
+  @ApiQuery({
+    name: 'part',
+    description: 'Part of the TQF3 that want to save',
+    required: true,
+  })
+  @ApiSuccessResponse(TQF3)
+  @ApiUnauthorizedErrorResponse()
+  @ApiErrorResponse(
+    HttpStatus.NOT_FOUND,
+    DESCRIPTION.NOT_FOUND,
+    ERROR_ENUM.NOT_FOUND,
+    'TQF3 not found',
+  )
   async saveEachPart(
     @Param() params: { id: string; part: string },
     @Body() requestDTO: any,
@@ -61,6 +117,8 @@ export class TQF3Controller {
 
   @Public()
   @Get('pdf')
+  @ApiOperation({ summary: 'Generate PDF for TQF3 data' })
+  @ApiOkResponse({ description: 'Get PDF TQF3' })
   async generatePDF(
     @Request() req,
     @Res() res: Response,

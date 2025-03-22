@@ -98,7 +98,7 @@ export class TQF3Service {
     }
   }
 
-  async reuseTQF3(requestDTO: any): Promise<TQF3> {
+  async reuseTQF3(requestDTO: { reuseId: string; id: string }): Promise<TQF3> {
     try {
       const [newTqf3] = await Promise.all([
         await this.model.findById(requestDTO.reuseId),
@@ -128,7 +128,7 @@ export class TQF3Service {
     try {
       const tqf3Document = await this.model.findById(params.id);
       if (!tqf3Document) {
-        throw new NotFoundException('TQF3 not found.');
+        throw new NotFoundException('TQF3 not found');
       }
 
       if (params.part === 'part2') {

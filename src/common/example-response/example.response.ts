@@ -1,20 +1,21 @@
 import { PLO } from 'src/obe/plo/schemas/plo.schema';
 import { ROLE } from '../enum/role.enum';
+import { TQF_STATUS } from '../enum/type.enum';
 
 export const exampleAcademicYearList = [
   {
-      "year": 2567,
-      "semester": 2,
-      "isActive": true,
-      "id": "xxxxxxxxxxxxxxxx810e"
+    year: 2567,
+    semester: 2,
+    isActive: true,
+    id: 'xxxxxxxxxxxxxxxx810e',
   },
   {
-      "year": 2567,
-      "semester": 1,
-      "isActive": false,
-      "id": "xxxxxxxxxxxxxxxxa45c"
-  }
-]
+    year: 2567,
+    semester: 1,
+    isActive: false,
+    id: 'xxxxxxxxxxxxxxxxa45c',
+  },
+];
 
 export const exampleStudent = {
   id: 'xxxxxxxxxxxxxxxx34cc',
@@ -259,3 +260,79 @@ export const exampleAllEnrollCourses = {
     },
   ],
 };
+
+export const exampleCourseReuseTQF3 = [
+  {
+    courseNo: '261336',
+    courseName: 'Computer Network Laboratory',
+    type: 'Field of Specialization',
+    sections: [
+      {
+        sectionNo: 1,
+        instructor: 'xxxxxxxxxxxxxxxx34ce',
+        coInstructors: ['xxxxxxxxxxxxxxxx34d5', 'xxxxxxxxxxxxxxxx5366'],
+        isActive: true,
+        students: [],
+        assignments: [],
+        id: 'xxxxxxxxxxxxxxxxfae7',
+      },
+      {
+        sectionNo: 701,
+        isActive: true,
+        instructor: 'xxxxxxxxxxxxxxxx34ce',
+        coInstructors: ['xxxxxxxxxxxxxxxx34d5', 'xxxxxxxxxxxxxxxx0b50'],
+        students: [],
+        assignments: [],
+        id: 'xxxxxxxxxxxxxxxxa16d',
+      },
+      {
+        sectionNo: 801,
+        instructor: 'xxxxxxxxxxxxxxxx34ce',
+        coInstructors: ['xxxxxxxxxxxxxxxx34d5', 'xxxxxxxxxxxxxxxx4180'],
+        isActive: true,
+        students: [],
+        assignments: [],
+        id: '66759f6a085c193c41dcfae8',
+      },
+    ],
+    TQF3: {
+      status: 'Done',
+      id: 'xxxxxxxxxxxxxxxx2133',
+    },
+    semester: 1,
+    year: 2567,
+    id: 'xxxxxxxxxxxxxxxx6082',
+  },
+  {
+    courseNo: '261999',
+    courseName: 'test 11111',
+    type: 'General Education',
+    sections: [
+      {
+        sectionNo: 1,
+        isActive: true,
+        instructor: 'xxxxxxxxxxxxxxxx5366',
+        coInstructors: ['xxxxxxxxxxxxxxxx0b50', 'xxxxxxxxxxxxxxxx4180'],
+        students: [],
+        assignments: [],
+        id: 'xxxxxxxxxxxxxxxx4383',
+      },
+      {
+        sectionNo: 4,
+        isActive: true,
+        instructor: 'xxxxxxxxxxxxxxxx0b50',
+        coInstructors: ['xxxxxxxxxxxxxxxx34ce'],
+        students: [],
+        assignments: [],
+        id: 'xxxxxxxxxxxxxxxxa8a1',
+      },
+    ],
+    TQF3: {
+      status: 'Done',
+      id: 'xxxxxxxxxxxxxxxx492d',
+    },
+    semester: 1,
+    year: 2567,
+    id: 'xxxxxxxxxxxxxxxxa8a4',
+  },
+];
