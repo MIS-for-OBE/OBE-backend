@@ -81,6 +81,12 @@ export class Part1TQF5Curriculum {
 
   @Prop()
   reviewingSLO: string;
+
+  @Prop()
+  recommendAbnormalScoreFactor: string;
+
+  @Prop()
+  recommendReviewingSLO: string;
 }
 
 export const Part1TQF5CurriculumSchema =
