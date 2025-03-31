@@ -436,8 +436,8 @@ export class CourseService {
           (course.TQF5 as any)._doc.oldRecommendation =
             oldRecomment?.TQF5?.part1?.list.map((item) => ({
               curriculum: item.curriculum,
-              recommendAbnormalScoreFactor: item.recommendAbnormalScoreFactor,
-              recommendReviewingSLO: item.recommendReviewingSLO,
+              abnormalScoreFactor: item.abnormalScoreFactor,
+              reviewingSLO: item.reviewingSLO,
             })) || [];
         }
         course.sections.forEach((section) => {
@@ -448,8 +448,8 @@ export class CourseService {
             (section.TQF5 as any)._doc.oldRecommendation =
               findTQF5?.part1?.list.map((item) => ({
                 curriculum: item.curriculum,
-                recommendAbnormalScoreFactor: item.recommendAbnormalScoreFactor,
-                recommendReviewingSLO: item.recommendReviewingSLO,
+                abnormalScoreFactor: item.abnormalScoreFactor,
+                reviewingSLO: item.reviewingSLO,
               })) || [];
           }
           section.students?.sort(
