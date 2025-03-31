@@ -128,6 +128,7 @@ export class ScoreController {
     @Body()
     requestDTO: {
       course: string;
+      topic: string;
       sectionNo: number;
       oldName: string;
       name: string;

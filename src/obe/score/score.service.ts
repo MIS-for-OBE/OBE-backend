@@ -170,6 +170,7 @@ export class ScoreService {
 
   async updateAssignment(requestDTO: {
     course: string;
+    topic: string;
     sectionNo: number;
     oldName: string;
     name: string;
@@ -178,6 +179,8 @@ export class ScoreService {
       const arrayFilters: any[] = [];
       if (requestDTO.sectionNo) {
         arrayFilters.push({ 'section.sectionNo': requestDTO.sectionNo });
+      } else if (requestDTO.topic) {
+        arrayFilters.push({ 'section.topic': requestDTO.topic });
       } else {
         arrayFilters.push({ 'section.assignments.name': requestDTO.oldName });
       }
@@ -229,7 +232,10 @@ export class ScoreService {
       const course = await this.courseModel.findById(requestDTO.course);
 
       course?.sections.forEach((section) => {
-        if (requestDTO.sectionNo && section.sectionNo != requestDTO.sectionNo) {
+        if (
+          (requestDTO.sectionNo && section.sectionNo != requestDTO.sectionNo) ||
+          (requestDTO.topic && section.topic != requestDTO.topic)
+        ) {
           return;
         }
         section.assignments = section.assignments.filter(
