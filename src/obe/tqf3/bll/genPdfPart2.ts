@@ -173,7 +173,10 @@ export const buildPart2Content = (
 
     doc
       .font(fontNormal)
-      .text(data.CourseDescriptionTha, { indent: 40, lineGap: 2 });
+      .text(data.CourseDescriptionTha ? data.CourseDescriptionTha : '-', {
+        indent: 40,
+        lineGap: 2,
+      });
 
     doc.moveDown(0.75);
   }

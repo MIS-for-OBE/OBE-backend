@@ -104,7 +104,7 @@ export const buildPart1Content = (
       grade,
       tqf5.gradingCriteria[grade.replace('+', 'plus')],
       gradeTotals[grade.replace('+', 'plus')],
-      percent === '0.00' ? '0' : percent,
+      percent ? (percent === '0.00' ? '0' : percent) : '-',
     ];
   });
 
