@@ -86,6 +86,8 @@ export class AcademicYearService {
               semester: academic.semester,
               courseNo: course.courseNo,
               courseName: course.courseName,
+              descTH: course.descTH,
+              descEN: course.descEN,
               type: course.type,
               sections: [],
             };

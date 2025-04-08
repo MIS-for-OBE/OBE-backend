@@ -197,14 +197,14 @@ export class Course {
     example: 'คำอธิบายรายวิชา',
     description: 'Description in Thai',
   })
-  @Prop()
+  @Prop({ required: true })
   descTH: string;
 
   @ApiProperty({
     example: 'Course description',
     description: 'Description in English',
   })
-  @Prop()
+  @Prop({ required: true })
   descEN: string;
 
   @ApiProperty({
