@@ -104,7 +104,11 @@ export const buildPart1Content = (
       grade,
       tqf5.gradingCriteria[grade.replace('+', 'plus')],
       gradeTotals[grade.replace('+', 'plus')],
-      percent ? (percent === '0.00' ? '0' : percent) : '-',
+      percent == null || isNaN(Number(percent)) || percent === ''
+        ? '-'
+        : percent === '0.00'
+          ? '0'
+          : percent,
     ];
   });
 
