@@ -308,6 +308,10 @@ export const buildPart2Content = (
     }
   }
 
+  if (doc.y > 650) {
+    doc.addPage();
+  }
+
   // Course content
   {
     doc
